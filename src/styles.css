@@ -1,0 +1,27 @@
+.toast-title {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.toast-message {
+    direction: rtl;
+    text-align: right;
+    font-size: 14px;
+}
+
+.toast-success {
+    background-color: #198754 !important;
+}
+
+.toast-error {
+    background-color: #dc3545 !important;
+}
+
+.toast-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.toast-info {
+    background-color: #0dcaf0 !important;
+}

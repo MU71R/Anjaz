@@ -1,0 +1,258 @@
+/* ===== الصفحة الرئيسية ===== */
+.page-container {
+  padding: 20px;
+  background-color: #f9fafc;
+  min-height: 100vh;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== العنوان والأزرار ===== */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.header-title h2 {
+  font-size: 24px;
+  margin: 0;
+  color: #1e1e2f;
+}
+
+.header-title p {
+  font-size: 14px;
+  color: #777;
+  margin-top: 5px;
+}
+
+.header-actions .btn {
+  margin-left: 10px;
+}
+
+/* ===== الأزرار ===== */
+.btn {
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn i {
+  margin-left: 6px;
+  margin-right: 0;
+}
+
+.btn-primary {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  color: #fff;
+}
+
+/* ===== الفلاتر ===== */
+.filters-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.search-input,
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 200px;
+}
+
+.reset-btn {
+  background: #f3f4f6;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== الجدول ===== */
+.table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table thead {
+  background-color: #f3f4f6;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 14px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* الأعمدة اليمنى (الإجراءات + الحالة) */
+.modern-table thead tr th:first-child,
+.modern-table thead tr th:nth-child(2),
+.modern-table tbody tr td:first-child,
+.modern-table tbody tr td:nth-child(2) {
+  text-align: right !important;
+  direction: rtl;
+}
+
+/* ترتيب الأزرار يمين */
+.action-buttons,
+td.d-flex {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+/* ===== أزرار الأيقونات ===== */
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.btn-icon.delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-icon.edit:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.btn-icon.toggle.active:hover {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.btn-icon.toggle.inactive:hover {
+  background: #fef3c7;
+  color: #ca8a04;
+}
+
+/* ===== الشارات ===== */
+.badge-active {
+  background: #dcfce7;
+  color: #16a34a;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.badge-inactive {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+/* ===== النصوص داخل الجدول ===== */
+.dept-name {
+  font-weight: 500;
+}
+
+.sector-name {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ===== النوافذ المنبثقة ===== */
+.modal-card {
+  width: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1050;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* اجعل كل الموديلات داخل التطبيق من اليمين لليسار */
+.modal-content {
+  direction: rtl;
+  text-align: right;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #495057;
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal-backdrop-custom {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.table-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ===== تحسين العرض للجوال ===== */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+}
