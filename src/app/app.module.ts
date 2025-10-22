@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-admin.component';
 import { AdministrationComponent } from './components/administration/administration.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { AdministrationComponent } from './components/administration/administrat
     LoginComponent,
     DashboardAdminComponent,
     AdministrationComponent,
+    SidebarComponent,
   ],
   imports: [
     BrowserModule,

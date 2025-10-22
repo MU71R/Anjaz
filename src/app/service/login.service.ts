@@ -49,11 +49,11 @@ export class LoginService {
               if (decoded) {
                 const user: User = {
                   _id: decoded.userId,
-                  fullname: decoded.name ?? '', 
-                  username: decoded.email ?? '', 
+                  fullname: decoded.name ?? '',
+                  username: decoded.email ?? '',
                   role: decoded.role ?? 'user',
-                  sector: '', 
-                  status: 'active', 
+                  sector: '',
+                  status: 'active',
                 };
                 this.setUser(user);
               }

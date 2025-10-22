@@ -1,0 +1,56 @@
+<!-- زر إظهار القائمة على الشاشات الصغيرة -->
+<button class="toggle-btn d-lg-none" (click)="isSidebarOpen = !isSidebarOpen" aria-label="s">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- القائمة الجانبية -->
+<aside class="sidebar shadow-sm" [class.open]="isSidebarOpen">
+    <div class="sidebar-header text-center border-bottom pb-3">
+        <div class="logo-section mb-2">
+            <i class="fa-solid fa-mortarboard fa-2x text-primary"></i>
+        </div>
+        <h5 class="fw-bold text-dark">لوحة التحكم</h5>
+        <span class="badge bg-primary">مسؤول النظام</span>
+    </div>
+
+    <nav class="sidebar-nav mt-4 flex-grow-1">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a routerLink="/dashboard-admin" routerLinkActive="active" class="nav-link">
+                    <i class="fa-solid fa-house me-2"></i> الرئيسية
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-plus me-2"></i> إضافة إنجاز
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-trophy me-2"></i> إنجازاتي
+                </a>
+            </li>
+            <li class="nav-item">
+                <a routerLink="/administration" routerLinkActive="active" class="nav-link">
+                    <i class="fa-solid fa-users me-2"></i> إدارة المستخدمين
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-building me-2"></i> إدارة الأقسام والمعايير
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-gear me-2"></i> الإعدادات
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer border-top pt-3 mt-auto text-center">
+        <a (click)="logout()" class="nav-link text-danger fw-semibold">
+            <i class="fa-solid fa-right-from-bracket me-2"></i> تسجيل الخروج
+        </a>
+    </div>
+</aside>

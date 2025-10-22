@@ -1,11 +1,31 @@
-/* ===== الصفحة الرئيسية ===== */
-.page-container {
-  padding: 20px;
-  background-color: #f9fafc;
+/* ===== تخطيط الصفحة مع الـ Sidebar ===== */
+.page-layout {
+  display: flex;
   min-height: 100vh;
+  background-color: #f9fafc;
   font-family: 'Cairo', sans-serif;
   direction: rtl;
   text-align: right;
+}
+
+app-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background-color: #1e3a8a;
+  color: #fff;
+  min-height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.page-content {
+  flex: 1;
+  padding: 30px;
+  margin-right: 250px;
+  /* لإفساح المجال للـ sidebar */
+  background-color: #f9fafc;
 }
 
 /* ===== العنوان والأزرار ===== */
@@ -33,7 +53,7 @@
   margin-left: 10px;
 }
 
-/* ===== الأزرار ===== */
+/* ===== الأزرار العامة ===== */
 .btn {
   padding: 8px 15px;
   border-radius: 8px;
@@ -93,40 +113,34 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.modern-table {
+.table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.modern-table thead {
+.table thead {
   background-color: #f3f4f6;
 }
 
-.modern-table th,
-.modern-table td {
+.table th,
+.table td {
   padding: 14px;
   text-align: center;
   font-size: 14px;
 }
 
-/* الأعمدة اليمنى (الإجراءات + الحالة) */
-.modern-table thead tr th:first-child,
-.modern-table thead tr th:nth-child(2),
-.modern-table tbody tr td:first-child,
-.modern-table tbody tr td:nth-child(2) {
+.table th.text-end,
+.table td.text-end {
   text-align: right !important;
-  direction: rtl;
 }
 
-/* ترتيب الأزرار يمين */
-.action-buttons,
-td.d-flex {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
+/* ===== الأزرار داخل الجدول ===== */
+.table-actions {
+  display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
-/* ===== أزرار الأيقونات ===== */
 .btn-icon {
   background: none;
   border: none;
@@ -136,6 +150,14 @@ td.d-flex {
   border-radius: 50%;
   transition: 0.2s;
 }
+
+.modal-header .btn-close {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 15;
+}
+
 
 .btn-icon.delete:hover {
   background: #fee2e2;
@@ -184,7 +206,7 @@ td.d-flex {
   font-size: 13px;
 }
 
-/* ===== النوافذ المنبثقة ===== */
+/* ===== النوافذ المنبثقة (Modal) ===== */
 .modal-card {
   width: 400px;
   position: fixed;
@@ -197,7 +219,6 @@ td.d-flex {
   padding: 20px;
 }
 
-/* اجعل كل الموديلات داخل التطبيق من اليمين لليسار */
 .modal-content {
   direction: rtl;
   text-align: right;
@@ -205,13 +226,15 @@ td.d-flex {
 
 .password-toggle {
   position: absolute;
-  top: 50%;
+  top: 70%;
   left: 10px;
   transform: translateY(-50%);
   cursor: pointer;
   font-size: 1.2rem;
   color: #495057;
+  z-index: 2;
 }
+
 
 .modal-backdrop-custom {
   position: fixed;
@@ -223,18 +246,25 @@ td.d-flex {
   z-index: 1040;
 }
 
-.modal-backdrop-custom {
-  background-color: rgba(0, 0, 0, 0.5);
+/* ===== أزرار داخل المودال ===== */
+.modal-footer .btn {
+  min-width: 80px;
 }
-
-.table-actions button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 
 /* ===== تحسين العرض للجوال ===== */
+@media (max-width: 992px) {
+  app-sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .page-content {
+    margin-right: 0;
+    padding: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .header-section {
     flex-direction: column;

@@ -3,6 +3,7 @@ import { AdministrationService } from '../../service/user.service';
 import { User, Sector } from '../../model/user';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-administration',
   templateUrl: './administration.component.html',
@@ -12,51 +13,67 @@ export class AdministrationComponent implements OnInit {
   users: User[] = [];
   sectors: Sector[] = [];
   filteredList: User[] = [];
-  activeTab: 'users' | 'sectors' | 'departments' = 'users';
+  activeTab: 'users' | 'sectors' = 'users';
+
   searchTerm = '';
   selectedSector = '';
-  showPassword: boolean = false;
-  newSector: Sector = { sector: '' };
+
+  // ====== MODALS CONTROL ======
+  showAddDepartmentModal = false;
+  showEditUserModal = false;
   showSectorForm = false;
-  selectedUser: Partial<User> = {
-    _id: '',
-    username: '',
+  showPassword = false;
+
+  // ====== DATA MODELS ======
+  newDepartment: Partial<User> & { _id?: string } = {
     fullname: '',
+    username: '',
     password: '',
     role: 'user',
     sector: '',
-    status: 'active',
   };
-  newDepartment = {
-    _id: '',
-    fullname: '',
-    username: '',
-    password: '',
-    role: '',
-    sector: '',
-  };
-  showDepartmentForm = false;
+
+  selectedUser: Partial<User> & { _id?: string } = {};
+  newSector: Sector = { _id: '', sector: '' };
 
   constructor(private adminService: AdministrationService) {}
 
   ngOnInit(): void {
-    this.loadUsers();
     this.loadSectors();
+    this.loadUsers();
   }
 
+  // =================== USERS ===================
   loadUsers(): void {
     this.adminService.getAllUsers().subscribe({
       next: (data) => {
-        this.users = data
+        const usersArray = Array.isArray(data)
+          ? data
+          : (data as { data: User[] }).data;
+        this.users = (usersArray || [])
           .filter((u) => u.username && u.fullname)
-          .map((u) => ({
-            _id: u._id,
-            fullname: u.fullname || '---',
-            username: u.username || '---',
-            role: u.role || 'user',
-            sector: u.sector || '---',
-            status: u.status || 'inactive',
-          }));
+          .map((u) => {
+            let sectorId = '';
+            let sectorName = '---';
+            if (typeof u.sector === 'string') {
+              sectorId = u.sector;
+              const found = this.sectors.find((s) => s._id === sectorId);
+              if (found) sectorName = found.sector;
+            } else if (u.sector && typeof u.sector === 'object') {
+              const sec = u.sector as Sector;
+              sectorId = sec._id || '';
+              sectorName = sec.sector || '---';
+            }
+            return {
+              _id: u._id,
+              fullname: u.fullname,
+              username: u.username,
+              role: u.role,
+              sector: sectorId,
+              sectorName,
+              status: u.status,
+            };
+          });
         this.applyFilters();
       },
       error: (err: HttpErrorResponse) =>
@@ -64,178 +81,157 @@ export class AdministrationComponent implements OnInit {
     });
   }
 
-  applyFilters(): void {
-    this.filteredList = this.users.filter((user) => {
-      const matchesSector = this.selectedSector
-        ? user.sector === this.selectedSector
-        : true;
-      const matchesName = this.searchTerm
-        ? (user.fullname || '')
-            .toLowerCase()
-            .includes(this.searchTerm.toLowerCase())
-        : true;
-      return matchesSector && matchesName;
-    });
-  }
-
-  resetFilters(): void {
-    this.selectedSector = '';
-    this.searchTerm = '';
-    this.applyFilters();
-  }
-
   toggleStatus(user: User): void {
     if (!user._id) return;
-    const newStatus: 'active' | 'inactive' =
-      user.status === 'active' ? 'inactive' : 'active';
-    this.adminService.updateDepartmentStatus(user._id, newStatus).subscribe({
+    const newStatus = user.status === 'active' ? 'inactive' : 'active';
+    this.adminService.updateUserStatus(user._id, newStatus).subscribe({
       next: () => (user.status = newStatus),
       error: (err: HttpErrorResponse) =>
-        console.error('خطأ في تحديث الحالة:', err.message),
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ في تحديث الحالة',
+          text: err.message,
+        }),
     });
   }
 
-  openEditUserModal(user: User): void {
+  openAddDepartment(): void {
+    this.newDepartment = {
+      fullname: '',
+      username: '',
+      password: '',
+      role: 'user',
+      sector: '',
+    };
+    this.showAddDepartmentModal = true;
+  }
+
+  closeAddDepartment(): void {
+    this.showAddDepartmentModal = false;
+  }
+
+  openEditUser(user: User): void {
     this.selectedUser = { ...user };
-    const modalElement = document.getElementById('editUserModal');
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
+    this.showEditUserModal = true;
+  }
+
+  closeEditUser(): void {
+    this.selectedUser = {};
+    this.showEditUserModal = false;
   }
 
   confirmEditUser(): void {
-    if (!this.selectedUser._id || !this.selectedUser.fullname?.trim()) return;
-
-    this.adminService
-      .updateUser(this.selectedUser._id, {
-        fullname: this.selectedUser.fullname.trim(),
-      })
-      .subscribe({
-        next: (updatedUser) => {
-          const target = this.users.find(
-            (u) => u._id === this.selectedUser._id
-          );
-          if (target) target.fullname = updatedUser.fullname;
-
-          // عرض إشعار نجاح
-          Swal.fire({
-            icon: 'success',
-            title: 'تم تعديل المستخدم بنجاح',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-          this.selectedUser = { _id: '' };
-        },
-        error: (err: HttpErrorResponse) =>
-          Swal.fire({
-            icon: 'error',
-            title: 'حدث خطأ أثناء تعديل المستخدم',
-            text: err.message,
-          }),
+    if (!this.selectedUser._id) return;
+    const { fullname, username, role, sector } = this.selectedUser;
+    if (!fullname?.trim() || !username?.trim() || !role || !sector) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'املأ جميع الحقول المطلوبة قبل الحفظ',
       });
+      return;
+    }
+    const payload: Partial<User> = {
+      fullname: fullname.trim(),
+      username: username.trim(),
+      role,
+      status: this.selectedUser.status,
+      sector: typeof sector === 'string' ? sector : (sector as Sector)?._id,
+    };
+    this.adminService.updateUser(this.selectedUser._id, payload).subscribe({
+      next: () => {
+        const index = this.users.findIndex(
+          (u) => u._id === this.selectedUser._id
+        );
+        if (index !== -1)
+          this.users[index] = { ...this.users[index], ...payload };
+        this.applyFilters();
+        Swal.fire({
+          icon: 'success',
+          title: 'تم تعديل المستخدم بنجاح',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        this.closeEditUser();
+      },
+      error: (err: HttpErrorResponse) =>
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ أثناء تعديل المستخدم',
+          text: err.message,
+        }),
+    });
   }
 
   deleteUser(user: User): void {
     if (!user._id) return;
-
     Swal.fire({
       title: `هل أنت متأكد من حذف المستخدم ${user.fullname}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
       confirmButtonText: 'نعم، احذفه',
       cancelButtonText: 'إلغاء',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.deleteUser(user._id).subscribe({
-          next: () => {
-            this.users = this.users.filter((u) => u._id !== user._id);
-            this.applyFilters();
-            Swal.fire({
-              icon: 'success',
-              title: 'تم حذف المستخدم بنجاح',
-              timer: 2000,
-              showConfirmButton: false,
-            });
-          },
-          error: (err: HttpErrorResponse) =>
-            Swal.fire({
-              icon: 'error',
-              title: 'حدث خطأ',
-              text: err.message,
-            }),
-        });
-      }
-    });
-  }
-
-  loadSectors(): void {
-    this.adminService.getAllSectors().subscribe({
-      next: (data) => {
-        this.sectors = data
-          .filter((s) => s.sector)
-          .map((s) => ({ _id: s._id, sector: s.sector }));
-      },
-      error: (err: HttpErrorResponse) =>
-        console.error('خطأ في جلب القطاعات:', err.message),
-    });
-  }
-
-  openSectorForm(): void {
-    this.newSector = { sector: '' };
-    this.showSectorForm = true;
-  }
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-
-  closeSectorForm(): void {
-    this.showSectorForm = false;
-    this.newSector = { sector: '' };
-  }
-
-  saveSector(): void {
-    if (!this.newSector.sector.trim()) return;
-
-    if (this.newSector._id) {
-      this.adminService
-        .updateSector(this.newSector._id, { sector: this.newSector.sector })
-        .subscribe({
-          next: (res) => {
-            const index = this.sectors.findIndex(
-              (s) => s._id === this.newSector._id
-            );
-            if (index !== -1) this.sectors[index] = res;
-            this.closeSectorForm();
-            Swal.fire({
-              icon: 'success',
-              title: 'تم تعديل القطاع بنجاح',
-              timer: 2000,
-              showConfirmButton: false,
-            });
-          },
-          error: (err: HttpErrorResponse) =>
-            console.error('خطأ في تعديل القطاع:', err.message),
-        });
-    } else {
-      this.adminService.addSector(this.newSector).subscribe({
-        next: (res) => {
-          this.sectors.push(res);
-          this.closeSectorForm();
+    }).then((res) => {
+      if (!res.isConfirmed) return;
+      this.adminService.deleteUser(user._id!).subscribe({
+        next: () => {
+          this.users = this.users.filter((u) => u._id !== user._id);
+          this.applyFilters();
           Swal.fire({
             icon: 'success',
-            title: 'تمت إضافة القطاع بنجاح',
+            title: 'تم حذف المستخدم',
             timer: 2000,
             showConfirmButton: false,
           });
         },
         error: (err: HttpErrorResponse) =>
-          console.error('خطأ في إضافة القطاع:', err.message),
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ أثناء الحذف',
+            text: err.message,
+          }),
       });
-    }
+    });
+  }
+
+  applyFilters(): void {
+    this.filteredList = this.users.filter((user) => {
+      const matchSector = this.selectedSector
+        ? user.sector === this.selectedSector
+        : true;
+      const matchName = this.searchTerm
+        ? user.fullname?.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true;
+      return matchSector && matchName;
+    });
+  }
+
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.selectedSector = '';
+    this.applyFilters();
+  }
+
+  // =================== SECTORS ===================
+  loadSectors(): void {
+    this.adminService.getAllSectors().subscribe({
+      next: (res) => {
+        const sectorsData = (res as any).data || res;
+        this.sectors = (sectorsData || [])
+          .filter((s: Sector) => s.sector)
+          .map((s: Sector) => ({ _id: s._id, sector: s.sector }));
+      },
+      error: (err: HttpErrorResponse) =>
+        Swal.fire({
+          icon: 'error',
+          title: 'خطأ في جلب القطاعات',
+          text: err.message,
+        }),
+    });
+  }
+
+  openSectorForm(): void {
+    this.newSector = { _id: '', sector: '' };
+    this.showSectorForm = true;
   }
 
   editSector(sector: Sector): void {
@@ -243,115 +239,132 @@ export class AdministrationComponent implements OnInit {
     this.showSectorForm = true;
   }
 
+  closeSectorForm(): void {
+    this.showSectorForm = false;
+    this.newSector = { _id: '', sector: '' };
+  }
+
+  saveSector(): void {
+    if (!this.newSector.sector?.trim()) {
+      Swal.fire({ icon: 'warning', title: 'اسم القطاع مطلوب' });
+      return;
+    }
+    const payload = { sector: this.newSector.sector.trim() };
+    if (this.newSector._id) {
+      this.adminService.updateSector(this.newSector._id, payload).subscribe({
+        next: () => {
+          this.closeSectorForm();
+          this.loadSectors();
+          this.loadUsers();
+        },
+        error: (err: HttpErrorResponse) =>
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ في تعديل القطاع',
+            text: err.message,
+          }),
+      });
+    } else {
+      this.adminService.addSector(payload as Sector).subscribe({
+        next: () => {
+          this.closeSectorForm();
+          this.loadSectors();
+        },
+        error: (err: HttpErrorResponse) =>
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ أثناء إضافة القطاع',
+            text: err.message,
+          }),
+      });
+    }
+  }
+
   deleteSector(id?: string): void {
     if (!id) return;
-
     Swal.fire({
       title: 'هل أنت متأكد؟',
-      text: 'لن تتمكن من التراجع بعد حذف هذا القطاع!',
+      text: 'لن تتمكن من التراجع بعد الحذف!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'نعم، احذفه!',
+      confirmButtonText: 'نعم، احذفه',
       cancelButtonText: 'إلغاء',
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.deleteSector(id).subscribe({
-          next: () => {
-            this.loadSectors();
-            Swal.fire({
-              icon: 'success',
-              title: 'تم الحذف!',
-              text: 'تم حذف القطاع بنجاح.',
-              timer: 2000,
-              showConfirmButton: false,
-            });
-          },
-          error: (err: HttpErrorResponse) =>
-            Swal.fire({
-              icon: 'error',
-              title: 'خطأ',
-              text: err.message || 'حدث خطأ أثناء حذف القطاع',
-            }),
-        });
-      }
+    }).then((res) => {
+      if (!res.isConfirmed) return;
+      this.adminService.deleteSector(id).subscribe({
+        next: () => {
+          this.loadSectors();
+          this.loadUsers();
+        },
+        error: (err: HttpErrorResponse) =>
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ في الحذف',
+            text: err.message,
+          }),
+      });
     });
   }
 
-  openDepartmentForm(): void {
-    this.newDepartment = {
-      _id: '',
-      fullname: '',
-      username: '',
-      password: '',
-      role: '',
-      sector: '',
-    };
-    this.showDepartmentForm = true;
-  }
-
-  closeDepartmentForm(): void {
-    this.showDepartmentForm = false;
-    this.newDepartment = {
-      _id: '',
-      fullname: '',
-      username: '',
-      password: '',
-      role: '',
-      sector: '',
-    };
+  // =================== DEPARTMENTS/USERS ===================
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   validatePassword(password: string): boolean {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-    return regex.test(password);
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
   }
 
   saveDepartment(): void {
     const { fullname, username, password, role, sector } = this.newDepartment;
-
-    if (!fullname || !username || !password || !role || !sector) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'يجب ملء جميع الحقول المطلوبة',
-      });
+    if (!fullname?.trim()) {
+      Swal.fire({ icon: 'warning', title: 'الاسم الكامل مطلوب' });
       return;
     }
-
+    if (!username?.trim()) {
+      Swal.fire({ icon: 'warning', title: 'اسم المستخدم مطلوب' });
+      return;
+    }
+    if (!password) {
+      Swal.fire({ icon: 'warning', title: 'كلمة المرور مطلوبة' });
+      return;
+    }
     if (!this.validatePassword(password)) {
       Swal.fire({
         icon: 'warning',
         title: 'كلمة المرور ضعيفة',
-        html: `يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتحتوي على:<br>
-             - حرف كبير واحد على الأقل<br>
-             - حرف صغير واحد على الأقل<br>
-             - رقم واحد<br>
-             - حرف خاص واحد`,
+        html: `<ul style="text-align:right;"><li>8 أحرف على الأقل</li><li>حرف كبير واحد على الأقل</li><li>حرف صغير واحد على الأقل</li><li>رقم واحد على الأقل</li><li>رمز خاص واحد على الأقل</li></ul>`,
       });
       return;
     }
+    if (!role) {
+      Swal.fire({ icon: 'warning', title: 'اختر الدور' });
+      return;
+    }
+    if (!sector) {
+      Swal.fire({ icon: 'warning', title: 'اختر القطاع' });
+      return;
+    }
 
-    const departmentData = {
-      fullname,
-      username,
-      password,
-      role: role as 'user' | 'admin',
-      sector,
-    };
-
-    this.adminService.addDepartment(departmentData).subscribe({
-      next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'تمت إضافة القسم بنجاح',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        this.closeDepartmentForm();
-        this.loadUsers();
-      },
-      error: (err: HttpErrorResponse) =>
-        console.error('خطأ في إضافة القسم:', err.message),
-    });
+    this.adminService
+      .addUser({ ...this.newDepartment, sector } as User)
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'تمت الإضافة بنجاح',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          this.closeAddDepartment();
+          this.loadUsers();
+        },
+        error: (err: HttpErrorResponse) =>
+          Swal.fire({
+            icon: 'error',
+            title: 'خطأ أثناء الإضافة',
+            text: err.message,
+          }),
+      });
   }
 }

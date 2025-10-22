@@ -1,95 +1,28 @@
 <div class="dashboard-container">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">
-          <i class="fa-solid fa-mortarboard"></i>
-        </div>
-        <h3 class="logo-text">الرئيسية</h3>
-      </div>
-      <div class="user-badge">
-        <span class="badge bg-primary">مسؤول نظام</span>
-      </div>
-    </div>
+  <app-sidebar></app-sidebar>
 
-    <nav class="sidebar-nav">
-      <ul class="nav-list">
-        <li class="nav-item active">
-          <a href="#" class="nav-link">
-            <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fa-solid fa-plus"></i>
-            <span>إضافة إنجاز</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fa-solid fa-trophy"></i>
-            <span>إنجازاتي</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/administration']">
-            <i class="fa-solid fa-users"></i>
-            <span>إدارة المستخدمين</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fa-solid fa-building"></i>
-            <span>إدارة الأقسام والمعايير</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="fa-solid fa-gear"></i>
-            <span>الإعدادات</span>
-          </a>
-        </li>
-      </ul>
-
-      <div class="sidebar-footer">
-        <a href="#" class="nav-link logout-link">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>تسجيل الخروج</span>
-        </a>
-      </div>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
   <main class="main-content">
     <!-- TOP HEADER -->
-  <header class="top-header">
-  <div class="header-left">
-    <div class="user-info">
-      <h5 class="user-name">أحمد محمد العلي</h5>
-      <p class="user-role">مسؤول نظام - قسم العلاقات العامة</p>
-    </div>
-  </div>
-  <div class="header-right">
-    <!-- أيقونة الإشعارات -->
-    <div class="notification">
-      <i class="fa-solid fa-bell"></i>
-      <span class="badge">3</span>
-    </div>
+    <header class="top-header">
+      <div class="header-left">
+        <div class="user-info">
+          <h5 class="user-name">أحمد محمد العلي</h5>
+          <p class="user-role">مسؤول نظام - قسم العلاقات العامة</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="notification">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge">3</span>
+        </div>
+        <button class="add-btn">
+          <i class="fa-solid fa-plus"></i>
+          إضافة إنجاز جديد
+        </button>
+      </div>
+    </header>
 
-    <!-- زر إضافة إنجاز جديد -->
-    <button class="add-btn">
-      <i class="fa-solid fa-plus"></i>
-      إضافة إنجاز جديد
-    </button>
-  </div>
-  </header>
-
-
-
-    <!-- STATISTICS CARDS -->
+    <!-- باقي محتوى الإحصائيات والإنجازات كما هو -->
     <section class="stats-section">
       <div class="stats-grid">
         <div class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.colorClass">
@@ -104,87 +37,71 @@
       </div>
     </section>
 
-   <!-- FILTER BAR -->
-<section class="filter-bar">
-  <div class="filter-title">
-    <i class="fa-solid fa-filter"></i>
-    <span>تصفية الإنجازات</span>
-  </div>
+    <section class="filter-bar">
+      <div class="filter-title">
+        <i class="fa-solid fa-filter"></i>
+        <span>تصفية الإنجازات</span>
+      </div>
 
-  <div class="filter-controls">
-    <!-- مربع البحث -->
-    <div class="search-box">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="ابحث عن الإنجاز..." />
-    </div>
-
-    <!-- قائمة الحالات -->
-    <!-- قائمة الحالات -->
-    <select title="اختيار حالة الإنجاز">
-      <option>جميع الحالات</option>
-      <option>معتمد</option>
-      <option>قيد المراجعة</option>
-      <option>مرفوض</option>
-    </select>
-    
-    <!-- قائمة الأقسام -->
-    <select title="اختيار القسم">
-      <option>جميع الأقسام</option>
-      <option>كلية التربية</option>
-      <option>كلية الهندسة</option>
-      <option>كلية الطب</option>
-    </select>
-
-
-    <!-- زر إعادة تعيين -->
-    <button class="reset-btn">
-      <i class="fa-solid fa-rotate-right"></i>
-      إعادة تعيين
-    </button>
-  </div>
-</section>
-
-
-    <!-- RECENT ACHIEVEMENTS -->
-<section class="achievements-section">
-  <div class="section-card">
-    <div class="section-header">
-      <h4 class="section-title">الإنجازات الأخيرة</h4>
-      <a href="#" class="view-all-link">عرض الكل</a>
-    </div>
-
-    <div class="achievements-list">
-      <div class="achievement-item" *ngFor="let achievement of achievements">
-        <div class="achievement-content">
-          <!-- العنوان -->
-          <h5 class="achievement-title">{{ achievement.title }}</h5>
-
-          <!-- اسم المنجز + القسم + التاريخ -->
-          <div class="achievement-meta">
-            <span class="author">{{ achievement.author }}</span>
-            <span class="dot">•</span>
-            <span class="department">{{ achievement.department }}</span>
-            <span class="dot">•</span>
-            <span class="date">{{ achievement.date }}</span>
-          </div>
-
-          <!-- التصنيف -->
-          <div class="achievement-category">
-            {{ achievement.categoryMain }} 
-            <span class="arrow">←</span> 
-            {{ achievement.categorySub }}
-          </div>
+      <div class="filter-controls">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="ابحث عن الإنجاز..." />
         </div>
 
-        <!-- الحالة -->
-        <div class="achievement-status">
-          <span class="status-badge" [ngClass]="achievement.statusClass">
-            {{ achievement.statusText }}
-          </span>
+        <select title="اختيار حالة الإنجاز">
+          <option>جميع الحالات</option>
+          <option>معتمد</option>
+          <option>قيد المراجعة</option>
+          <option>مرفوض</option>
+        </select>
+
+        <select title="اختيار القسم">
+          <option>جميع الأقسام</option>
+          <option>كلية التربية</option>
+          <option>كلية الهندسة</option>
+          <option>كلية الطب</option>
+        </select>
+
+        <button class="reset-btn">
+          <i class="fa-solid fa-rotate-right"></i>
+          إعادة تعيين
+        </button>
+      </div>
+    </section>
+
+    <section class="achievements-section">
+      <div class="section-card">
+        <div class="section-header">
+          <h4 class="section-title">الإنجازات الأخيرة</h4>
+          <a href="#" class="view-all-link">عرض الكل</a>
+        </div>
+
+        <div class="achievements-list">
+          <div class="achievement-item" *ngFor="let achievement of achievements">
+            <div class="achievement-content">
+              <h5 class="achievement-title">{{ achievement.title }}</h5>
+              <div class="achievement-meta">
+                <span class="author">{{ achievement.author }}</span>
+                <span class="dot">•</span>
+                <span class="department">{{ achievement.department }}</span>
+                <span class="dot">•</span>
+                <span class="date">{{ achievement.date }}</span>
+              </div>
+              <div class="achievement-category">
+                {{ achievement.categoryMain }}
+                <span class="arrow">←</span>
+                {{ achievement.categorySub }}
+              </div>
+            </div>
+            <div class="achievement-status">
+              <span class="status-badge" [ngClass]="achievement.statusClass">
+                {{ achievement.statusText }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
- </section>
+    </section>
   </main>
 </div>

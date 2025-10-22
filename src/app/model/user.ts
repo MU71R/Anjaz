@@ -4,18 +4,21 @@ export interface LoginCredentials {
 }
 
 export interface User {
-  _id: string;
+  _id?: string;
   username: string;
-  fullname: string; 
+  fullname: string;
   role: 'admin' | 'user' | string;
   sector: string;
-  status: 'active' | 'inactive'; 
+  status?: 'active' | 'inactive';
+  sectorName?: string; 
   department?: string;
   password?: string;
 }
 
 export interface LoginResponse {
-  token: string;
+  success: boolean;
+  message?: string;
+  token?: string;
   user?: User;
 }
 
@@ -41,5 +44,9 @@ export interface Department {
 export interface Sector {
   _id?: string;
   sector: string;
+}
+
+export interface addSector{
+  sector : string
 }
 
