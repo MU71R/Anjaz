@@ -114,12 +114,23 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
     this.criteriaService.getAllSectors().subscribe({
       next: (response) => {
+        console.log('Sectors API Response:', response); // إضافة للتصحيح
         if (response.success) {
           this.sectors = response.data;
+          console.log('Sectors loaded:', this.sectors); // إضافة للتصحيح
+          console.log('Number of sectors:', this.sectors.length); // إضافة للتصحيح
+
+          // تحقق من هيكل البيانات
+          if (this.sectors.length > 0) {
+            console.log('First sector sample:', this.sectors[0]);
+          }
+        } else {
+          console.log('Sectors response not successful:', response);
         }
       },
       error: (error) => {
         console.error('Error loading sectors:', error);
+        console.error('Error details:', error.error);
         Swal.fire({
           title: 'خطأ',
           text: 'حدث خطأ في تحميل القطاعات',
@@ -131,6 +142,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
     this.criteriaService.getAllDepartments().subscribe({
       next: (departments) => {
+        console.log('Departments loaded:', departments); // إضافة للتصحيح
         this.departments = departments;
         this.isLoadingSectorsDepts = false;
       },
@@ -145,6 +157,31 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         this.isLoadingSectorsDepts = false;
       },
     });
+  }
+
+  // أضف هذه الدالة في الـ component
+  getSectorDisplayName(sector: any): string {
+    if (!sector) return 'غير محدد';
+
+    // إذا كان القطاع كائن عادي
+    if (sector.name) return sector.name;
+
+    // إذا كان القطاع من نوع مختلف
+    if (sector.sectorName) return sector.sectorName;
+    if (sector.title) return sector.title;
+    if (sector.sector) return sector.sector;
+
+    return 'قطاع بدون اسم';
+  }
+
+  getSectorId(sector: any): string {
+    if (!sector) return '';
+
+    // إذا كان القطاع كائن عادي
+    if (sector._id) return sector._id;
+    if (sector.id) return sector.id;
+
+    return '';
   }
 
   // ---------- Helpers ----------
@@ -223,11 +260,20 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
   }
 
   // ---------- Main criterion modals & actions ----------
+  // ---------- Main criterion modals & actions ----------
   openMainModal(edit?: MainCriteria) {
+    // إعادة تحميل القطاعات والأقسام للتأكد من أنها محدثة
+    this.loadSectorsAndDepartments();
+
+    console.log('Opening main modal, sectors:', this.sectors);
+    console.log('Opening main modal, departments:', this.departments);
+
     if (edit) {
       this.editingMain = { ...edit };
       this.mainName = edit.name;
       this.mainLevel = edit.level;
+
+      console.log('Editing main criteria:', edit);
 
       // معالجة sector سواء كان string أو object
       if (edit.sector) {
@@ -250,6 +296,13 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       } else {
         this.mainDeptId = '';
       }
+
+      console.log(
+        'After processing - Sector ID:',
+        this.mainSectorId,
+        'Dept ID:',
+        this.mainDeptId
+      );
     } else {
       this.editingMain = null;
       this.mainName = '';
@@ -302,7 +355,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     this.isSubmitting = true;
 
     if (this.editingMain) {
-      // بناء الـ request body بشكل صحيح
+      // تحديث معيار موجود
       const updateData: any = {
         id: this.editingMain._id,
         name: name,
@@ -312,7 +365,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       // إضافة الحقول بناءً على المستوى
       if (this.mainLevel === 'SECTOR') {
         updateData.sector = this.mainSectorId;
-        // تأكد من إرسال null للحقول الأخرى
         updateData.departmentUser = null;
       } else if (this.mainLevel === 'DEPARTMENT') {
         updateData.departmentUser = this.mainDeptId;
@@ -322,10 +374,11 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         updateData.departmentUser = null;
       }
 
-      console.log('Sending update data:', updateData); // للتصحيح
+      console.log('Sending UPDATE data:', updateData);
 
       this.criteriaService.updateMainCriteriaPartial(updateData).subscribe({
         next: (updatedCriteria) => {
+          console.log('UPDATE response:', updatedCriteria);
           this.mainCriteria = this.mainCriteria.map((m) =>
             m._id === this.editingMain!._id ? updatedCriteria : m
           );
@@ -340,45 +393,35 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating main criteria:', error);
-
-          // تحليل الخطأ بشكل مفصل
-          if (error.status === 401) {
-            Swal.fire({
-              title: 'انتهت الجلسة',
-              text: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى',
-              icon: 'warning',
-              confirmButtonText: 'حسناً',
-            }).then(() => {
-              this.loginService.removeToken();
-              location.reload();
-            });
-          } else {
-            Swal.fire({
-              title: 'خطأ',
-              text:
-                error.error?.error ||
-                error.error?.message ||
-                'حدث خطأ في تحديث المعيار الرئيسي',
-              icon: 'error',
-              confirmButtonText: 'حسناً',
-            });
-          }
+          console.error('Error details:', error.error);
           this.isSubmitting = false;
         },
       });
     } else {
-      // إضافة معيار جديد - تم التصحيح هنا
-      const criteriaData: AddMainCriteriaRequest = {
+      // إضافة معيار جديد - استخدام any بدلاً من AddMainCriteriaRequest
+      const criteriaData: any = {
         name,
         level: this.mainLevel,
-        sector: this.mainLevel === 'SECTOR' ? this.mainSectorId : undefined,
-        departmentUser:
-          this.mainLevel === 'DEPARTMENT' ? this.mainDeptId : undefined,
       };
 
-      // استخدام addMainCriteria بدلاً من updateMainCriteriaPartial
+      // استخدام null بدلاً من undefined للتأكد من حفظ القيم
+      if (this.mainLevel === 'SECTOR') {
+        criteriaData.sector = this.mainSectorId;
+        criteriaData.departmentUser = null;
+      } else if (this.mainLevel === 'DEPARTMENT') {
+        criteriaData.departmentUser = this.mainDeptId;
+        criteriaData.sector = null;
+      } else if (this.mainLevel === 'ALL') {
+        criteriaData.sector = null;
+        criteriaData.departmentUser = null;
+      }
+
+      console.log('Sending CREATE data:', criteriaData);
+
+      // استخدام addMainCriteria مع any
       this.criteriaService.addMainCriteria(criteriaData).subscribe({
         next: (newCriteria) => {
+          console.log('CREATE response:', newCriteria);
           this.mainCriteria = [...this.mainCriteria, newCriteria];
           Swal.fire({
             title: 'نجاح',
@@ -391,6 +434,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error adding main criteria:', error);
+          console.error('Error details:', error.error);
           Swal.fire({
             title: 'خطأ',
             text: error.error?.error || 'حدث خطأ في إضافة المعيار الرئيسي',
