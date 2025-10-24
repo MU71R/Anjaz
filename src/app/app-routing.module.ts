@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-admin.component';
 import { AdministrationComponent } from './components/administration/administration.component';
+import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
 // import { AuthGuard } from './guards/auth.guard';
 // import { LoginGuard } from './guards/login.guard';
 
@@ -21,9 +22,13 @@ const routes: Routes = [
     path: 'dashboard-admin',
     component: DashboardAdminComponent,
   },
-
+  {
+    path: 'criteria-management',
+    component: DepartmentCriteriaManagementComponent,
+  },
   // أي مسار غير معروف يعيد إلى login
   { path: '**', redirectTo: 'login' },
+
 ];
 
 @NgModule({

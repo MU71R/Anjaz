@@ -1,107 +1,91 @@
-<div class="dashboard-container">
+<div class="container my-4">
   <app-sidebar></app-sidebar>
 
-  <main class="main-content">
-    <!-- TOP HEADER -->
-    <header class="top-header">
-      <div class="header-left">
-        <div class="user-info">
-          <h5 class="user-name">أحمد محمد العلي</h5>
-          <p class="user-role">مسؤول نظام - قسم العلاقات العامة</p>
+  <!-- Header -->
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-2">
+    <div>
+      <h1 class="h4">الرئيسية</h1>
+      <p class="text-muted">مرحباً {{ currentUser.fullName }}</p>
+    </div>
+    <button class="btn btn-primary">إضافة إنجاز جديد</button>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3" *ngFor="let stat of ['total', 'pending', 'approved', 'rejected']">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ stat === 'total' ? 'إجمالي الإنجازات' : 
+               stat === 'pending' ? 'قيد المراجعة' : 
+               stat === 'approved' ? 'المعتمدة' : 'المرفوضة' }}
+          </h6>
+          <h3 class="card-title">{{ getStatValue() }}</h3>
         </div>
       </div>
-      <div class="header-right">
-        <div class="notification">
-          <i class="fa-solid fa-bell"></i>
-          <span class="badge">3</span>
-        </div>
-        <button class="add-btn">
-          <i class="fa-solid fa-plus"></i>
-          إضافة إنجاز جديد
-        </button>
-      </div>
-    </header>
+    </div>
+  </div>
 
-    <!-- باقي محتوى الإحصائيات والإنجازات كما هو -->
-    <section class="stats-section">
-      <div class="stats-grid">
-        <div class="stat-card" *ngFor="let stat of stats" [ngClass]="stat.colorClass">
-          <div class="stat-icon">
-            <i [class]="stat.icon"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ stat.value }}</h3>
-            <p class="stat-label">{{ stat.label }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="filter-bar">
-      <div class="filter-title">
-        <i class="fa-solid fa-filter"></i>
-        <span>تصفية الإنجازات</span>
-      </div>
-
-      <div class="filter-controls">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="ابحث عن الإنجاز..." />
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-12 col-md-3 position-relative">
+          <input type="text" class="form-control" placeholder="البحث..." [(ngModel)]="searchQuery" (input)="applyFilters()">
         </div>
 
-        <select title="اختيار حالة الإنجاز">
-          <option>جميع الحالات</option>
-          <option>معتمد</option>
-          <option>قيد المراجعة</option>
-          <option>مرفوض</option>
-        </select>
-
-        <select title="اختيار القسم">
-          <option>جميع الأقسام</option>
-          <option>كلية التربية</option>
-          <option>كلية الهندسة</option>
-          <option>كلية الطب</option>
-        </select>
-
-        <button class="reset-btn">
-          <i class="fa-solid fa-rotate-right"></i>
-          إعادة تعيين
-        </button>
-      </div>
-    </section>
-
-    <section class="achievements-section">
-      <div class="section-card">
-        <div class="section-header">
-          <h4 class="section-title">الإنجازات الأخيرة</h4>
-          <a href="#" class="view-all-link">عرض الكل</a>
+        <div class="col-12 col-md-3">
+          <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilters()" title="تصفية حسب الحالة">
+            <option value="all">جميع الحالات</option>
+            <option value="pending">قيد المراجعة</option>
+            <option value="approved">معتمد</option>
+            <option value="rejected">مرفوض</option>
+          </select>
         </div>
 
-        <div class="achievements-list">
-          <div class="achievement-item" *ngFor="let achievement of achievements">
-            <div class="achievement-content">
-              <h5 class="achievement-title">{{ achievement.title }}</h5>
-              <div class="achievement-meta">
-                <span class="author">{{ achievement.author }}</span>
-                <span class="dot">•</span>
-                <span class="department">{{ achievement.department }}</span>
-                <span class="dot">•</span>
-                <span class="date">{{ achievement.date }}</span>
-              </div>
-              <div class="achievement-category">
-                {{ achievement.categoryMain }}
-                <span class="arrow">←</span>
-                {{ achievement.categorySub }}
-              </div>
-            </div>
-            <div class="achievement-status">
-              <span class="status-badge" [ngClass]="achievement.statusClass">
-                {{ achievement.statusText }}
-              </span>
+        <div class="col-12 col-md-3" *ngIf="currentUser.role === 'admin'">
+          <select class="form-select" [(ngModel)]="departmentFilter" (change)="applyFilters()" title="تصفية حسب القسم">
+            <option value="all">جميع الأقسام</option>
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">إعادة تعيين</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Achievements -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-3">الإنجازات الأخيرة</h5>
+      <div *ngIf="filteredAchievements.length === 0" class="text-center text-muted py-4">
+        لا توجد إنجازات مطابقة للفلاتر المحددة
+      </div>
+      <div class="list-group">
+        <div *ngFor="let a of filteredAchievements" class="list-group-item list-group-item-action d-flex flex-column flex-sm-row justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <h6 class="mb-1">{{ a.title }}</h6>
+            <small class="text-muted">{{ a.userName }} • {{ a.department }} • {{ a.createdAt | date:'dd/MM/yyyy' }}</small>
+            <div class="mt-1">
+              <span class="text-secondary">{{ a.mainCriterion }}</span>
+              <span class="text-muted mx-1">←</span>
+              <span class="text-secondary">{{ a.subCriterion }}</span>
             </div>
           </div>
+          <span class="badge rounded-pill px-3 py-2 mt-2 mt-sm-0" [ngClass]="getStatusClass(a.status)">
+            {{ getStatusLabel(a.status) }}
+          </span>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center mt-4 pt-3 border-top text-muted" style="font-size: 12pt;">
+    🏛 الجهة المطوّرة: جامعة قنا – كلية حاسبات ومعلومات
+  </footer>
+
 </div>

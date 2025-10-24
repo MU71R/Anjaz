@@ -13,6 +13,9 @@ import {
   providedIn: 'root',
 })
 export class LoginService {
+  removeToken() {
+    throw new Error('Method not implemented.');
+  }
   private readonly userKey = 'userData';
   private readonly tokenKey = 'token';
   private readonly apiUrl = 'http://localhost:3000';
