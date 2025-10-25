@@ -4,6 +4,7 @@ import { LoginComponent } from './components/login/login.component';
 import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-admin.component';
 import { AdministrationComponent } from './components/administration/administration.component';
 import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
+import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
 // import { AuthGuard } from './guards/auth.guard';
 // import { LoginGuard } from './guards/login.guard';
 
@@ -25,6 +26,10 @@ const routes: Routes = [
   {
     path: 'criteria-management',
     component: DepartmentCriteriaManagementComponent,
+  },
+  {
+    path: 'add-achievement',
+    component: AddAchievementComponent,
   },
   // أي مسار غير معروف يعيد إلى login
   { path: '**', redirectTo: 'login' },

@@ -1,12 +1,41 @@
 /* ألوان الحالة */
-.badge-warning { background-color: #fff3cd; color: #856404; }
-.badge-success { background-color: #d4edda; color: #155724; }
-.badge-danger  { background-color: #f8d7da; color: #721c24; }
-.badge-secondary { background-color: #e2e3e5; color: #6c757d; }
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-secondary {
+    background-color: #e2e3e5;
+    color: #6c757d;
+}
 
 /* كروت الإحصائيات */
-.card-title { font-size: 1.5rem; font-weight: 600; }
-.card-subtitle { font-size: 0.875rem; }
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+}
 
 /* Hover على الإنجازات */
-.list-group-item-action:hover { background-color: #f8f9fa; cursor: pointer; }
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.container{
+    width: 1250px;
+    margin-left: 10px;
+}

@@ -1,0 +1,316 @@
+/* ===============================
+   تنسيق واجهة إضافة إنجاز
+   =============================== */
+
+/* الحاوية العامة */
+.container {
+  width: 1250px;
+  margin: 2px ;
+  padding: 1rem;
+}
+
+/* الحاوية الرئيسية */
+.add-achievement-container {
+  margin: 3rem auto;
+  padding: 0 2rem 5rem;
+  background-color: #f9fafb;
+  position: relative;
+  direction: rtl;
+}
+
+/* العناوين */
+.add-achievement-container h2 {
+  font-weight: 700;
+  color: #0f235f;
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.add-achievement-container p {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+/* البطاقة */
+.card {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* عنوان البطاقة */
+.card h5 {
+  color: #0f235f;
+  font-weight: 700;
+  border-right: 4px solid #0f235f;
+  padding-right: 12px;
+  margin-bottom: 1.5rem;
+}
+
+/* الحقول */
+.mb-3 {
+  margin-bottom: 1.5rem !important;
+}
+
+.form-label {
+  color: #1f2937;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  background-color: #fff;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #17307a;
+  box-shadow: 0 0 0 0.15rem rgba(23, 48, 122, 0.25);
+}
+
+/* شريط الأدوات */
+.toolbar {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.toolbar .btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.toolbar .btn:hover {
+  background-color: #17307a;
+  color: #fff;
+  border-color: #17307a;
+}
+
+/* المحرر */
+.editor {
+  width: 100%;
+  min-height: 180px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  overflow-y: auto;
+}
+
+.editor:empty:before {
+  content: "أدخل وصف الإنجاز هنا...";
+  color: #9ca3af;
+}
+
+/* المرفقات */
+.list-unstyled li {
+  background: #f9fafb;
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: background 0.2s;
+}
+
+.list-unstyled li:hover {
+  background: #f1f5f9;
+}
+
+/* الأزرار العامة */
+.btn {
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: "Tajawal", sans-serif;
+  font-size: 18px;
+  padding: 16px 0;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+/* الأزرار الأساسية */
+.btn-primary {
+  background-color: #17307a;
+  border: none;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0f235f;
+  transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f1f5f9;
+  color: #17307a;
+}
+
+.btn-light {
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.btn-light:hover {
+  background-color: #f8fafc;
+}
+
+/* أزرار التحكم السفلية */
+.form-footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-footer .btn {
+  flex: 1 1 30%;
+  min-width: 150px;
+}
+
+/* زر الإلغاء */
+.cancel-btn {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #ececec;
+}
+
+/* زر الحفظ كمسودة */
+.draft-btn {
+  background-color: #ffffff;
+  border: 1px solid #999;
+  color: #333;
+}
+
+.draft-btn:hover {
+  background-color: #f4f4f4;
+}
+
+/* زر الإرسال للمراجعة */
+.submit-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+.submit-btn:hover {
+  background-color: #0069d9;
+}
+
+/* زر رفع الملفات */
+.custom-upload {
+  width: 100%;
+  background-color: #f5f8ff;
+  color: #007bff;
+  font-size: 18px;
+  font-weight: 600;
+  height: 60px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px dashed #007bff;
+}
+
+.custom-upload i {
+  font-size: 1.5em;
+  transition: transform 0.3s ease;
+}
+
+.custom-upload:hover {
+  background-color: #e8f0ff;
+  border-color: #0056d2;
+  color: #0056d2;
+}
+
+.custom-upload:hover i {
+  transform: translateY(-3px);
+}
+
+/* التنبيهات */
+.alert {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+
+/* استجابة للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .add-achievement-container {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .form-footer {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .custom-upload {
+    font-size: 16px;
+    padding: 24px 0;
+  }
+
+  .custom-upload i {
+    font-size: 1.8em;
+  }
+}

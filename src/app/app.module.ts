@@ -14,6 +14,7 @@ import { DepartmentCriteriaManagementComponent } from './components/department-c
 import { CriteriaService } from './service/criteria.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ToastrService } from 'ngx-toastr';
     DashboardAdminComponent,
     AdministrationComponent,
     SidebarComponent,
-    DepartmentCriteriaManagementComponent
+    DepartmentCriteriaManagementComponent,
+    AddAchievementComponent
   ],
   imports: [
     BrowserModule,
