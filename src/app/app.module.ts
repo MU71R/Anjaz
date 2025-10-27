@@ -11,10 +11,8 @@ import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-
 import { AdministrationComponent } from './components/administration/administration.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
-import { CriteriaService } from './service/criteria.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
+import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +22,8 @@ import { AddAchievementComponent } from './components/add-achievement/add-achiev
     AdministrationComponent,
     SidebarComponent,
     DepartmentCriteriaManagementComponent,
-    AddAchievementComponent
+    AddAchievementComponent,
+    MyAchievementsComponent,
   ],
   imports: [
     BrowserModule,

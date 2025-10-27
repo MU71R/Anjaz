@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MainCriterion } from 'src/app/model/criteria';
 import { CriteriaService, SubCriteria } from 'src/app/service/criteria.service';
 import Swal from 'sweetalert2';
+import { ActivityService } from '../../service/achievements-service.service';
 
 @Component({
   selector: 'app-add-achievement',
@@ -23,20 +24,32 @@ export class AddAchievementComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private criteriaService: CriteriaService
+    private criteriaService: CriteriaService,
+    private activityService: ActivityService
   ) {}
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      title: ['', [Validators.required, Validators.maxLength(150)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      mainCriterion: ['', Validators.required],
-      subCriterion: [''],
-    });
+    this.initializeForm();
+    this.loadMainCriteria();
+  }
 
+  initializeForm(): void {
+    this.form = this.fb.group({
+      activityTitle: ['', [Validators.required, Validators.maxLength(150)]],
+      activityDescription: [
+        '',
+        [Validators.required, Validators.minLength(10)],
+      ],
+      MainCriteria: ['', Validators.required],
+      SubCriteria: ['', Validators.required],
+    });
+  }
+
+  loadMainCriteria(): void {
     this.criteriaService.getAllMainCriteria().subscribe({
       next: (res: any[]) => {
         this.mainCriteria = res;
+        console.log('✅ Main Criteria:', res);
       },
       error: () => {
         Swal.fire({
@@ -56,18 +69,40 @@ export class AddAchievementComponent implements OnInit {
 
     if (this.selectedMain) {
       this.getSubCriteria(this.selectedMain);
+      this.form.patchValue({ SubCriteria: '' });
     } else {
       this.subCriteria = [];
+      this.form.patchValue({ SubCriteria: '' });
     }
   }
 
   getSubCriteria(mainId: string): void {
     this.criteriaService.getAllSubCriteria().subscribe({
       next: (res: SubCriteria[]) => {
-        this.subCriteria = res;
-        console.log('✅ Subcriteria:', res);
+        console.log('🔍 All Subcriteria:', res);
+
+        // استخدم الخاصية الصحيحة بناءً على ما تراه في الكونسول
+        this.subCriteria = res.filter((sub) => {
+          // جرب هذه الخيارات - سترى في الكونسول أيها صحيح
+          if ((sub as any).MainCriteria === mainId) return true;
+          if ((sub as any).mainCriteria === mainId) return true;
+          if ((sub as any).mainCriteriaId === mainId) return true;
+          return false;
+        });
+
+        console.log(
+          '✅ Filtered Subcriteria for',
+          mainId,
+          ':',
+          this.subCriteria
+        );
+
+        if (this.subCriteria.length === 0) {
+          console.warn('⚠️ No sub-criteria found for main criteria:', mainId);
+        }
       },
-      error: () => {
+      error: (error) => {
+        console.error('❌ Error loading sub-criteria:', error);
         Swal.fire({
           title: 'خطأ',
           text: 'حدث خطأ أثناء تحميل المعايير الفرعية من الخادم.',
@@ -87,7 +122,8 @@ export class AddAchievementComponent implements OnInit {
 
   syncDescriptionToForm() {
     const html = this.descriptionEditor.nativeElement.innerHTML.trim();
-    this.form.get('description')?.setValue(html);
+    this.form.get('activityDescription')?.setValue(html);
+    this.form.get('activityDescription')?.markAsTouched();
   }
 
   onFilesSelected(ev: Event) {
@@ -130,58 +166,137 @@ export class AddAchievementComponent implements OnInit {
 
   submitForReview() {
     this.syncDescriptionToForm();
+    this.markAllFieldsAsTouched();
 
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      Swal.fire('تنبيه', 'يرجى ملء جميع الحقول المطلوبة.', 'warning');
+      this.showValidationErrors();
       return;
     }
 
-    const payload = new FormData();
-    payload.append('title', this.form.value.title);
-    payload.append('description', this.form.value.description);
-    payload.append('mainCriterion', this.form.value.mainCriterion);
-    payload.append('subCriterion', this.form.value.subCriterion);
-    payload.append('status', 'pending');
-    this.attachments.forEach((f) => payload.append('attachments', f, f.name));
-
-    console.log('Submitting:', {
-      form: this.form.value,
-      attachments: this.attachments,
-    });
+    const payload = this.createFormData('قيد المراجعة', 'مكتمل');
 
     Swal.fire({
-      title: 'تم الإرسال',
-      text: 'تم إرسال الإنجاز للمراجعة بنجاح.',
-      icon: 'success',
-      confirmButtonText: 'حسناً',
-    }).then(() => this.resetForm());
+      title: 'جاري الإرسال...',
+      text: 'يرجى الانتظار قليلاً.',
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    this.activityService.addActivity(payload).subscribe({
+      next: (res) => {
+        Swal.fire({
+          title: 'تم الإرسال',
+          text: 'تم إرسال النشاط بنجاح ✅',
+          icon: 'success',
+          confirmButtonText: 'حسناً',
+        }).then(() => this.resetForm());
+      },
+      error: (err) => {
+        console.error('❌ خطأ أثناء الإرسال:', err);
+        Swal.fire({
+          title: 'خطأ',
+          text: err?.error?.message || 'حدث خطأ أثناء الإرسال إلى الخادم.',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+        });
+      },
+    });
   }
 
   saveAsDraft() {
     this.syncDescriptionToForm();
 
-    if (this.form.get('title')?.invalid) {
+    if (this.form.get('activityTitle')?.invalid) {
       Swal.fire('تنبيه', 'العنوان مطلوب لحفظ المسودة.', 'warning');
       return;
     }
 
-    const payload = new FormData();
-    payload.append('title', this.form.value.title);
-    payload.append('description', this.form.value.description || '');
-    payload.append('mainCriterion', this.form.value.mainCriterion || '');
-    payload.append('status', 'draft');
-    this.attachments.forEach((f) => payload.append('attachments', f, f.name));
+    const payload = this.createFormData('قيد المراجعة', 'مسودة');
 
-    console.log('Saving draft:', {
-      form: this.form.value,
-      attachments: this.attachments,
+    this.activityService.addActivity(payload).subscribe({
+      next: (res) => {
+        Swal.fire({
+          title: 'تم الحفظ',
+          text: 'تم حفظ المسودة بنجاح.',
+          icon: 'success',
+          confirmButtonText: 'حسناً',
+        });
+      },
+      error: (err) => {
+        console.error('❌ خطأ أثناء حفظ المسودة:', err);
+        Swal.fire({
+          title: 'خطأ',
+          text: 'فشل في حفظ المسودة.',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+        });
+      },
+    });
+  }
+
+  private createFormData(
+    status: 'مرفوض' | 'قيد المراجعة' | 'معتمد',
+    saveStatus: 'مسودة' | 'مكتمل'
+  ): FormData {
+    const payload = new FormData();
+
+    // الحقول الأساسية من النموذج
+    payload.append('activityTitle', this.form.value.activityTitle);
+    payload.append('activityDescription', this.form.value.activityDescription);
+    payload.append('MainCriteria', this.form.value.MainCriteria);
+    payload.append('SubCriteria', this.form.value.SubCriteria);
+
+    // الحقول الإضافية المطلوبة
+    payload.append('status', status);
+    payload.append('SaveStatus', saveStatus);
+    payload.append('name', localStorage.getItem('fullname') || '');
+    payload.append('user', localStorage.getItem('userId') || '');
+
+    // المرفقات
+    this.attachments.forEach((file) => {
+      payload.append('Attachments', file, file.name);
     });
 
+    // طباعة بيانات FormData للتأكد
+    console.log('📤 FormData contents:');
+    payload.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+
+    return payload;
+  }
+
+  private markAllFieldsAsTouched(): void {
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.get(key)?.markAsTouched();
+    });
+  }
+
+  private showValidationErrors(): void {
+    const errors = [];
+
+    if (this.form.get('activityTitle')?.invalid) {
+      errors.push('• العنوان مطلوب (حتى 150 حرف)');
+    }
+
+    if (this.form.get('activityDescription')?.invalid) {
+      errors.push('• الوصف مطلوب (10 أحرف على الأقل)');
+    }
+
+    if (this.form.get('MainCriteria')?.invalid) {
+      errors.push('• المعيار الرئيسي مطلوب');
+    }
+
+    if (this.form.get('SubCriteria')?.invalid) {
+      errors.push('• المعيار الفرعي مطلوب');
+    }
+
     Swal.fire({
-      title: 'تم الحفظ',
-      text: 'تم حفظ المسودة بنجاح.',
-      icon: 'success',
+      title: 'بيانات ناقصة',
+      html: `يرجى ملء جميع الحقول المطلوبة:<br>${errors.join('<br>')}`,
+      icon: 'warning',
       confirmButtonText: 'حسناً',
     });
   }

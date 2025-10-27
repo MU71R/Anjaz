@@ -5,6 +5,7 @@ import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-
 import { AdministrationComponent } from './components/administration/administration.component';
 import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
 import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
+import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
 // import { AuthGuard } from './guards/auth.guard';
 // import { LoginGuard } from './guards/login.guard';
 
@@ -30,6 +31,10 @@ const routes: Routes = [
   {
     path: 'add-achievement',
     component: AddAchievementComponent,
+  },
+  {
+    path: 'my-achievements',
+    component: MyAchievementsComponent,
   },
   // أي مسار غير معروف يعيد إلى login
   { path: '**', redirectTo: 'login' },

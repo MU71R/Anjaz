@@ -1,0 +1,198 @@
+.custom-container {
+    /* تحديد عرض أقصى للحاوية بدلاً من أن تملأ الشاشة بالكامل */
+    max-width: 1200px !important; 
+    margin: 40px auto 20px  !important; /* توسيط الحاوية */
+    position: relative; /* لتحديد موقع الـ div في الأسفل يسار */
+    bottom: 20px; /* 20 بكسل من الأسفل */
+    right: 7rem; /* 20 بكسل من اليسار */
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+}
+
+/* ==================================== */
+/* 2. تصغير حجم البطاقة (Card) وتقليل الهوامش */
+/* ==================================== */
+.achievement-card {
+    border-right: 4px solid #007bff; /* تقليل عرض الشريط الجانبي */
+    border-radius: 6px; /* تقليل زوايا التقوس */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ظل أخف */
+    padding: 0 !important;
+}
+
+.achievement-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* ظل أعمق عند التحويم */
+}
+
+.card-header-custom {
+    padding: 0.75rem 1.25rem 0.5rem 1rem; /* تقليل البادينغ */
+}
+
+/* ==================================== */
+/* 3. تصغير حجم الخطوط والعناصر داخل البطاقة */
+/* ==================================== */
+
+/* العنوان الرئيسي للإنجاز */
+.small-title {
+    font-size: 1.0em; /* تصغير حجم الخط */
+    margin-bottom: 0.3rem;
+}
+
+/* وصف الإنجاز */
+.small-description {
+    font-size: 0.85em; /* تصغير حجم الخط */
+    margin-bottom: 0.8rem;
+}
+
+/* حالة الإنجاز (Badge) */
+.small-badge {
+    padding: 3px 8px; /* تقليل البادينغ */
+    font-size: 0.75em; /* تصغير حجم الخط */
+}
+
+/* البيانات الوصفية (Metadata) */
+.small-metadata {
+    font-size: 0.8em; /* تصغير حجم الخط */
+    gap: 10px !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* أيقونات الإجراءات في الهيدر */
+.btn-xs {
+    padding: 0.15rem; /* تقليل البادينغ */
+    font-size: 0.85rem;
+}
+
+/* الفئة والمرفقات */
+.small-link {
+    font-size: 0.85em;
+}
+
+.small-attachment {
+    font-size: 0.8em;
+}
+
+/* زر الاعتماد في الأسفل */
+.approve-btn, .view-approved-btn {
+    font-size: 0.85rem; /* تصغير حجم الخط */
+    padding: 0.3rem 0.8rem; /* تصغير البادينغ */
+    min-width: 100px;
+}
+
+/* شريط الإجراءات السفلي (Footer) */
+.card-actions-footer {
+    padding: 0.5rem 1rem 0.8rem 1rem !important;
+}
+
+/* أيقونات Font Awesome (للتأكد من صغر حجمها) */
+.meta-icon {
+    font-size: 0.9em;
+    margin-left: 4px;
+}
+
+/* الأنماط المتبقية من الكود السابق للحفاظ على التصميم */
+.page-title { font-size: 1.5em; font-weight: bold; color: #343a40;}
+.review-button { font-weight: bold; }
+.search-input-group { box-shadow: 0 0 3px rgba(0, 0, 0, 0.05); border-radius: 0.25rem; }
+.status-approved { background-color: #28a745; }
+.status-pending { background-color: #ffc107; color: #333; }
+.status-rejected { background-color: #dc3545; }
+.reassign-btn { font-weight: bold; border-radius: 4px; }
+
+/* === تنسيقات عامة للمكون === */
+.custom-container {
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+/* === كروت الإنجازات === */
+.achievement-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+.achievement-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === العناوين والوصف === */
+.achievement-title {
+  color: #111827;
+}
+.achievement-description {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+/* === الميتاداتا === */
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+.meta-icon {
+  color: #9ca3af;
+}
+
+/* === الشارات === */
+.status-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* === الأزرار === */
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.btn-icon:hover {
+  color: #1d4ed8;
+}
+
+
+
+
+.modal-content {
+  font-family: "Cairo", sans-serif;
+  direction: rtl;
+}
+
+.modal-header h5 {
+  font-weight: 700;
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
+.text-muted.small {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.form-control.small {
+  font-size: 0.9rem;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.modal-body p {
+  margin-bottom: 0.4rem;
+}
+
+.modal-dialog {
+  max-width: 550px;
+}

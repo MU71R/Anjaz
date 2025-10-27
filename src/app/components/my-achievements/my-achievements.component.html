@@ -1,0 +1,301 @@
+<div class="container-fluid py-4 custom-container" dir="rtl">
+  <app-sidebar></app-sidebar>
+
+  <!-- 🏷️ العنوان -->
+  <header class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+    <h2 class="page-title mb-0">جميع الإنجازات</h2>
+    <button class="btn btn-outline-success review-button btn-sm">
+      مراجعة واعتماد الإنجازات المقدمة
+    </button>
+  </header>
+
+  <!-- 🔍 البحث والتصفية -->
+  <div class="row mb-3 align-items-end">
+    <div class="col-md-5 col-lg-4 mb-2">
+      <div class="input-group search-input-group">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="البحث..."
+          [(ngModel)]="searchTerm"
+        />
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-lg-3 mb-2">
+      <select
+        class="form-select form-control form-control-sm"
+        [(ngModel)]="statusFilter"
+      >
+        <option value="all">جميع الحالات</option>
+        <option value="معتمد">معتمد</option>
+        <option value="قيد المراجعة">قيد المراجعة</option>
+        <option value="مرفوض">مرفوض</option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-lg-2 mb-2">
+      <button class="btn btn-secondary w-100 btn-sm" (click)="resetFilters()">
+        إعادة تعيين
+      </button>
+    </div>
+  </div>
+
+  <!-- 🏆 قائمة الإنجازات -->
+  <div class="achievements-list">
+    <div
+      class="card achievement-card mb-2"
+      *ngFor="let achievement of filteredAchievements()"
+    >
+      <div class="card-header-custom d-flex justify-content-between align-items-center">
+        <span
+          class="status-badge small-badge px-2 py-1 rounded"
+          [ngClass]="getStatusClass(achievement.status)"
+        >
+          {{ achievement.status }}
+        </span>
+
+        <div class="header-actions">
+          <button
+            class="btn btn-icon btn-xs"
+            (click)="openDetailsModal(achievement)"
+            title="عرض"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+
+          <button
+            *ngIf="achievement.status === 'قيد المراجعة'"
+            class="btn btn-icon btn-xs"
+            (click)="handleAction('edit', achievement.id)"
+            title="تعديل"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
+
+          <button
+            class="btn btn-icon btn-xs text-danger"
+            (click)="handleAction('delete', achievement.id)"
+            title="حذف"
+          >
+            <i class="fas fa-trash-alt"></i>
+          </button>
+
+          <button
+            *ngIf="achievement.status === 'معتمد'"
+            class="btn btn-sm btn-light reassign-btn ms-1"
+            (click)="handleAction('reassign', achievement.id)"
+          >
+            إعادة تعيين
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body content-body p-3">
+        <h5 class="achievement-title small-title font-semibold">
+          {{ achievement.title }}
+        </h5>
+        <p class="achievement-description small-description">
+          {{ achievement.description }}
+        </p>
+
+        <div class="metadata d-flex flex-wrap gap-2 mb-2 small-metadata">
+          <span class="meta-item">
+            <i class="fas fa-calendar-alt meta-icon"></i>
+            <span>{{ achievement.date }} هـ</span>
+          </span>
+          <span class="meta-item">
+            <i class="fas fa-map-marker-alt meta-icon"></i>
+            <span>{{ achievement.college }}</span>
+          </span>
+          <span class="meta-item">
+            <i class="fas fa-user meta-icon"></i>
+            <span>{{ achievement.user }}</span>
+          </span>
+        </div>
+
+        <div
+          class="links d-flex justify-content-between align-items-center pt-2 border-top"
+        >
+          <a href="#" class="category-link small-link text-blue-600">
+            {{ achievement.category }}
+          </a>
+          <span class="attachment-info small-attachment">
+            <i class="fas fa-paperclip meta-icon"></i>
+            <span>{{ achievement.attachmentsCount }} مرفق</span>
+          </span>
+        </div>
+      </div>
+
+      <div
+        class="card-footer card-actions-footer d-flex justify-content-end p-2"
+      >
+        <button
+          *ngIf="achievement.status !== 'معتمد'"
+          class="btn btn-success btn-sm approve-btn"
+          (click)="handleAction('approve', achievement.id)"
+        >
+          <i class="fas fa-check-circle me-1"></i> اعتماد
+        </button>
+
+        <button
+          *ngIf="achievement.status === 'معتمد'"
+          class="btn btn-primary btn-sm view-approved-btn"
+          (click)="openDetailsModal(achievement)"
+        >
+          عرض
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ مودال تفاصيل الإنجاز -->
+<!-- ✅ مودال تفاصيل الإنجاز (تصميم مطابق للصورة) -->
+<div class="modal-backdrop fade show" *ngIf="showDetailsModal"></div>
+<div
+  class="modal fade show d-block"
+  *ngIf="showDetailsModal"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-content rounded-4 shadow-sm border-0 overflow-hidden">
+      <div class="modal-header bg-white border-bottom-0">
+        <div>
+          <h5 class="fw-bold mb-0">تفاصيل الإنجاز</h5>
+          <small class="text-muted">عرض كامل معلومات الإنجاز</small>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="إغلاق"
+          (click)="closeDetailsModal()"
+        ></button>
+      </div>
+
+      <div class="modal-body bg-light-subtle px-4">
+        <!-- 🔸 عنوان الإنجاز -->
+        <h5 class="fw-semibold text-dark mb-2">
+          {{ selectedAchievement?.title }}
+        </h5>
+
+        <!-- 🔸 حالة الإنجاز -->
+        <span
+          class="badge px-3 py-2 rounded-pill mb-3"
+          [ngClass]="{
+            'bg-success text-white': selectedAchievement?.status === 'معتمد',
+            'bg-warning text-dark': selectedAchievement?.status === 'قيد المراجعة',
+            'bg-danger text-white': selectedAchievement?.status === 'مرفوض'
+          }"
+        >
+          {{ selectedAchievement?.status }}
+        </span>
+
+        <!-- 🔸 الوصف -->
+        <div class="mb-3">
+          <p class="fw-bold mb-1">الوصف</p>
+          <p class="text-muted small">
+            {{ selectedAchievement?.description }}
+          </p>
+        </div>
+
+        <!-- 🔸 تفاصيل الشبكة -->
+        <div class="row mb-3 g-2">
+          <div class="col-6">
+            <p class="fw-bold mb-1">المعيار الرئيسي</p>
+            <p class="text-muted small mb-0">
+              {{ selectedAchievement?.category || 'خدمة المجتمع' }}
+            </p>
+          </div>
+
+          <div class="col-6">
+            <p class="fw-bold mb-1">المعيار الفرعي</p>
+            <p class="text-muted small mb-0">
+              {{ selectedAchievement?.category }}
+            </p>
+          </div>
+
+          <div class="col-6">
+            <p class="fw-bold mb-1">القسم</p>
+            <p class="text-muted small mb-0">
+              {{ selectedAchievement?.college }}
+            </p>
+          </div>
+
+          <div class="col-6">
+            <p class="fw-bold mb-1">المسؤول</p>
+            <p class="text-muted small mb-0">
+              {{ selectedAchievement?.user }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 🔸 المرفقات -->
+        <div class="mb-3">
+          <p class="fw-bold mb-1">المرفقات</p>
+          <div
+            class="p-2 border rounded bg-white small d-flex align-items-center justify-content-between"
+          >
+            <span>{{ selectedAchievement?.attachmentsCount || 'training_plan.pdf' }}</span>
+            <i class="fas fa-paperclip text-secondary"></i>
+          </div>
+        </div>
+
+        <!-- 🔸 ملاحظات المراجعة -->
+        <div>
+          <p class="fw-bold mb-1">ملاحظات المراجعة</p>
+          <textarea
+            class="form-control small"
+            rows="3"
+            [(ngModel)]="rejectionReason"
+            placeholder="أدخل ملاحظات أو تعليقات..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div
+        class="modal-footer bg-white border-top-0 d-flex justify-content-between px-4"
+      >
+        <button
+          type="button"
+          class="btn btn-success px-4"
+          (click)="selectedAchievement && selectedAchievement.id && handleAction('approve', selectedAchievement.id)"
+        >
+          <i class="fas fa-check-circle me-1"></i> اعتماد
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger px-4"
+          (click)="selectedAchievement && openRejectModal(selectedAchievement)"
+        >
+          <i class="fas fa-times-circle me-1"></i> رفض
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ❌ مودال الرفض -->
+<div class="modal fade show d-block" *ngIf="showRejectModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <h5 class="fw-bold mb-2 text-danger">سبب الرفض</h5>
+      <textarea
+        class="form-control mb-3"
+        [(ngModel)]="rejectionReason"
+        placeholder="اكتب سبب الرفض هنا..."
+      ></textarea>
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-secondary me-2" (click)="closeRejectModal()">
+          إلغاء
+        </button>
+        <button class="btn btn-danger" (click)="submitRejection()">
+          تأكيد الرفض
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,11 +18,11 @@
             <div class="mb-3 Main-Criterion">
               <label class="form-label fw-semibold" for="main">المعيار الرئيسي <span
                   class="text-danger">*</span></label>
-            <select id="main" class="form-control" formControlName="mainCriterion" (change)="onMainCriterionChange($event)"
-              title="اختر المعيار الرئيسي"
-              [class.is-invalid]="form.get('mainCriterion')?.touched && form.get('mainCriterion')?.invalid">
+              <select id="main" class="form-control" formControlName="MainCriteria"
+                (change)="onMainCriterionChange($event)" title="اختر المعيار الرئيسي"
+                [class.is-invalid]="form.get('MainCriteria')?.touched && form.get('MainCriteria')?.invalid">
                 <option value="">-- اختر المعيار الرئيسي --</option>
-                <option *ngFor="let item of mainCriteria" [value]="item.name">{{ item.name }}</option>
+                <option *ngFor="let item of mainCriteria" [value]="item._id">{{ item.name }}</option>
               </select>
               <div class="invalid-feedback">يجب اختيار معيار رئيسي.</div>
             </div>
@@ -30,10 +30,10 @@
             <!-- المعيار الفرعي -->
             <div class="mb-3" *ngIf="selectedMain">
               <label class="form-label fw-semibold" for="sub">المعيار الفرعي <span class="text-danger">*</span></label>
-              <select id="sub" class="form-select" formControlName="subCriterion" title="اختر المعيار الفرعي"
-                [class.is-invalid]="form.get('subCriterion')?.touched && form.get('subCriterion')?.invalid">
+              <select id="sub" class="form-select" formControlName="SubCriteria" title="اختر المعيار الفرعي"
+                [class.is-invalid]="form.get('SubCriteria')?.touched && form.get('SubCriteria')?.invalid">
                 <option value="">اختر المعيار الفرعي</option>
-                <option *ngFor="let sub of subCriteria" [value]="sub.name">{{ sub.name }}</option>
+                <option *ngFor="let sub of subCriteria" [value]="sub._id">{{ sub.name }}</option>
               </select>
               <div class="invalid-feedback">يجب اختيار معيار فرعي.</div>
             </div>
@@ -42,9 +42,10 @@
             <div class="mb-3">
               <label class="form-label fw-semibold" for="title">عنوان الإنجاز <span class="text-danger">*</span></label>
               <input id="title" type="text" class="form-control" placeholder="أدخل عنوان الإنجاز"
-                formControlName="title"
-                [ngClass]="{'is-invalid': form.get('title')?.touched && form.get('title')?.invalid}">
-              <div class="invalid-feedback" *ngIf="form.get('title')?.touched && form.get('title')?.invalid">
+                formControlName="activityTitle"
+                [ngClass]="{'is-invalid': form.get('activityTitle')?.touched && form.get('activityTitle')?.invalid}">
+              <div class="invalid-feedback"
+                *ngIf="form.get('activityTitle')?.touched && form.get('activityTitle')?.invalid">
                 العنوان مطلوب (حتى 150 حرف).
               </div>
             </div>
@@ -83,7 +84,7 @@
                 (input)="syncDescriptionToForm()"></div>
               <small class="form-text text-muted mt-1 d-block">يمكنك استخدام شريط الأدوات أعلاه لتنسيق النص</small>
               <div class="text-danger mt-1"
-                *ngIf="form.get('description')?.touched && form.get('description')?.invalid">
+                *ngIf="form.get('activityDescription')?.touched && form.get('activityDescription')?.invalid">
                 الوصف مطلوب (من 10 أحرف على الأقل).
               </div>
             </div>
