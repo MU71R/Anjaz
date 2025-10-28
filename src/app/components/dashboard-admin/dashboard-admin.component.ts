@@ -51,48 +51,75 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   // ===== تحميل جميع الأنشطة =====
-  loadActivities(): void {
-    this.activityService.getAll().subscribe({
-      next: (res) => {
-        this.activities = res.activities.filter(
-          (a) => a.SaveStatus !== 'مسودة'
-        );
-        this.departments = Array.from(
-          new Set(
-            this.activities
-              .map((a) => (a as any).department || a.name || '')
-              .filter((d) => d)
-          )
-        );
-        this.applyFilters();
-      },
-      error: (err) => {
-        Swal.fire('خطأ', err.error?.message || 'فشل تحميل الأنشطة', 'error');
-      },
-    });
-  }
+    loadActivities(): void {
+      this.activityService.getAll().subscribe({
+        next: (res) => {
+          this.activities = res.activities.filter(
+            (a) => a.SaveStatus !== 'مسودة'
+          );
+          this.departments = Array.from(
+            new Set(
+              this.activities
+                .map((a) => (a as any).department || a.name || '')
+                .filter((d) => d)
+            )
+          );
+          this.applyFilters();
+        },
+        error: (err) => {
+          Swal.fire('خطأ', err.error?.message || 'فشل تحميل الأنشطة', 'error');
+        },
+      });
+    }
 
-  // ===== تحميل أحدث الإنجازات =====
-  loadRecentAchievements(): void {
-    this.activityService.getRecentAchievements().subscribe({
-      next: (res: any) => {
-        this.recentAchievements = res.map((a: any) => ({
-          message: `تمت إضافة إنجاز جديد بواسطة ${
-            a.user?.fullName || 'مستخدم غير معروف'
-          } 
-      بعنوان: "${a.activityTitle}" ضمن المعيار "${
-            a.MainCriteria?.name || 'غير محدد'
-          }"`,
-          time: a.date,
-          id: a._id,
-        }));
-      },
-      error: (err) => {
-        console.error('خطأ في تحميل الإنجازات الحديثة', err);
-      },
-    });
+    // ===== تحميل أحدث الإنجازات =====
+   loadRecentAchievements(): void {
+  this.activityService.getRecentAchievements().subscribe({
+    next: (res: any) => {
+      this.recentAchievements = res.map((a: any) => {
+        let message = a.message || '';
+        let formattedTime = '';
+        const rawTime = a.time || a.createdAt;
 
-  }
+        if (rawTime) {
+          const dateObj = new Date(rawTime);
+          if (!isNaN(dateObj.getTime())) {
+            formattedTime = dateObj.toLocaleString('ar-EG', {
+              timeZone: 'Africa/Cairo',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+            });
+
+            // فقط أضف الوقت إذا لم يكن موجود مسبقًا في الرسالة
+            if (!message.includes('')) {
+              message += `<small>${formattedTime}</small>`;
+            }
+          }
+        }
+
+        return {
+          id: a.id,
+          message,
+          time: formattedTime,
+        };
+      });
+    },
+    error: (err: any) => {
+      console.error('❌ خطأ في تحميل الإنجازات الحديثة:', err);
+    },
+  });
+}
+
+
+
+
+
+
+
 
   applyFilters(): void {
     let filtered = this.activities;

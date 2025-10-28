@@ -116,21 +116,28 @@
 
 
   <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title mb-3">أحدث الإنجازات</h5>
-  
-      <div *ngIf="recentAchievements.length === 0" class="text-center text-muted py-4">
-        لا توجد إنجازات حديثة
-      </div>
-  
-      <ul class="list-group list-group-flush">
-        <li *ngFor="let r of recentAchievements" class="list-group-item">
-          <small class="text-muted">{{ r.time | date:'dd/MM/yyyy HH:mm' }}</small>
-          <p class="mb-0">{{ r.message }}</p>
-        </li>
-      </ul>
+  <div class="card-body">
+    <h5 class="card-title mb-3">أحدث الإنجازات</h5>
+
+    <div *ngIf="recentAchievements.length === 0" class="text-center text-muted py-4">
+      لا توجد إنجازات حديثة
     </div>
+
+    <ul class="list-group list-group-flush" *ngIf="recentAchievements.length > 0">
+      <li
+        *ngFor="let r of recentAchievements"
+        class="list-group-item d-flex flex-column"
+        style="line-height: 1.8"
+      >
+        <div [innerHTML]="r.message"></div>
+        <small class="text-muted mt-1">
+          {{ r.time}}
+        </small>
+      </li>
+    </ul>
   </div>
+</div>
+
 
 
   <footer class="text-center mt-4 pt-3 border-top text-muted" style="font-size: 12pt">
