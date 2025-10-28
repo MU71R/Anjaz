@@ -3,8 +3,9 @@
     font-family: "Tajawal", sans-serif;
 }
 
+/* القائمة الجانبية */
 .sidebar {
-    width: 250px;
+    width: 260px;
     min-height: 100vh;
     background-color: #ffffff;
     display: flex;
@@ -14,94 +15,82 @@
     right: 0;
     z-index: 1000;
     transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
 }
 
+/* الرأس */
+.sidebar-header {
+    background: #f8f9fa;
+    padding-top: 20px;
+}
+
+.logo-section i {
+    color: #4e73df;
+}
+
+/* روابط القائمة */
 .nav-link {
     display: flex;
     align-items: center;
     padding: 12px 20px;
     color: #555;
-    text-decoration: none;
-    transition: all 0.3s ease;
     font-weight: 500;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    background-color: #86a7d9;
-    color: #fff !important;
     border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.25s ease;
 }
 
 .nav-link i {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
 }
 
-.sidebar-header {
-    background: #f8f9fa;
+/* التأثيرات */
+.nav-link:hover,
+.nav-link.active {
+    background-color: #4e73df;
+    color: #fff !important;
+    transform: translateX(-4px);
 }
 
+/* التذييل */
 .sidebar-footer {
     background: #f8f9fa;
+    padding-bottom: 15px;
 }
 
-@media (max-width: 992px) {
-    .sidebar {
-        position: fixed;
-        right: -250px;
-        width: 250px;
-    }
-
-    .sidebar.open {
-        right: 0;
-    }
-}
-
-/* زر لفتح/إغلاق القائمة عند الشاشات الصغيرة */
+/* الزر للشاشات الصغيرة */
 .toggle-btn {
     position: fixed;
     top: 15px;
     right: 15px;
     z-index: 1100;
-    background: #5a77a2;
+    background: #4e73df;
     color: #fff;
     border: none;
     border-radius: 6px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: #3a5db0;
 }
 
 .toggle-btn i {
     font-size: 1.2rem;
 }
 
+/* استجابة الشاشات الصغيرة */
 @media (max-width: 992px) {
     .sidebar {
-        position: fixed;
-        right: -250px;
-        top: 0;
-        width: 250px;
+        right: -260px;
         transition: right 0.3s ease-in-out;
-        z-index: 1050;
     }
 
     .sidebar.open {
         right: 0;
-    }
-
-    .toggle-btn {
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        background-color: #9fbfef;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 10px;
-        z-index: 1100;
-    }
-
-    .toggle-btn i {
-        font-size: 1.2rem;
     }
 }

@@ -9,6 +9,12 @@ interface User {
   role: 'admin' | 'user';
 }
 
+interface RecentAchievement {
+  message: string;
+  time: string;
+  id: string;
+}
+
 @Component({
   selector: 'app-dashboard-admin',
   templateUrl: './dashboard-admin.component.html',
@@ -23,6 +29,7 @@ export class DashboardAdminComponent implements OnInit {
 
   activities: Activity[] = [];
   filteredActivities: Activity[] = [];
+  recentAchievements: RecentAchievement[] = [];
 
   searchQuery = '';
   statusFilter = 'all';
@@ -40,8 +47,10 @@ export class DashboardAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadActivities();
+    this.loadRecentAchievements();
   }
 
+  // ===== تحميل جميع الأنشطة =====
   loadActivities(): void {
     this.activityService.getAll().subscribe({
       next: (res) => {
@@ -63,17 +72,37 @@ export class DashboardAdminComponent implements OnInit {
     });
   }
 
+  // ===== تحميل أحدث الإنجازات =====
+  loadRecentAchievements(): void {
+    this.activityService.getRecentAchievements().subscribe({
+      next: (res: any) => {
+        this.recentAchievements = res.map((a: any) => ({
+          message: `تمت إضافة إنجاز جديد بواسطة ${
+            a.user?.fullName || 'مستخدم غير معروف'
+          } 
+      بعنوان: "${a.activityTitle}" ضمن المعيار "${
+            a.MainCriteria?.name || 'غير محدد'
+          }"`,
+          time: a.date,
+          id: a._id,
+        }));
+      },
+      error: (err) => {
+        console.error('خطأ في تحميل الإنجازات الحديثة', err);
+      },
+    });
+
+  }
+
   applyFilters(): void {
     let filtered = this.activities;
 
-    // تصفية حسب المستخدم (لو مستخدم عادي)
     if (this.currentUser.role === 'user') {
       filtered = filtered.filter(
         (a) => a.user === this.currentUser.id && a.SaveStatus !== 'مسودة'
       );
     }
 
-    // البحث
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -84,14 +113,12 @@ export class DashboardAdminComponent implements OnInit {
       );
     }
 
-    // الحالة
     if (this.statusFilter !== 'all') {
       filtered = filtered.filter(
         (a) => a.status === this.getArabicStatus(this.statusFilter)
       );
     }
 
-    // القسم (إن وجد)
     if (this.departmentFilter !== 'all') {
       filtered = filtered.filter(
         (a) => (a as any).department === this.departmentFilter

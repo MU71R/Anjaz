@@ -38,6 +38,8 @@ const routes: Routes = [
     path: 'my-achievements',
     component: MyAchievementsComponent,
   },
+  { path: 'add-achievement/:id', component: AddAchievementComponent }, 
+
   { path: 'drafts', component: DraftsComponent }, // المسودة
   { path: 'archive', component: ArchivedActivitiesComponent },
   // أي مسار غير معروف يعيد إلى login

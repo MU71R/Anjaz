@@ -213,7 +213,7 @@ export class AddAchievementComponent implements OnInit {
       return;
     }
 
-    const payload = this.createFormData('مسودة', 'مسودة'); // عدل هنا
+const payload = this.createFormData('قيد المراجعة', 'مسودة');
 
     this.activityService.addActivity(payload).subscribe({
       next: () => {

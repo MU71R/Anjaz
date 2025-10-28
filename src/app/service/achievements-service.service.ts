@@ -119,9 +119,29 @@ export class ActivityService {
     );
   }
 
-  getDraftActivities(): Observable<Activity[]> {
-    return this.http.get<Activity[]>(`${this.API_BASE_URL}/draft`, {
-      headers: this.getAuthHeaders(),
-    });
+  getDraftActivities(): Observable<{ success: boolean; data: Activity[] }> {
+    return this.http.get<{ success: boolean; data: Activity[] }>(
+      `${this.API_BASE_URL}/draft`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  // في achievement-service.service.ts
+  getActivityById(id: string): Observable<any> {
+    return this.http.get(`${this.API_BASE_URL}/${id}`);
+  }
+
+  updateActivity(id: string, activityData: FormData): Observable<any> {
+    return this.http.put(`${this.API_BASE_URL}/update/${id}`, activityData);
+  }
+
+  // ===== إضافة في ActivityService =====
+  getRecentAchievements(): Observable<
+    { message: string; time: string; id: string }[]
+  > {
+    return this.http.get<{ message: string; time: string; id: string }[]>(
+      `${this.API_BASE_URL}/recent-achievements`,
+      { headers: this.getAuthHeaders() }
+    );
   }
 }

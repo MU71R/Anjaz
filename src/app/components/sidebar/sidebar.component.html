@@ -1,15 +1,13 @@
-<!-- زر إظهار القائمة على الشاشات الصغيرة -->
-<button class="toggle-btn d-lg-none" (click)="isSidebarOpen = !isSidebarOpen" aria-label="s">
+<button class="toggle-btn d-lg-none" (click)="isSidebarOpen = !isSidebarOpen" aria-label="Toggle sidebar">
     <i class="fa-solid fa-bars"></i>
 </button>
 
-<!-- القائمة الجانبية -->
 <aside class="sidebar shadow-sm" [class.open]="isSidebarOpen">
     <div class="sidebar-header text-center border-bottom pb-3">
         <div class="logo-section mb-2">
-            <i class="fa-solid fa-mortarboard fa-2x text-primary"></i>
+            <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
         </div>
-        <h5 class="fw-bold text-dark">لوحة التحكم</h5>
+        <h5 class="fw-bold mb-1">لوحة التحكم</h5>
         <span class="badge bg-primary">مسؤول النظام</span>
     </div>
 
@@ -20,40 +18,47 @@
                     <i class="fa-solid fa-house me-2"></i> الرئيسية
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/add-achievement" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-plus me-2"></i> إضافة إنجاز
+                    <i class="fa-solid fa-circle-plus me-2"></i> إضافة إنجاز
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/my-achievements" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-trophy me-2"></i> إنجازاتي
+                    <i class="fa-solid fa-medal me-2"></i> إنجازاتي
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/administration" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-users me-2"></i> إدارة المستخدمين
+                    <i class="fa-solid fa-users-gear me-2"></i> إدارة المستخدمين
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/criteria-management" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-building me-2"></i> إدارة المعايير
+                    <i class="fa-solid fa-layer-group me-2"></i> إدارة المعايير
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/archive" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-archive me-2"></i> الأرشيف
+                    <i class="fa-solid fa-box-archive me-2"></i> الأرشيف
                 </a>
             </li>
+
             <li class="nav-item">
                 <a routerLink="/drafts" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-file-alt me-2"></i> المسودة
+                    <i class="fa-solid fa-file-pen me-2"></i> المسودات
                 </a>
             </li>
+
         </ul>
     </nav>
 
-    <div class="sidebar-footer border-top pt-3 mt-auto text-center">
+    <div class="sidebar-footer border-top pt-3 text-center">
         <a (click)="logout()" class="nav-link text-danger fw-semibold">
             <i class="fa-solid fa-right-from-bracket me-2"></i> تسجيل الخروج
         </a>
