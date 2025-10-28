@@ -1,0 +1,34 @@
+<div class="container mt-4" dir="rtl">
+
+    <div class="header-box mb-4 p-4 rounded shadow-sm bg-primary text-white">
+        <h2 class="fw-bold mb-1">المسودات</h2>
+        <p class="opacity-75 mb-0">جميع الإنجازات المحفوظة كمسودة</p>
+    </div>
+
+    <div *ngIf="loading" class="text-center my-5">
+        <div class="spinner-border text-primary"></div>
+    </div>
+
+    <div *ngIf="!loading && draftActivities.length === 0" class="alert alert-info text-center">
+        لا توجد مسودات حاليًا.
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3" *ngFor="let activity of draftActivities">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ activity.activityTitle }}</h5>
+                    <p class="card-text text-muted">{{ activity.activityDescription }}</p>
+
+                    <p class="small text-secondary mb-1">
+                        <strong>المعيار الرئيسي:</strong> {{ getMainCriteriaName(activity) }}
+                    </p>
+                    <p class="small text-secondary">
+                        <strong>المعيار الفرعي:</strong> {{ getSubCriteriaName(activity) }}
+                    </p>
+                    <span class="badge bg-secondary">{{ activity.SaveStatus }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

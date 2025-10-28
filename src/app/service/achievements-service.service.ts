@@ -18,12 +18,10 @@ export class ActivityService {
     if (token) {
       headers = headers.set('Authorization', token);
     }
-    // لا تضيف Content-Type لـ FormData - المتصفح سيفعل ذلك تلقائياً
     return headers;
   }
 
   addActivity(data: FormData): Observable<any> {
-    // بالنسبة لـ FormData، دع المتصفح يضبط Content-Type مع boundary تلقائياً
     const headers = this.getAuthHeaders();
 
     return this.http.post<any>(`${this.API_BASE_URL}/add`, data, {
@@ -112,5 +110,18 @@ export class ActivityService {
       `${this.API_BASE_URL}/filter`,
       { params, headers: this.getAuthHeaders() }
     );
+  }
+
+  getArchivedActivities(): Observable<{ success: boolean; data: Activity[] }> {
+    return this.http.get<{ success: boolean; data: Activity[] }>(
+      `${this.API_BASE_URL}/archived`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  getDraftActivities(): Observable<Activity[]> {
+    return this.http.get<Activity[]>(`${this.API_BASE_URL}/draft`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }

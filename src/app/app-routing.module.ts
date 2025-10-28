@@ -6,6 +6,8 @@ import { AdministrationComponent } from './components/administration/administrat
 import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
 import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
 import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
+import { DraftsComponent } from './components/draft/draft.component';
+import { ArchivedActivitiesComponent } from './components/archives/archives.component';
 // import { AuthGuard } from './guards/auth.guard';
 // import { LoginGuard } from './guards/login.guard';
 
@@ -13,7 +15,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
   // صفحة تسجيل الدخول - محمية بـ LoginGuard لمنع الوصول بعد تسجيل الدخول
-  { path: 'login', component: LoginComponent},
+  { path: 'login', component: LoginComponent },
 
   // الصفحات الداخلية المحمية
   {
@@ -36,9 +38,10 @@ const routes: Routes = [
     path: 'my-achievements',
     component: MyAchievementsComponent,
   },
+  { path: 'drafts', component: DraftsComponent }, // المسودة
+  { path: 'archive', component: ArchivedActivitiesComponent },
   // أي مسار غير معروف يعيد إلى login
   { path: '**', redirectTo: 'login' },
-
 ];
 
 @NgModule({

@@ -1,0 +1,13 @@
+.header-box {
+    background-color: #007bff;
+    color: white;
+}
+
+.card {
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}

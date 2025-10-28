@@ -21,19 +21,22 @@ export interface Achievement {
 }
 
 // src/app/model/achievement.ts
+// src/app/model/achievement.ts
 export interface Activity {
   _id?: string;
-  user: string; // ObjectId
+  user: { _id?: string; name?: string } | string;
   activityTitle: string;
   activityDescription: string;
-  MainCriteria: string; // ObjectId
-  SubCriteria: string; // ObjectId
-  status: 'مرفوض' | 'قيد المراجعة' | 'معتمد';
+  MainCriteria: { _id?: string; name?: string } | string;
+  SubCriteria: { _id?: string; name?: string } | string;
+  department?: { _id?: string; name?: string } | string;
+  status: 'مرفوض' | 'قيد المراجعة' | 'معتمد' | string;
   SaveStatus: 'مسودة' | 'مكتمل';
   Attachments: string[];
-  name: string;
+  name?: string;
   date?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
+
 

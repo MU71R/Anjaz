@@ -34,22 +34,30 @@ export class AddAchievementComponent implements OnInit {
   }
 
   initializeForm(): void {
-    this.form = this.fb.group({
-      activityTitle: ['', [Validators.required, Validators.maxLength(150)]],
-      activityDescription: [
-        '',
-        [Validators.required, Validators.minLength(10)],
-      ],
-      MainCriteria: ['', Validators.required],
-      SubCriteria: ['', Validators.required],
-    });
+    this.form = this.fb.group(
+      {
+        activityTitle: ['', [Validators.required, Validators.maxLength(150)]],
+        activityDescription: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(10),
+            Validators.maxLength(300),
+          ],
+        ],
+        MainCriteria: ['', Validators.required],
+        SubCriteria: ['', Validators.required],
+        name: [''],
+      },
+      { updateOn: 'change' }
+    );
   }
 
   loadMainCriteria(): void {
     this.criteriaService.getAllMainCriteria().subscribe({
       next: (res: any[]) => {
         this.mainCriteria = res;
-        console.log('✅ Main Criteria:', res);
+        console.log(' Main Criteria:', res);
       },
       error: () => {
         Swal.fire({
@@ -66,43 +74,29 @@ export class AddAchievementComponent implements OnInit {
   onMainCriterionChange(event: Event): void {
     const target = event.target as HTMLSelectElement | null;
     this.selectedMain = target?.value ?? '';
+    this.form.patchValue({ SubCriteria: '' });
 
     if (this.selectedMain) {
       this.getSubCriteria(this.selectedMain);
-      this.form.patchValue({ SubCriteria: '' });
     } else {
       this.subCriteria = [];
-      this.form.patchValue({ SubCriteria: '' });
     }
   }
 
   getSubCriteria(mainId: string): void {
     this.criteriaService.getAllSubCriteria().subscribe({
       next: (res: SubCriteria[]) => {
-        console.log('🔍 All Subcriteria:', res);
-
-        // استخدم الخاصية الصحيحة بناءً على ما تراه في الكونسول
         this.subCriteria = res.filter((sub) => {
-          // جرب هذه الخيارات - سترى في الكونسول أيها صحيح
-          if ((sub as any).MainCriteria === mainId) return true;
-          if ((sub as any).mainCriteria === mainId) return true;
-          if ((sub as any).mainCriteriaId === mainId) return true;
-          return false;
+          const mcId =
+            typeof sub.mainCriteria === 'string'
+              ? sub.mainCriteria
+              : sub.mainCriteria._id;
+          return mcId === mainId;
         });
-
-        console.log(
-          '✅ Filtered Subcriteria for',
-          mainId,
-          ':',
-          this.subCriteria
-        );
-
-        if (this.subCriteria.length === 0) {
-          console.warn('⚠️ No sub-criteria found for main criteria:', mainId);
-        }
+        console.log('Filtered Subcriteria:', this.subCriteria);
       },
-      error: (error) => {
-        console.error('❌ Error loading sub-criteria:', error);
+      error: (err) => {
+        console.error('Error loading sub-criteria:', err);
         Swal.fire({
           title: 'خطأ',
           text: 'حدث خطأ أثناء تحميل المعايير الفرعية من الخادم.',
@@ -121,8 +115,15 @@ export class AddAchievementComponent implements OnInit {
   }
 
   syncDescriptionToForm() {
-    const html = this.descriptionEditor.nativeElement.innerHTML.trim();
-    this.form.get('activityDescription')?.setValue(html);
+    let html = this.descriptionEditor.nativeElement.innerHTML.trim();
+
+    const text = html
+      .replace(/<br\s*\/?>/gi, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/<[^>]*>/g, '')
+      .trim();
+
+    this.form.get('activityDescription')?.setValue(text);
     this.form.get('activityDescription')?.markAsTouched();
   }
 
@@ -174,7 +175,6 @@ export class AddAchievementComponent implements OnInit {
     }
 
     const payload = this.createFormData('قيد المراجعة', 'مكتمل');
-
     Swal.fire({
       title: 'جاري الإرسال...',
       text: 'يرجى الانتظار قليلاً.',
@@ -185,16 +185,16 @@ export class AddAchievementComponent implements OnInit {
     });
 
     this.activityService.addActivity(payload).subscribe({
-      next: (res) => {
+      next: () => {
         Swal.fire({
           title: 'تم الإرسال',
-          text: 'تم إرسال النشاط بنجاح ✅',
+          text: 'تم إرسال النشاط بنجاح ',
           icon: 'success',
           confirmButtonText: 'حسناً',
         }).then(() => this.resetForm());
       },
       error: (err) => {
-        console.error('❌ خطأ أثناء الإرسال:', err);
+        console.error(' خطأ أثناء الإرسال:', err);
         Swal.fire({
           title: 'خطأ',
           text: err?.error?.message || 'حدث خطأ أثناء الإرسال إلى الخادم.',
@@ -213,19 +213,20 @@ export class AddAchievementComponent implements OnInit {
       return;
     }
 
-    const payload = this.createFormData('قيد المراجعة', 'مسودة');
+    const payload = this.createFormData('مسودة', 'مسودة'); // عدل هنا
 
     this.activityService.addActivity(payload).subscribe({
-      next: (res) => {
+      next: () => {
         Swal.fire({
           title: 'تم الحفظ',
           text: 'تم حفظ المسودة بنجاح.',
           icon: 'success',
           confirmButtonText: 'حسناً',
         });
+        this.resetForm();
       },
       error: (err) => {
-        console.error('❌ خطأ أثناء حفظ المسودة:', err);
+        console.error('خطأ أثناء حفظ المسودة:', err);
         Swal.fire({
           title: 'خطأ',
           text: 'فشل في حفظ المسودة.',
@@ -237,33 +238,29 @@ export class AddAchievementComponent implements OnInit {
   }
 
   private createFormData(
-    status: 'مرفوض' | 'قيد المراجعة' | 'معتمد',
+    status: 'مرفوض' | 'قيد المراجعة' | 'معتمد' | 'مسودة',
     saveStatus: 'مسودة' | 'مكتمل'
   ): FormData {
     const payload = new FormData();
 
-    // الحقول الأساسية من النموذج
     payload.append('activityTitle', this.form.value.activityTitle);
     payload.append('activityDescription', this.form.value.activityDescription);
     payload.append('MainCriteria', this.form.value.MainCriteria);
     payload.append('SubCriteria', this.form.value.SubCriteria);
-
-    // الحقول الإضافية المطلوبة
     payload.append('status', status);
     payload.append('SaveStatus', saveStatus);
-    payload.append('name', localStorage.getItem('fullname') || '');
     payload.append('user', localStorage.getItem('userId') || '');
+    payload.append(
+      'name',
+      this.form.value.name || localStorage.getItem('fullname') || ''
+    );
 
-    // المرفقات
     this.attachments.forEach((file) => {
       payload.append('Attachments', file, file.name);
     });
 
-    // طباعة بيانات FormData للتأكد
-    console.log('📤 FormData contents:');
-    payload.forEach((value, key) => {
-      console.log(`${key}:`, value);
-    });
+    console.log('FormData contents:');
+    payload.forEach((v, k) => console.log(`${k}:`, v));
 
     return payload;
   }
@@ -275,23 +272,16 @@ export class AddAchievementComponent implements OnInit {
   }
 
   private showValidationErrors(): void {
-    const errors = [];
+    const errors: string[] = [];
 
-    if (this.form.get('activityTitle')?.invalid) {
+    if (this.form.get('activityTitle')?.invalid)
       errors.push('• العنوان مطلوب (حتى 150 حرف)');
-    }
-
-    if (this.form.get('activityDescription')?.invalid) {
+    if (this.form.get('activityDescription')?.invalid)
       errors.push('• الوصف مطلوب (10 أحرف على الأقل)');
-    }
-
-    if (this.form.get('MainCriteria')?.invalid) {
+    if (this.form.get('MainCriteria')?.invalid)
       errors.push('• المعيار الرئيسي مطلوب');
-    }
-
-    if (this.form.get('SubCriteria')?.invalid) {
+    if (this.form.get('SubCriteria')?.invalid)
       errors.push('• المعيار الفرعي مطلوب');
-    }
 
     Swal.fire({
       title: 'بيانات ناقصة',
@@ -309,8 +299,8 @@ export class AddAchievementComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'نعم',
       cancelButtonText: 'لا',
-    }).then((result) => {
-      if (result.isConfirmed) {
+    }).then((r) => {
+      if (r.isConfirmed) {
         this.resetForm();
         Swal.fire('تم', 'تم إلغاء العملية.', 'success');
       }

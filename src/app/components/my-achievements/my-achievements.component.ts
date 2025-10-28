@@ -1,159 +1,173 @@
 import { Component, OnInit } from '@angular/core';
-
-interface Achievement {
-  id: string;
-  userId: string;
-  title: string;
-  description: string;
-  user: string;
-  college: string;
-  category: string;
-  attachmentsCount: number;
-  date: string;
-  status: 'قيد المراجعة' | 'معتمد' | 'مرفوض';
-  rejectionNotes?: string;
-}
+import { ActivityService } from '../../service/achievements-service.service';
+import { Activity } from 'src/app/model/achievement';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-my-achievements',
   templateUrl: './my-achievements.component.html',
-  styleUrls: ['./my-achievements.component.css']
+  styleUrls: ['./my-achievements.component.css'],
 })
 export class MyAchievementsComponent implements OnInit {
-  searchTerm: string = '';
-  statusFilter: string = 'all';
-  achievements: Achievement[] = [];
-  selectedAchievement: Achievement | null = null;
-  rejectionReason: string = '';
+  searchTerm = '';
+  statusFilter = 'all';
+  achievements: Activity[] = [];
+  selectedAchievement: Activity | null = null;
+  rejectionReason = '';
 
-  // 🟢 التحكم بالمودالات
   showDetailsModal = false;
   showRejectModal = false;
 
+  constructor(private activityService: ActivityService) {}
+
   ngOnInit(): void {
-    this.achievements = this.getMockData();
+    this.loadActivities();
   }
 
-  // بيانات تجريبية
-  getMockData(): Achievement[] {
-    return [
-      {
-        id: '1',
-        userId: '1',
-        title: 'نشر بحث علمي في مجلة دولية محكمة',
-        description: 'تم نشر بحث علمي متميز في مجال التعليم الإلكتروني.',
-        user: 'فاطمة خالد السالم',
-        college: 'قطاع التعليم',
-        category: 'البحث العلمي',
-        attachmentsCount: 1,
-        date: '١٤٤٧/٠٩/٠٩',
-        status: 'قيد المراجعة'
+  // تحميل الإنجازات
+  loadActivities(): void {
+    this.activityService.getAll().subscribe({
+      next: (res) => {
+        if (res.success) this.achievements = res.activities;
       },
-      {
-        id: '2',
-        userId: '2',
-        title: 'تطوير تطبيق تعليمي ذكي',
-        description: 'تطوير تطبيق يستخدم الذكاء الاصطناعي لتحسين تجربة التعلم.',
-        user: 'سارة القحطاني',
-        college: 'قطاع الهندسة',
-        category: 'الابتكار',
-        attachmentsCount: 2,
-        date: '١٤٤٧/٠٥/٢٢',
-        status: 'معتمد'
+      error: () => {
+        Swal.fire('خطأ', 'حدث خطأ أثناء تحميل الإنجازات', 'error');
       },
-      {
-        id: '3',
-        userId: '3',
-        title: 'الحصول على براءة اختراع',
-        description: 'براءة اختراع في مجال الطاقة المتجددة.',
-        user: 'علي الدوسري',
-        college: 'قطاع العلوم',
-        category: 'الاختراع',
-        attachmentsCount: 3,
-        date: '١٤٤٦/٠٨/١٥',
-        status: 'مرفوض',
-        rejectionNotes: 'الوثائق غير مكتملة وغير مصدقة.'
-      }
-    ];
+    });
   }
 
-  filteredAchievements(): Achievement[] {
+  // فلترة البحث
+  filteredAchievements(): Activity[] {
     let list = [...this.achievements];
+    const term = this.searchTerm.trim().toLowerCase();
 
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      list = list.filter(a =>
-        a.title.toLowerCase().includes(term) ||
-        a.description.toLowerCase().includes(term) ||
-        a.user.toLowerCase().includes(term)
+    if (term) {
+      list = list.filter(
+        (a) =>
+          a.activityTitle.toLowerCase().includes(term) ||
+          a.activityDescription.toLowerCase().includes(term) ||
+          (a.name?.toLowerCase().includes(term) ?? false)
       );
     }
 
     if (this.statusFilter !== 'all') {
-      list = list.filter(a => a.status === this.statusFilter);
+      list = list.filter((a) => a.status === this.statusFilter);
     }
 
     return list;
   }
 
-  resetFilters() {
+  resetFilters(): void {
     this.searchTerm = '';
     this.statusFilter = 'all';
   }
 
-  // 🔍 عرض التفاصيل
-  openDetailsModal(achievement: Achievement) {
-    this.selectedAchievement = achievement;
+  // عرض التفاصيل
+  openDetailsModal(activity: Activity): void {
+    this.selectedAchievement = activity;
     this.showDetailsModal = true;
   }
 
-  closeDetailsModal() {
+  closeDetailsModal(): void {
     this.showDetailsModal = false;
     this.selectedAchievement = null;
   }
 
-  // ❌ رفض الإنجاز
-  openRejectModal(achievement: Achievement) {
-    this.selectedAchievement = achievement;
+  // رفض الإنجاز
+  openRejectModal(activity: Activity): void {
+    this.selectedAchievement = activity;
     this.rejectionReason = '';
     this.showRejectModal = true;
   }
 
-  closeRejectModal() {
+  closeRejectModal(): void {
     this.showRejectModal = false;
   }
 
-  submitRejection() {
-    if (!this.selectedAchievement) return;
+  submitRejection(): void {
+    const achievement = this.selectedAchievement;
+    if (!achievement || !achievement._id) return;
 
-    this.achievements = this.achievements.map(a =>
-      a.id === this.selectedAchievement!.id
-        ? { ...a, status: 'مرفوض', rejectionNotes: this.rejectionReason }
-        : a
-    );
-
-    this.showRejectModal = false;
-    this.showDetailsModal = false;
+    this.activityService.updateStatus(achievement._id!, 'مرفوض').subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.updateLocalStatus(achievement._id!, 'مرفوض');
+          this.showRejectModal = false;
+          this.showDetailsModal = false;
+          Swal.fire('تم الرفض', 'تم رفض الإنجاز بنجاح', 'success');
+        }
+      },
+      error: () => Swal.fire('خطأ', 'تعذر رفض الإنجاز', 'error'),
+    });
   }
 
-  // 🟢 اعتماد / حذف / إعادة تعيين
-  handleAction(action: string, id: string) {
+  // اعتماد / حذف / إعادة تعيين
+  handleAction(action: string, id?: string): void {
+    if (!id) return;
     if (action === 'approve') {
-      this.updateStatus(id, 'معتمد');
-      this.showDetailsModal = false;
+      this.updateActivityStatus(id, 'معتمد');
     } else if (action === 'delete') {
-      this.achievements = this.achievements.filter(a => a.id !== id);
+      this.deleteActivity(id);
     } else if (action === 'reassign') {
-      this.updateStatus(id, 'قيد المراجعة');
+      this.updateActivityStatus(id, 'قيد المراجعة');
     }
   }
 
-  updateStatus(id: string, status: 'معتمد' | 'قيد المراجعة' | 'مرفوض') {
-    this.achievements = this.achievements.map(a =>
-      a.id === id ? { ...a, status } : a
+  // تحديث الحالة
+  updateActivityStatus(
+    id: string,
+    status: 'معتمد' | 'قيد المراجعة' | 'مرفوض'
+  ): void {
+    this.activityService.updateStatus(id, status).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.updateLocalStatus(id, status);
+          this.showDetailsModal = false;
+          Swal.fire('تم', `تم تحديث الحالة إلى ${status}`, 'success');
+        }
+      },
+      error: () => Swal.fire('خطأ', 'تعذر تحديث الحالة', 'error'),
+    });
+  }
+
+  // حذف الإنجاز
+  deleteActivity(id: string): void {
+    Swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: 'سيتم حذف هذا الإنجاز نهائيًا',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، حذف',
+      cancelButtonText: 'إلغاء',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.activityService.delete(id).subscribe({
+          next: (res) => {
+            if (res.success) {
+              this.achievements = this.achievements.filter((a) => a._id !== id);
+              Swal.fire('تم الحذف', 'تم حذف الإنجاز بنجاح', 'success');
+            }
+          },
+          error: () => Swal.fire('خطأ', 'تعذر حذف الإنجاز', 'error'),
+        });
+      }
+    });
+  }
+
+  // تحديث الحالة محلياً
+  private updateLocalStatus(id: string, status: string): void {
+    this.achievements = this.achievements.map((a) =>
+      a._id === id ? { ...a, status } : a
     );
   }
 
+  // عرض النص بطريقة موحدة (field ممكن يكون string أو object)
+  getNameField(field: any): string {
+    if (!field) return 'غير محدد';
+    return typeof field === 'object' ? field.name || 'غير محدد' : field;
+  }
+
+  // ألوان الحالة
   getStatusClass(status: string): string {
     switch (status) {
       case 'معتمد':
@@ -166,4 +180,5 @@ export class MyAchievementsComponent implements OnInit {
         return '';
     }
   }
+
 }

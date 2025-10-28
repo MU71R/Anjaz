@@ -1,0 +1,49 @@
+<div class="container mt-4" dir="rtl">
+    <!-- <app-sidebar></app-sidebar> -->
+
+    <div class="header-box mb-4 p-4 rounded shadow-sm">
+        <h2 class="fw-bold text-white mb-1">الأرشيف</h2>
+        <p class="text-light opacity-75 mb-0">
+            جميع الإنجازات المعتمدة والمؤرشفة
+        </p>
+    </div>
+
+    <div *ngIf="loading" class="text-center text-muted py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2">جاري التحميل...</p>
+    </div>
+
+    <div *ngIf="!loading && archivedActivities.length === 0" class="text-center text-muted">
+        لا توجد إنجازات مؤرشفة حالياً
+    </div>
+
+    <div class="row" *ngIf="!loading && archivedActivities.length > 0">
+        <div class="col-md-6 col-lg-4 mb-4" *ngFor="let activity of archivedActivities">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ activity.activityTitle }}</h5>
+                    <p class="card-text text-muted">
+                        {{ activity.activityDescription }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>المعيار الرئيسي:</strong>
+                        {{ getCriteriaName(activity.MainCriteria) }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>المعيار الفرعي:</strong>
+                        {{ getCriteriaName(activity.SubCriteria) }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>المنفذ:</strong> {{ activity.name || '-' }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>تاريخ النشاط:</strong>
+                        <!-- {{ activity.date | date: 'dd/MM/yyyy' }} -->
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

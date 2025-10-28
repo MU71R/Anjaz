@@ -1,198 +1,183 @@
-.custom-container {
-    /* تحديد عرض أقصى للحاوية بدلاً من أن تملأ الشاشة بالكامل */
-    max-width: 1200px !important; 
-    margin: 40px auto 20px  !important; /* توسيط الحاوية */
-    position: relative; /* لتحديد موقع الـ div في الأسفل يسار */
-    bottom: 20px; /* 20 بكسل من الأسفل */
-    right: 7rem; /* 20 بكسل من اليسار */
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-
-}
-
-/* ==================================== */
-/* 2. تصغير حجم البطاقة (Card) وتقليل الهوامش */
-/* ==================================== */
-.achievement-card {
-    border-right: 4px solid #007bff; /* تقليل عرض الشريط الجانبي */
-    border-radius: 6px; /* تقليل زوايا التقوس */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ظل أخف */
-    padding: 0 !important;
-}
-
-.achievement-card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* ظل أعمق عند التحويم */
-}
-
-.card-header-custom {
-    padding: 0.75rem 1.25rem 0.5rem 1rem; /* تقليل البادينغ */
-}
-
-/* ==================================== */
-/* 3. تصغير حجم الخطوط والعناصر داخل البطاقة */
-/* ==================================== */
-
-/* العنوان الرئيسي للإنجاز */
-.small-title {
-    font-size: 1.0em; /* تصغير حجم الخط */
-    margin-bottom: 0.3rem;
-}
-
-/* وصف الإنجاز */
-.small-description {
-    font-size: 0.85em; /* تصغير حجم الخط */
-    margin-bottom: 0.8rem;
-}
-
-/* حالة الإنجاز (Badge) */
-.small-badge {
-    padding: 3px 8px; /* تقليل البادينغ */
-    font-size: 0.75em; /* تصغير حجم الخط */
-}
-
-/* البيانات الوصفية (Metadata) */
-.small-metadata {
-    font-size: 0.8em; /* تصغير حجم الخط */
-    gap: 10px !important;
-    margin-bottom: 0.5rem !important;
-}
-
-/* أيقونات الإجراءات في الهيدر */
-.btn-xs {
-    padding: 0.15rem; /* تقليل البادينغ */
-    font-size: 0.85rem;
-}
-
-/* الفئة والمرفقات */
-.small-link {
-    font-size: 0.85em;
-}
-
-.small-attachment {
-    font-size: 0.8em;
-}
-
-/* زر الاعتماد في الأسفل */
-.approve-btn, .view-approved-btn {
-    font-size: 0.85rem; /* تصغير حجم الخط */
-    padding: 0.3rem 0.8rem; /* تصغير البادينغ */
-    min-width: 100px;
-}
-
-/* شريط الإجراءات السفلي (Footer) */
-.card-actions-footer {
-    padding: 0.5rem 1rem 0.8rem 1rem !important;
-}
-
-/* أيقونات Font Awesome (للتأكد من صغر حجمها) */
-.meta-icon {
-    font-size: 0.9em;
-    margin-left: 4px;
-}
-
-/* الأنماط المتبقية من الكود السابق للحفاظ على التصميم */
-.page-title { font-size: 1.5em; font-weight: bold; color: #343a40;}
-.review-button { font-weight: bold; }
-.search-input-group { box-shadow: 0 0 3px rgba(0, 0, 0, 0.05); border-radius: 0.25rem; }
-.status-approved { background-color: #28a745; }
-.status-pending { background-color: #ffc107; color: #333; }
-.status-rejected { background-color: #dc3545; }
-.reassign-btn { font-weight: bold; border-radius: 4px; }
-
-/* === تنسيقات عامة للمكون === */
-.custom-container {
-  background-color: #f9fafb;
-  border-radius: 8px;
-}
-
-/* === كروت الإنجازات === */
-.achievement-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-}
-.achievement-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* === العناوين والوصف === */
-.achievement-title {
-  color: #111827;
-}
-.achievement-description {
-  color: #4b5563;
-  font-size: 0.9rem;
-}
-
-/* === الميتاداتا === */
-.meta-item {
+.achievements-page {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #6b7280;
-  font-size: 0.85rem;
-}
-.meta-icon {
-  color: #9ca3af;
-}
-
-/* === الشارات === */
-.status-badge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: 6px;
-}
-
-/* === الأزرار === */
-.btn-icon {
-  background: transparent;
-  border: none;
-  color: #4b5563;
-  padding: 4px;
-  transition: color 0.2s;
-}
-.btn-icon:hover {
-  color: #1d4ed8;
-}
-
-
-
-
-.modal-content {
-  font-family: "Cairo", sans-serif;
   direction: rtl;
+  font-family: "Cairo", sans-serif;
+  color: #2c3e50;
 }
 
-.modal-header h5 {
-  font-weight: 700;
+/* السايدبار */
+.sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
-.badge {
-  font-size: 0.8rem;
+/* المحتوى */
+.achievements-content {
+  flex-grow: 1;
+  padding: 20px;
+  margin-right: 250px;
+  /* عشان المسافة مع السايدبار */
+  max-width: 1200px;
 }
 
-.text-muted.small {
-  font-size: 0.85rem;
-  line-height: 1.4;
+/* رأس الصفحة */
+.header-box {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border-radius: 12px;
 }
 
-.form-control.small {
-  font-size: 0.9rem;
+/* شريط الفلترة */
+.filter-bar {
+  background-color: #f8fafc;
+  border: 1px solid #e1e5eb;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.btn {
+.search-input {
+  flex: 1;
+  min-width: 250px;
   border-radius: 8px;
+}
+
+.filter-select {
+  min-width: 170px;
+  border-radius: 8px;
+}
+
+.reset-btn {
   font-weight: 500;
 }
 
-.modal-body p {
-  margin-bottom: 0.4rem;
+/* كرت الإنجاز */
+.achievement-card {
+  background-color: #fff;
+  border: 1px solid #e4e8ed;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+  transition: all 0.2s ease;
 }
 
-.modal-dialog {
-  max-width: 550px;
+.achievement-card:hover {
+  background-color: #f9fbff;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.achievement-title {
+  font-weight: 700;
+  color: #1a237e;
+  margin-bottom: 8px;
+}
+
+.achievement-desc {
+  color: #34495e;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.achievement-meta {
+  color: #607d8b;
+}
+
+/* الحالة */
+.status-badge {
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-approved {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-pending {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.status-rejected {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* الأزرار */
+.actions .btn {
+  font-size: 0.8rem;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.actions .btn:hover {
+  transform: translateY(-1px);
+}
+
+/* المودال */
+.modal-content {
+  direction: rtl;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e1e5eb;
+}
+
+.modal-title {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.modal-body p {
+  margin-bottom: 0.8rem;
+  color: #2c3e50;
+}
+
+/* التجاوب */
+@media (max-width: 768px) {
+  .achievements-page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+  }
+
+  .achievements-content {
+    margin-right: 0;
+    padding: 10px;
+  }
+
+  .achievement-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

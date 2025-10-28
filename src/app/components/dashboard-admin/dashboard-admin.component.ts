@@ -1,167 +1,108 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { LoginService } from '../../service/login.service';
-
-interface Achievement {
-  id: number;
-  userId: number;
-  userName: string;
-  department: string;
-  title: string;
-  description: string;
-  mainCriterion: string;
-  subCriterion: string;
-  status: 'pending' | 'approved' | 'rejected' | 'draft';
-  createdAt: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { ActivityService } from '../../service/achievements-service.service';
+import { Activity } from 'src/app/model/achievement';
+import Swal from 'sweetalert2';
 
 interface User {
-  id: number;
+  id: string;
   fullName: string;
   role: 'admin' | 'user';
 }
-
 
 @Component({
   selector: 'app-dashboard-admin',
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css'],
 })
-export class DashboardAdminComponent {
-  currentUser: User = { id: 1, fullName: 'محمد أحمد', role: 'admin' };
+export class DashboardAdminComponent implements OnInit {
+  currentUser: User = {
+    id: localStorage.getItem('userId') || '',
+    fullName: localStorage.getItem('fullname') || '',
+    role: (localStorage.getItem('role') as 'admin' | 'user') || 'user',
+  };
 
-  achievements: Achievement[] = [];
-  filteredAchievements: Achievement[] = [];
+  activities: Activity[] = [];
+  filteredActivities: Activity[] = [];
 
   searchQuery = '';
   statusFilter = 'all';
   departmentFilter = 'all';
-
   departments: string[] = [];
 
-  stats: Record<'all' | 'total' | 'pending' | 'approved' | 'rejected', number> =
-    {
-      all: 0,
-      total: 0,
-      pending: 0,
-      approved: 0,
-      rejected: 0,
-    };
+  stats = {
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  };
 
-    
+  constructor(private activityService: ActivityService) {}
 
-  ngOnInit() {
-    // بيانات تجريبية
-    this.achievements = [
-      {
-        id: 1,
-        userId: 1,
-        userName: 'أحمد علي',
-        department: 'تقنية المعلومات',
-        title: 'إنجاز 1',
-        description: 'وصف 1',
-        mainCriterion: 'المعيار الرئيسي 1',
-        subCriterion: 'المعيار الفرعي 1',
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        userId: 2,
-        userName: 'منى خالد',
-        department: 'الموارد البشرية',
-        title: 'إنجاز 2',
-        description: 'وصف 2',
-        mainCriterion: 'المعيار الرئيسي 2',
-        subCriterion: 'المعيار الفرعي 2',
-        status: 'approved',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 3,
-        userId: 1,
-        userName: 'أحمد علي',
-        department: 'تقنية المعلومات',
-        title: 'إنجاز 3',
-        description: 'وصف 3',
-        mainCriterion: 'المعيار الرئيسي 3',
-        subCriterion: 'المعيار الفرعي 3',
-        status: 'rejected',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    this.departments = Array.from(
-      new Set(this.achievements.map((a) => a.department))
-    );
-
-    this.applyFilters();
+  ngOnInit(): void {
+    this.loadActivities();
   }
 
-  applyFilters() {
-    let filtered = this.achievements;
+  loadActivities(): void {
+    this.activityService.getAll().subscribe({
+      next: (res) => {
+        this.activities = res.activities.filter(
+          (a) => a.SaveStatus !== 'مسودة'
+        );
+        this.departments = Array.from(
+          new Set(
+            this.activities
+              .map((a) => (a as any).department || a.name || '')
+              .filter((d) => d)
+          )
+        );
+        this.applyFilters();
+      },
+      error: (err) => {
+        Swal.fire('خطأ', err.error?.message || 'فشل تحميل الأنشطة', 'error');
+      },
+    });
+  }
 
-    // تصفية حسب المستخدم
+  applyFilters(): void {
+    let filtered = this.activities;
+
+    // تصفية حسب المستخدم (لو مستخدم عادي)
     if (this.currentUser.role === 'user') {
       filtered = filtered.filter(
-        (a) => a.userId === this.currentUser.id && a.status !== 'draft'
+        (a) => a.user === this.currentUser.id && a.SaveStatus !== 'مسودة'
       );
-    } else {
-      filtered = filtered.filter((a) => a.status !== 'draft');
     }
 
     // البحث
-    if (this.searchQuery) {
+    if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(
         (a) =>
-          a.title.toLowerCase().includes(q) ||
-          a.description.toLowerCase().includes(q) ||
-          a.userName.toLowerCase().includes(q)
+          a.activityTitle?.toLowerCase().includes(q) ||
+          a.activityDescription?.toLowerCase().includes(q) ||
+          (a.name?.toLowerCase().includes(q) ?? false)
       );
     }
 
-    // تصفية الحالة
+    // الحالة
     if (this.statusFilter !== 'all') {
-      filtered = filtered.filter((a) => a.status === this.statusFilter);
+      filtered = filtered.filter(
+        (a) => a.status === this.getArabicStatus(this.statusFilter)
+      );
     }
 
-    // تصفية القسم
+    // القسم (إن وجد)
     if (this.departmentFilter !== 'all') {
-      filtered = filtered.filter((a) => a.department === this.departmentFilter);
+      filtered = filtered.filter(
+        (a) => (a as any).department === this.departmentFilter
+      );
     }
 
-    this.filteredAchievements = filtered;
-
+    this.filteredActivities = filtered;
     this.updateStats();
   }
 
-  updateStats() {
-    const data =
-      this.currentUser.role === 'admin'
-        ? this.achievements.filter((a) => a.status !== 'draft')
-        : this.achievements.filter(
-            (a) => a.userId === this.currentUser.id && a.status !== 'draft'
-          );
-
-    this.stats.total = data.length;
-    this.stats.pending = data.filter((a) => a.status === 'pending').length;
-    this.stats.approved = data.filter((a) => a.status === 'approved').length;
-    this.stats.rejected = data.filter((a) => a.status === 'rejected').length;
-  }
-
-  getStatValue(): number {
-    return this.stats[this.statusFilter as keyof typeof this.stats];
-  }
-
-  resetFilters() {
-    this.searchQuery = '';
-    this.statusFilter = 'all';
-    this.departmentFilter = 'all';
-    this.applyFilters();
-  }
-
-  getStatusLabel(status: Achievement['status']): any {
+  getArabicStatus(status: string): string {
     switch (status) {
       case 'pending':
         return 'قيد المراجعة';
@@ -169,22 +110,43 @@ export class DashboardAdminComponent {
         return 'معتمد';
       case 'rejected':
         return 'مرفوض';
-      case 'draft':
-        return 'مسودة';
       default:
-        return '';
+        return status;
     }
   }
 
-  getStatusClass(status: Achievement['status']): any {
+  updateStats(): void {
+    const data = this.activities.filter((a) => a.SaveStatus !== 'مسودة');
+    this.stats.total = data.length;
+    this.stats.pending = data.filter((a) => a.status === 'قيد المراجعة').length;
+    this.stats.approved = data.filter((a) => a.status === 'معتمد').length;
+    this.stats.rejected = data.filter((a) => a.status === 'مرفوض').length;
+  }
+
+  getStatValue(stat: keyof typeof this.stats): number {
+    return this.stats[stat];
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.statusFilter = 'all';
+    this.departmentFilter = 'all';
+    this.applyFilters();
+  }
+
+  getStatusLabel(status: Activity['status']): string {
+    return status;
+  }
+
+  getStatusClass(status: Activity['status']): string {
     switch (status) {
-      case 'pending':
+      case 'قيد المراجعة':
         return 'badge-warning';
-      case 'approved':
+      case 'معتمد':
         return 'badge-success';
-      case 'rejected':
+      case 'مرفوض':
         return 'badge-danger';
-      case 'draft':
+      case 'مسودة':
         return 'badge-secondary';
       default:
         return '';

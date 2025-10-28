@@ -67,14 +67,12 @@ export class CriteriaService {
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    // إزالة Bearer وإرسال التوكن فقط
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `${token}`, // بدون Bearer
+      Authorization: `${token}`, 
     });
   }
 
-  // Main Criteria Methods
   addMainCriteria(
     criteriaData: AddMainCriteriaRequest
   ): Observable<MainCriteria> {
@@ -93,7 +91,6 @@ export class CriteriaService {
     });
   }
 
-  // update main criteria partial
   updateMainCriteriaPartial(updateData: any): Observable<MainCriteria> {
     const id = updateData.id;
 
@@ -115,7 +112,6 @@ export class CriteriaService {
     );
   }
 
-  // Sub Criteria Methods
   addSubCriteria(
     subCriteriaData: AddSubCriteriaRequest
   ): Observable<SubCriteria> {
@@ -153,14 +149,12 @@ export class CriteriaService {
     );
   }
 
-  // الحصول على جميع الأقسام (المستخدمين من نوع department)
   getAllDepartments(): Observable<Department[]> {
     return this.http.get<Department[]>(`${this.usersUrl}/all-users`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  // الحصول على جميع القطاعات
   getAllSectors(): Observable<{ success: boolean; data: Sector[] }> {
     return this.http.get<{ success: boolean; data: Sector[] }>(
       `${this.usersUrl}/all-sectors`,

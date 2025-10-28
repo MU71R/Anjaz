@@ -206,6 +206,8 @@
   background-color: #f9f9f9;
   border: 1px solid #ccc;
   color: #333;
+  height: 8px;
+
 }
 
 .cancel-btn:hover {
@@ -217,6 +219,8 @@
   background-color: #ffffff;
   border: 1px solid #999;
   color: #333;
+  height: 8px;
+
 }
 
 .draft-btn:hover {
@@ -225,9 +229,10 @@
 
 /* زر الإرسال للمراجعة */
 .submit-btn {
-  background-color: #007bff;
+  background-color: #0553a6;
   color: #fff;
   border: none;
+  height: 8px;
 }
 
 .submit-btn:hover {

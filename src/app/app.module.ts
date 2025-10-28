@@ -13,6 +13,8 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DepartmentCriteriaManagementComponent } from './components/department-criteria-management/department-criteria-management.component';
 import { AddAchievementComponent } from './components/add-achievement/add-achievement.component';
 import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
+import { ArchivedActivitiesComponent } from './components/archives/archives.component';
+import { DraftsComponent } from './components/draft/draft.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,8 @@ import { MyAchievementsComponent } from './components/my-achievements/my-achieve
     DepartmentCriteriaManagementComponent,
     AddAchievementComponent,
     MyAchievementsComponent,
+    ArchivedActivitiesComponent,
+    DraftsComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,10 +37,10 @@ import { MyAchievementsComponent } from './components/my-achievements/my-achieve
     HttpClientModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      positionClass: 'toast-top-right', 
+      positionClass: 'toast-top-right',
       timeOut: 3000,
-      progressBar: true, 
-      closeButton: true, 
+      progressBar: true,
+      closeButton: true,
       preventDuplicates: true,
     }),
   ],
