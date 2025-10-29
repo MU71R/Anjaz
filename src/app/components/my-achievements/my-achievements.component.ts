@@ -14,9 +14,12 @@ export class MyAchievementsComponent implements OnInit {
   achievements: Activity[] = [];
   selectedAchievement: Activity | null = null;
   rejectionReason = '';
+  loading = true;
 
   showDetailsModal = false;
   showRejectModal = false;
+  showImageModal = false;
+  selectedImage = '';
 
   constructor(private activityService: ActivityService) {}
 
@@ -24,19 +27,23 @@ export class MyAchievementsComponent implements OnInit {
     this.loadActivities();
   }
 
-  // تحميل الإنجازات
   loadActivities(): void {
+    this.loading = true;
     this.activityService.getAll().subscribe({
       next: (res) => {
-        if (res.success) this.achievements = res.activities;
+        if (res.success) {
+          this.achievements = res.activities || [];
+        }
+        this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading activities:', err);
+        this.loading = false;
         Swal.fire('خطأ', 'حدث خطأ أثناء تحميل الإنجازات', 'error');
       },
     });
   }
 
-  // فلترة البحث
   filteredAchievements(): Activity[] {
     let list = [...this.achievements];
     const term = this.searchTerm.trim().toLowerCase();
@@ -44,9 +51,10 @@ export class MyAchievementsComponent implements OnInit {
     if (term) {
       list = list.filter(
         (a) =>
-          a.activityTitle.toLowerCase().includes(term) ||
-          a.activityDescription.toLowerCase().includes(term) ||
-          (a.name?.toLowerCase().includes(term) ?? false)
+          a.activityTitle?.toLowerCase().includes(term) ||
+          a.activityDescription?.toLowerCase().includes(term) ||
+          a.name?.toLowerCase().includes(term) ||
+          this.getUserName(a.user)?.toLowerCase().includes(term)
       );
     }
 
@@ -62,7 +70,6 @@ export class MyAchievementsComponent implements OnInit {
     this.statusFilter = 'all';
   }
 
-  // عرض التفاصيل
   openDetailsModal(activity: Activity): void {
     this.selectedAchievement = activity;
     this.showDetailsModal = true;
@@ -73,47 +80,21 @@ export class MyAchievementsComponent implements OnInit {
     this.selectedAchievement = null;
   }
 
-  // رفض الإنجاز
-  openRejectModal(activity: Activity): void {
-    this.selectedAchievement = activity;
-    this.rejectionReason = '';
-    this.showRejectModal = true;
-  }
-
-  closeRejectModal(): void {
-    this.showRejectModal = false;
-  }
-
-  submitRejection(): void {
-    const achievement = this.selectedAchievement;
-    if (!achievement || !achievement._id) return;
-
-    this.activityService.updateStatus(achievement._id!, 'مرفوض').subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.updateLocalStatus(achievement._id!, 'مرفوض');
-          this.showRejectModal = false;
-          this.showDetailsModal = false;
-          Swal.fire('تم الرفض', 'تم رفض الإنجاز بنجاح', 'success');
-        }
-      },
-      error: () => Swal.fire('خطأ', 'تعذر رفض الإنجاز', 'error'),
-    });
-  }
-
-  // اعتماد / حذف / إعادة تعيين
   handleAction(action: string, id?: string): void {
     if (!id) return;
-    if (action === 'approve') {
-      this.updateActivityStatus(id, 'معتمد');
-    } else if (action === 'delete') {
-      this.deleteActivity(id);
-    } else if (action === 'reassign') {
-      this.updateActivityStatus(id, 'قيد المراجعة');
+
+    const actions = {
+      approve: () => this.updateActivityStatus(id, 'معتمد'),
+      reassign: () => this.updateActivityStatus(id, 'قيد المراجعة'),
+      delete: () => this.deleteActivity(id),
+    };
+
+    const actionHandler = actions[action as keyof typeof actions];
+    if (actionHandler) {
+      actionHandler();
     }
   }
 
-  // تحديث الحالة
   updateActivityStatus(
     id: string,
     status: 'معتمد' | 'قيد المراجعة' | 'مرفوض'
@@ -122,15 +103,46 @@ export class MyAchievementsComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.updateLocalStatus(id, status);
-          this.showDetailsModal = false;
           Swal.fire('تم', `تم تحديث الحالة إلى ${status}`, 'success');
         }
       },
-      error: () => Swal.fire('خطأ', 'تعذر تحديث الحالة', 'error'),
+      error: (err) => {
+        console.error('Error updating status:', err);
+        Swal.fire('خطأ', 'تعذر تحديث الحالة', 'error');
+      },
     });
   }
 
-  // حذف الإنجاز
+  openRejectModal(activity: Activity): void {
+    this.selectedAchievement = activity;
+    this.rejectionReason = '';
+    this.showRejectModal = true;
+  }
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+    this.selectedAchievement = null;
+  }
+
+  submitRejection(): void {
+    const achievement = this.selectedAchievement;
+    if (!achievement || !achievement._id) return;
+
+    this.activityService.updateStatus(achievement._id, 'مرفوض').subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.updateLocalStatus(achievement._id!, 'مرفوض');
+          this.showRejectModal = false;
+          Swal.fire('تم الرفض', 'تم رفض الإنجاز بنجاح', 'success');
+        }
+      },
+      error: (err) => {
+        console.error('Error rejecting activity:', err);
+        Swal.fire('خطأ', 'تعذر رفض الإنجاز', 'error');
+      },
+    });
+  }
+
   deleteActivity(id: string): void {
     Swal.fire({
       title: 'هل أنت متأكد؟',
@@ -139,6 +151,7 @@ export class MyAchievementsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'نعم، حذف',
       cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#dc3545',
     }).then((result) => {
       if (result.isConfirmed) {
         this.activityService.delete(id).subscribe({
@@ -148,37 +161,100 @@ export class MyAchievementsComponent implements OnInit {
               Swal.fire('تم الحذف', 'تم حذف الإنجاز بنجاح', 'success');
             }
           },
-          error: () => Swal.fire('خطأ', 'تعذر حذف الإنجاز', 'error'),
+          error: (err) => {
+            console.error('Error deleting activity:', err);
+            Swal.fire('خطأ', 'تعذر حذف الإنجاز', 'error');
+          },
         });
       }
     });
   }
 
-  // تحديث الحالة محلياً
   private updateLocalStatus(id: string, status: string): void {
     this.achievements = this.achievements.map((a) =>
       a._id === id ? { ...a, status } : a
     );
   }
 
-  // عرض النص بطريقة موحدة (field ممكن يكون string أو object)
   getNameField(field: any): string {
     if (!field) return 'غير محدد';
     return typeof field === 'object' ? field.name || 'غير محدد' : field;
   }
 
-  // ألوان الحالة
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'معتمد':
-        return 'bg-success text-white';
-      case 'قيد المراجعة':
-        return 'bg-warning text-dark';
-      case 'مرفوض':
-        return 'bg-danger text-white';
-      default:
-        return '';
+  getUserName(user: any): string {
+    if (!user) return 'غير محدد';
+    if (typeof user === 'string') return user;
+    return user.name || 'غير محدد';
+  }
+
+  isImage(attachment: string): boolean {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+    return imageExtensions.some(
+      (ext) =>
+        attachment.toLowerCase().endsWith(ext) ||
+        attachment.toLowerCase().includes(ext)
+    );
+  }
+
+  isPdf(attachment: string): boolean {
+    return attachment.toLowerCase().includes('.pdf');
+  }
+
+  getFullAttachmentUrl(attachment: string): string {
+    if (attachment.startsWith('http')) {
+      return attachment;
+    } else {
+      return `http://localhost:3000${attachment}`;
     }
   }
 
+  openImageModal(attachment: string): void {
+    this.selectedImage = this.getFullAttachmentUrl(attachment);
+    this.showImageModal = true;
+  }
+
+  closeImageModal(): void {
+    this.showImageModal = false;
+    this.selectedImage = '';
+  }
+
+  formatDate(dateString: string | Date | undefined | null): string {
+    if (!dateString) return 'غير محدد';
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'غير محدد';
+      }
+
+      return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'غير محدد';
+    }
+  }
+
+  getStatusClass(status: string): string {
+    const statusClasses: { [key: string]: string } = {
+      معتمد: 'bg-success',
+      'قيد المراجعة': 'bg-warning',
+      مرفوض: 'bg-danger',
+      مسودة: 'bg-secondary',
+    };
+    return statusClasses[status] || 'bg-secondary';
+  }
+
+  getStatusHeaderClass(status: string): string {
+    const headerClasses: { [key: string]: string } = {
+      معتمد: 'bg-gradient-success',
+      'قيد المراجعة': 'bg-gradient-warning',
+      مرفوض: 'bg-gradient-danger',
+      مسودة: 'bg-gradient-secondary',
+    };
+    return headerClasses[status] || 'bg-gradient-primary';
+  }
 }

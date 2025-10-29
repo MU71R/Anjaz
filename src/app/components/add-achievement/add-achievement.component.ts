@@ -4,6 +4,7 @@ import { MainCriterion } from 'src/app/model/criteria';
 import { CriteriaService, SubCriteria } from 'src/app/service/criteria.service';
 import Swal from 'sweetalert2';
 import { ActivityService } from '../../service/achievements-service.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-achievement',
@@ -16,21 +17,110 @@ export class AddAchievementComponent implements OnInit {
 
   form!: FormGroup;
   attachments: File[] = [];
+  existingAttachments: string[] = [];
   subCriteria: SubCriteria[] = [];
   mainCriteria: MainCriterion[] = [];
   selectedMain = '';
   maxFiles = 2;
   maxFileSizeMB = 8;
+  isEditing = false;
+  draftId: string = '';
+  originalDraftData: any = null;
+  deletedAttachments: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private criteriaService: CriteriaService,
-    private activityService: ActivityService
+    private activityService: ActivityService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadMainCriteria();
+    this.checkEditMode();
+  }
+
+  checkEditMode(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.isEditing = params['edit'] === 'true';
+      this.draftId = params['draftId'] || '';
+
+      if (this.isEditing) {
+        this.loadDraftData();
+      }
+    });
+  }
+
+  loadDraftData(): void {
+    const savedDraft = localStorage.getItem('editingDraft');
+
+    if (savedDraft) {
+      try {
+        this.originalDraftData = JSON.parse(savedDraft);
+        this.populateFormWithDraftData();
+        console.log('Loaded draft data for editing:', this.originalDraftData);
+      } catch (error) {
+        console.error('Error parsing draft data:', error);
+        Swal.fire('خطأ', 'حدث خطأ في تحميل بيانات المسودة', 'error');
+      }
+    } else {
+      console.warn('No draft data found in localStorage');
+      Swal.fire('تنبيه', 'لم يتم العثور على بيانات المسودة', 'warning');
+    }
+  }
+
+  populateFormWithDraftData(): void {
+    if (this.originalDraftData && this.form) {
+      console.log('Populating form with draft data...');
+
+      this.form.patchValue({
+        activityTitle: this.originalDraftData.activityTitle,
+        activityDescription: this.originalDraftData.activityDescription,
+        MainCriteria:
+          this.originalDraftData.MainCriteria?._id ||
+          this.originalDraftData.MainCriteria,
+        SubCriteria:
+          this.originalDraftData.SubCriteria?._id ||
+          this.originalDraftData.SubCriteria,
+        name: this.originalDraftData.name,
+      });
+
+      if (
+        this.originalDraftData.Attachments &&
+        Array.isArray(this.originalDraftData.Attachments)
+      ) {
+        this.existingAttachments = [...this.originalDraftData.Attachments];
+        console.log(
+          'Loaded existing attachments:',
+          this.existingAttachments
+        );
+        console.log(
+          'Number of attachments:',
+          this.existingAttachments.length
+        );
+      } else {
+        console.warn('No attachments found in draft data');
+        this.existingAttachments = [];
+      }
+
+      const mainCriteriaId =
+        this.originalDraftData.MainCriteria?._id ||
+        this.originalDraftData.MainCriteria;
+      if (mainCriteriaId) {
+        this.selectedMain = mainCriteriaId;
+        this.getSubCriteria(mainCriteriaId);
+      }
+
+      if (this.descriptionEditor) {
+        this.descriptionEditor.nativeElement.innerHTML =
+          this.originalDraftData.activityDescription || '';
+      }
+
+      console.log('Form populated successfully');
+      console.log('Final existingAttachments:', this.existingAttachments);
+    }
   }
 
   initializeForm(): void {
@@ -132,7 +222,10 @@ export class AddAchievementComponent implements OnInit {
     if (!input.files) return;
 
     const files = Array.from(input.files);
-    if (this.attachments.length + files.length > this.maxFiles) {
+    const totalFiles =
+      this.attachments.length + files.length + this.existingAttachments.length;
+
+    if (totalFiles > this.maxFiles) {
       Swal.fire('تنبيه', `الحد الأقصى ${this.maxFiles} ملفات فقط.`, 'warning');
       return;
     }
@@ -141,6 +234,21 @@ export class AddAchievementComponent implements OnInit {
       const sizeMB = f.size / (1024 * 1024);
       const ext = f.name.split('.').pop()?.toLowerCase() || '';
       const allowedImage = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'];
+
+      if (ext === 'pdf') {
+        Swal.fire({
+          title: 'تأكيد',
+          text: 'هل تريد حقاً إضافة ملف PDF؟',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'نعم',
+          cancelButtonText: 'لا',
+        }).then((result) => {
+          if (!result.isConfirmed) {
+            return; 
+          }
+        });
+      }
 
       if (!(ext === 'pdf' || allowedImage.includes(ext))) {
         Swal.fire(
@@ -165,6 +273,25 @@ export class AddAchievementComponent implements OnInit {
     Swal.fire('تم', 'تم حذف الملف بنجاح.', 'success');
   }
 
+  removeExistingAttachment(index: number) {
+    const attachmentToRemove = this.existingAttachments[index];
+
+    Swal.fire({
+      title: 'تأكيد الحذف',
+      text: 'هل تريد حذف هذا المرفق؟',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deletedAttachments.push(attachmentToRemove);
+        this.existingAttachments.splice(index, 1);
+        Swal.fire('تم', 'تم حذف الملف بنجاح.', 'success');
+      }
+    });
+  }
+
   submitForReview() {
     this.syncDescriptionToForm();
     this.markAllFieldsAsTouched();
@@ -174,35 +301,11 @@ export class AddAchievementComponent implements OnInit {
       return;
     }
 
-    const payload = this.createFormData('قيد المراجعة', 'مكتمل');
-    Swal.fire({
-      title: 'جاري الإرسال...',
-      text: 'يرجى الانتظار قليلاً.',
-      icon: 'info',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-
-    this.activityService.addActivity(payload).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'تم الإرسال',
-          text: 'تم إرسال النشاط بنجاح ',
-          icon: 'success',
-          confirmButtonText: 'حسناً',
-        }).then(() => this.resetForm());
-      },
-      error: (err) => {
-        console.error(' خطأ أثناء الإرسال:', err);
-        Swal.fire({
-          title: 'خطأ',
-          text: err?.error?.message || 'حدث خطأ أثناء الإرسال إلى الخادم.',
-          icon: 'error',
-          confirmButtonText: 'حسناً',
-        });
-      },
-    });
+    if (this.isEditing) {
+      this.updateDraft('قيد المراجعة', 'مكتمل');
+    } else {
+      this.addNewActivity('قيد المراجعة', 'مكتمل');
+    }
   }
 
   saveAsDraft() {
@@ -213,23 +316,45 @@ export class AddAchievementComponent implements OnInit {
       return;
     }
 
-const payload = this.createFormData('قيد المراجعة', 'مسودة');
+    if (this.isEditing) {
+      this.updateDraft('قيد المراجعة', 'مسودة');
+    } else {
+      this.addNewActivity('قيد المراجعة', 'مسودة');
+    }
+  }
+
+  private addNewActivity(status: string, saveStatus: string) {
+    const payload = this.createFormData(status, saveStatus);
+
+    Swal.fire({
+      title: 'جاري الحفظ...',
+      text: 'يرجى الانتظار قليلاً.',
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
 
     this.activityService.addActivity(payload).subscribe({
       next: () => {
+        const message =
+          saveStatus === 'مسودة'
+            ? 'تم حفظ المسودة بنجاح'
+            : 'تم إرسال النشاط بنجاح للمراجعة';
         Swal.fire({
-          title: 'تم الحفظ',
-          text: 'تم حفظ المسودة بنجاح.',
+          title: 'تم',
+          text: message,
           icon: 'success',
           confirmButtonText: 'حسناً',
+        }).then(() => {
+          this.cleanupForm();
         });
-        this.resetForm();
       },
       error: (err) => {
-        console.error('خطأ أثناء حفظ المسودة:', err);
+        console.error('خطأ أثناء الحفظ:', err);
         Swal.fire({
           title: 'خطأ',
-          text: 'فشل في حفظ المسودة.',
+          text: err?.error?.message || 'حدث خطأ أثناء الحفظ.',
           icon: 'error',
           confirmButtonText: 'حسناً',
         });
@@ -237,12 +362,47 @@ const payload = this.createFormData('قيد المراجعة', 'مسودة');
     });
   }
 
-  private createFormData(
-    status: 'مرفوض' | 'قيد المراجعة' | 'معتمد' | 'مسودة',
-    saveStatus: 'مسودة' | 'مكتمل'
-  ): FormData {
-    const payload = new FormData();
+  private updateDraft(status: string, saveStatus: string) {
+    const payload = this.createFormData(status, saveStatus);
 
+    Swal.fire({
+      title: 'جاري التحديث...',
+      text: 'يرجى الانتظار قليلاً.',
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    this.activityService.updateDraftActivity(this.draftId, payload).subscribe({
+      next: (response) => {
+        const message =
+          saveStatus === 'مسودة'
+            ? 'تم تحديث المسودة بنجاح'
+            : 'تم إرسال النشاط بنجاح للمراجعة';
+        Swal.fire({
+          title: 'تم',
+          text: message,
+          icon: 'success',
+          confirmButtonText: 'حسناً',
+        }).then(() => {
+          this.cleanupForm();
+        });
+      },
+      error: (err) => {
+        console.error('خطأ أثناء التحديث:', err);
+        Swal.fire({
+          title: 'خطأ',
+          text: err?.error?.message || 'حدث خطأ أثناء التحديث.',
+          icon: 'error',
+          confirmButtonText: 'حسناً',
+        });
+      },
+    });
+  }
+
+  private createFormData(status: string, saveStatus: string): FormData {
+    const payload = new FormData();
     payload.append('activityTitle', this.form.value.activityTitle);
     payload.append('activityDescription', this.form.value.activityDescription);
     payload.append('MainCriteria', this.form.value.MainCriteria);
@@ -259,8 +419,18 @@ const payload = this.createFormData('قيد المراجعة', 'مسودة');
       payload.append('Attachments', file, file.name);
     });
 
-    console.log('FormData contents:');
-    payload.forEach((v, k) => console.log(`${k}:`, v));
+    this.existingAttachments.forEach((attachment) => {
+      payload.append('existingAttachments', attachment);
+    });
+
+    this.deletedAttachments.forEach((deletedAttachment) => {
+      payload.append('deletedAttachments', deletedAttachment);
+    });
+
+    console.log('إرسال البيانات:');
+    console.log('مرفقات جديدة:', this.attachments.length);
+    console.log('مرفقات قديمة متبقية:', this.existingAttachments.length);
+    console.log('مرفقات محذوفة:', this.deletedAttachments.length);
 
     return payload;
   }
@@ -301,17 +471,100 @@ const payload = this.createFormData('قيد المراجعة', 'مسودة');
       cancelButtonText: 'لا',
     }).then((r) => {
       if (r.isConfirmed) {
-        this.resetForm();
-        Swal.fire('تم', 'تم إلغاء العملية.', 'success');
+        this.cleanupForm();
       }
     });
   }
 
+  private cleanupForm() {
+    localStorage.removeItem('editingDraft');
+    this.resetForm();
+  }
+
   resetForm() {
     this.form.reset();
-    this.descriptionEditor.nativeElement.innerHTML = '';
+    if (this.descriptionEditor) {
+      this.descriptionEditor.nativeElement.innerHTML = '';
+    }
     this.attachments = [];
+    this.existingAttachments = [];
+    this.deletedAttachments = []; 
     this.subCriteria = [];
     this.selectedMain = '';
+    this.isEditing = false;
+    this.draftId = '';
+    this.originalDraftData = null;
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupForm();
+  }
+
+  getFileName(attachmentUrl: string): string {
+    if (!attachmentUrl) return 'ملف';
+    const parts = attachmentUrl.split('/');
+    return parts[parts.length - 1] || 'ملف';
+  }
+
+  getFileType(attachmentUrl: string): string {
+    if (!attachmentUrl) return '';
+    const ext = attachmentUrl.split('.').pop()?.toLowerCase() || '';
+    if (['pdf'].includes(ext)) return 'PDF';
+    if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'].includes(ext))
+      return 'صورة';
+    return 'ملف';
+  }
+
+  isImage(attachmentUrl: string): boolean {
+    if (!attachmentUrl) return false;
+    const ext = attachmentUrl.split('.').pop()?.toLowerCase() || '';
+    return ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'].includes(ext);
+  }
+
+  isImageFile(file: File): boolean {
+    if (!file) return false;
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    return ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'].includes(ext);
+  }
+
+  getFullAttachmentUrl(attachmentPath: string): string {
+    if (!attachmentPath) return '';
+    if (attachmentPath.startsWith('http')) {
+      return attachmentPath;
+    }
+    if (attachmentPath.startsWith('/uploads/')) {
+      return `http://localhost:3000${attachmentPath}`;
+    }
+    if (attachmentPath.startsWith('uploads/')) {
+      return `http://localhost:3000/${attachmentPath}`;
+    }
+    return `http://localhost:3000/uploads/${attachmentPath}`;
+  }
+
+  getFilePreview(file: File): string {
+    if (this.isImageFile(file)) {
+      return URL.createObjectURL(file);
+    }
+    return '';
+  }
+
+  viewAttachment(attachmentUrl: string): void {
+    const fullUrl = this.getFullAttachmentUrl(attachmentUrl);
+    window.open(fullUrl, '_blank');
+  }
+
+  debugDraftData(): void {
+    console.log('=== DEBUG DRAFT DATA ===');
+    console.log('isEditing:', this.isEditing);
+    console.log('draftId:', this.draftId);
+    console.log('originalDraftData:', this.originalDraftData);
+    console.log('existingAttachments:', this.existingAttachments);
+    console.log('attachments:', this.attachments);
+    console.log('deletedAttachments:', this.deletedAttachments);
+    console.log('form values:', this.form.value);
+    console.log('mainCriteria:', this.mainCriteria);
+    console.log('subCriteria:', this.subCriteria);
+    console.log('selectedMain:', this.selectedMain);
+    console.log('========================');
   }
 }

@@ -1,4 +1,3 @@
-// src/app/models/achievement.model.ts
 export interface User {
   id: string;
   role: 'admin' | 'user' | string;
@@ -12,7 +11,7 @@ export interface Achievement {
   userId: string;
   userName: string;
   department: string;
-  createdAt: string; // ISO date
+  createdAt: string; 
   mainCriterion: string;
   subCriterion: string;
   attachments: string[];
@@ -20,8 +19,6 @@ export interface Achievement {
   status: "pending" | "approved" | "rejected" | "draft";
 }
 
-// src/app/model/achievement.ts
-// src/app/model/achievement.ts
 export interface Activity {
   _id?: string;
   user: { _id?: string; name?: string } | string;

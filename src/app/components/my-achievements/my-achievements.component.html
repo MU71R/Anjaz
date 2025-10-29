@@ -1,107 +1,338 @@
-<div class="achievements-page">
-  <app-sidebar class="sidebar"></app-sidebar>
-
-  <div class="achievements-content">
-    <!-- عنوان الصفحة -->
-    <div class="header-box mb-4 p-4 rounded shadow-sm">
-      <h2 class="fw-bold text-white mb-1">جميع الإنجازات</h2>
-      <p class="text-light opacity-75 mb-0">مراجعة واعتماد الإنجازات المقدمة</p>
+<div class="container-fluid mt-4" dir="rtl">
+  <div class="row">
+    <div class="col-md-3 col-lg-2">
+      <app-sidebar></app-sidebar>
     </div>
 
-    <!-- شريط البحث والتصفية -->
-    <div class="filter-bar mb-4 d-flex flex-wrap align-items-center gap-2">
-      <input type="text" class="form-control search-input" placeholder="ابحث عن إنجاز..." [(ngModel)]="searchTerm" />
+    <div class="col-md-9 col-lg-10">
+      <div class="header-box mb-4 p-4 rounded-3 shadow-sm bg-gradient-primary text-white">
+        <h2 class="fw-bold mb-2 display-6">
+          <i class="fa-solid fa-trophy me-2"></i>جميع الإنجازات
+        </h2>
+        <p class="opacity-90 mb-0 fs-6">
+          <i class="fa-solid fa-circle-info me-1"></i>
+          قائمة بجميع الإنجازات المقدمة
+        </p>
+      </div>
 
-      <select class="form-select filter-select" [(ngModel)]="statusFilter">
-        <option value="all">جميع الحالات</option>
-        <option value="قيد المراجعة">قيد المراجعة</option>
-        <option value="معتمد">معتمد</option>
-        <option value="مرفوض">مرفوض</option>
-      </select>
-
-      <button class="btn btn-outline-secondary reset-btn" (click)="resetFilters()">
-        <i class="fas fa-undo-alt me-1"></i> إعادة تعيين
-      </button>
-    </div>
-
-    <!-- قائمة الإنجازات -->
-    <div *ngFor="let achievement of filteredAchievements()" class="achievement-card shadow-sm">
-      <div class="d-flex justify-content-between align-items-start flex-wrap">
-        <div class="flex-grow-1">
-          <h5 class="achievement-title">{{ achievement.activityTitle }}</h5>
-          <p class="achievement-desc">{{ achievement.activityDescription }}</p>
-          <div class="achievement-meta text-muted small">
-            {{ getNameField(achievement.MainCriteria) }} ←
-            {{ getNameField(achievement.SubCriteria) }}
+      <div class="filter-bar mb-4 p-4 bg-light rounded-3 shadow-sm">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <i class="fa-solid fa-search text-muted"></i>
+              </span>
+              <input type="text" class="form-control border-start-0" placeholder="ابحث في الإنجازات..."
+                [(ngModel)]="searchTerm">
+            </div>
           </div>
-        </div>
 
-        <div class="status-box mt-2 mt-md-0">
-          <span class="badge status-badge" [ngClass]="getStatusClass(achievement.status)">
-            {{ achievement.status }}
-          </span>
+          <div class="col-md-4">
+            <select class="form-select" [(ngModel)]="statusFilter">
+              <option value="all">جميع الحالات</option>
+              <option value="قيد المراجعة">قيد المراجعة</option>
+              <option value="معتمد">معتمد</option>
+              <option value="مرفوض">مرفوض</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+              <i class="fa-solid fa-rotate-right me-1"></i> إعادة
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="achievement-footer mt-3 d-flex justify-content-between align-items-center flex-wrap">
-        <div class="user-info small text-muted">
-          <i class="fas fa-user"></i> {{ achievement.name }}
-          <span class="mx-2">•</span>
-          <i class="fas fa-map-marker-alt"></i> {{ achievement.department }}
-          <span class="mx-2">•</span>
-          <i class="fas fa-calendar-alt"></i> {{ achievement.date }}
-        </div>
+      <div *ngIf="loading" class="text-center my-5 py-5">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+        <p class="text-muted fs-6">جاري تحميل الإنجازات...</p>
+      </div>
 
-        <div class="actions d-flex gap-2 mt-2 mt-md-0">
-          <button class="btn btn-outline-info btn-sm" (click)="openDetailsModal(achievement)">
-            <i class="fas fa-eye"></i> عرض
-          </button>
+      <div *ngIf="!loading && filteredAchievements().length === 0"
+        class="alert alert-light text-center border-0 shadow-sm rounded-3 py-5 my-4">
+        <i class="fa-solid fa-inbox text-muted fa-3x mb-3"></i>
+        <h5 class="text-muted mb-2" *ngIf="achievements.length === 0">لا توجد إنجازات</h5>
+        <h5 class="text-muted mb-2" *ngIf="achievements.length > 0">لا توجد نتائج مطابقة</h5>
+      </div>
 
-          <button class="btn btn-outline-danger btn-sm" *ngIf="achievement._id"
-            (click)="handleAction('delete', achievement._id)">
-            <i class="fas fa-trash-alt"></i> حذف
-          </button>
+      <div class="row" *ngIf="!loading && filteredAchievements().length > 0">
+        <div class="col-12">
+          <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th width="30px">#</th>
+                      <th>عنوان الإنجاز</th>
+                      <th width="120px">المعيار الرئيسي</th>
+                      <th width="120px">المعيار الفرعي</th>
+                      <th width="100px">مقدم الطلب</th>
+                      <th width="100px">الحالة</th>
+                      <th width="80px">التاريخ</th>
+                      <th width="80px">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let achievement of filteredAchievements(); let i = index" class="achievement-row">
+                      <td class="text-muted">{{ i + 1 }}</td>
+                      <td>
+                        <div class="achievement-title">
+                          {{ achievement.activityTitle || 'بدون عنوان' }}
+                        </div>
+                        <div class="achievement-desc text-muted small">
+                          {{ (achievement.activityDescription || 'لا يوجد وصف').substring(0, 50) }}...
+                        </div>
+                      </td>
+                      <td>{{ getNameField(achievement.MainCriteria) }}</td>
+                      <td>{{ getNameField(achievement.SubCriteria) }}</td>
+                      <td>{{ achievement.name || 'غير محدد' }}</td>
+                      <td>
+                        <span class="badge status-badge" [ngClass]="getStatusClass(achievement.status)">
+                          {{ achievement.status }}
+                        </span>
+                      </td>
+                      <td class="text-muted small">{{ formatDate(achievement.createdAt) }}</td>
+                      <td>
+                        <div class="action-buttons">
+                          <button class="btn btn-outline-primary btn-sm view-btn"
+                            (click)="openDetailsModal(achievement)" title="عرض التفاصيل">
+                            <i class="fa-solid fa-eye"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- نافذة التفاصيل -->
-<div class="modal fade show" tabindex="-1" style="display: block" *ngIf="showDetailsModal && selectedAchievement">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">تفاصيل الإنجاز</h5>
-        <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
+<div *ngIf="showDetailsModal && selectedAchievement" class="modal-backdrop fade show" (click)="closeDetailsModal()">
+</div>
+<div *ngIf="showDetailsModal && selectedAchievement" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded-3 border-0 shadow-lg">
+      <div class="modal-header bg-gradient-primary text-white rounded-top-3">
+        <h5 class="modal-title fw-bold">
+          <i class="fa-solid fa-file-lines me-2"></i>
+          تفاصيل الإنجاز
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeDetailsModal()"
+          aria-label="Close"></button>
       </div>
-
       <div class="modal-body">
-        <p><strong>العنوان:</strong> {{ selectedAchievement.activityTitle }}</p>
-        <p><strong>الوصف:</strong> {{ selectedAchievement.activityDescription }}</p>
-        <p><strong>المعيار الرئيسي:</strong> {{ getNameField(selectedAchievement.MainCriteria) }}</p>
-        <p><strong>المعيار الفرعي:</strong> {{ getNameField(selectedAchievement.SubCriteria) }}</p>
-        <p><strong>الحالة:</strong> {{ selectedAchievement.status }}</p>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="info-section">
+              <h6 class="section-title">
+                <i class="fa-solid fa-info-circle text-primary me-2"></i>
+                المعلومات الأساسية
+              </h6>
+              <div class="info-grid">
+                <div class="info-item">
+                  <strong>عنوان الإنجاز:</strong>
+                  <span>{{ selectedAchievement.activityTitle || 'بدون عنوان' }}</span>
+                </div>
+                <div class="info-item">
+                  <strong>الوصف:</strong>
+                  <p class="mb-0">{{ selectedAchievement.activityDescription || 'لا يوجد وصف' }}</p>
+                </div>
+                <div class="info-item">
+                  <strong>اسم القائم بالنشاط:</strong>
+                  <span>{{ selectedAchievement.name || 'غير محدد' }}</span>
+                </div>
+                <div class="info-item">
+                  <strong>مقدم الطلب:</strong>
+                  <span>{{ getUserName(selectedAchievement.user) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="info-section">
+              <h6 class="section-title">
+                <i class="fa-solid fa-layer-group text-primary me-2"></i>
+                التصنيف والحالة
+              </h6>
+              <div class="info-grid">
+                <div class="info-item">
+                  <strong>المعيار الرئيسي:</strong>
+                  <span>{{ getNameField(selectedAchievement.MainCriteria) }}</span>
+                </div>
+                <div class="info-item">
+                  <strong>المعيار الفرعي:</strong>
+                  <span>{{ getNameField(selectedAchievement.SubCriteria) }}</span>
+                </div>
+                <div class="info-item">
+                  <strong>الحالة:</strong>
+                  <span class="badge status-badge" [ngClass]="getStatusClass(selectedAchievement.status)">
+                    {{ selectedAchievement.status }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <strong>تاريخ الإنشاء:</strong>
+                  <span>{{ formatDate(selectedAchievement.createdAt) }}</span>
+                </div>
+                <div class="info-item">
+                  <strong>آخر تحديث:</strong>
+                  <span>{{ formatDate(selectedAchievement.updatedAt) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="info-section">
+              <h6 class="section-title">
+                <i class="fa-solid fa-paperclip text-primary me-2"></i>
+                المرفقات
+                <span class="badge bg-primary ms-2">{{ selectedAchievement.Attachments.length || 0 }}</span>
+              </h6>
+              <div *ngIf="selectedAchievement.Attachments && selectedAchievement.Attachments.length > 0"
+                class="attachments-grid">
+                <div class="row g-3">
+                  <div class="col-xl-3 col-lg-4 col-md-6"
+                    *ngFor="let attachment of selectedAchievement.Attachments; let i = index">
+                    <div class="attachment-card border rounded-2 p-3 text-center">
+                      <div *ngIf="isImage(attachment)">
+                        <div class="attachment-image mb-2">
+                          <img [src]="getFullAttachmentUrl(attachment)" [alt]="'مرفق ' + (i + 1)"
+                            class="img-thumbnail attachment-preview" (click)="openImageModal(attachment)">
+                        </div>
+                        <p class="small text-muted mb-0">صورة {{ i + 1 }}</p>
+                      </div>
+
+                      <div *ngIf="isPdf(attachment)">
+                        <div class="attachment-icon mb-2">
+                          <i class="fa-solid fa-file-pdf text-danger fa-2x"></i>
+                        </div>
+                        <p class="small text-muted mb-2">ملف PDF {{ i + 1 }}</p>
+                        <a [href]="getFullAttachmentUrl(attachment)" target="_blank"
+                          class="btn btn-outline-danger btn-sm w-100">
+                          <i class="fa-solid fa-download me-1"></i>تحميل
+                        </a>
+                      </div>
+
+                      <div *ngIf="!isImage(attachment) && !isPdf(attachment)">
+                        <div class="attachment-icon mb-2">
+                          <i class="fa-solid fa-file text-secondary fa-2x"></i>
+                        </div>
+                        <p class="small text-muted mb-2">ملف {{ i + 1 }}</p>
+                        <a [href]="getFullAttachmentUrl(attachment)" target="_blank"
+                          class="btn btn-outline-primary btn-sm w-100">
+                          <i class="fa-solid fa-external-link-alt me-1"></i>فتح
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!selectedAchievement.Attachments || selectedAchievement.Attachments.length === 0"
+                class="text-center py-4 border rounded-2 bg-light">
+                <i class="fa-solid fa-file-circle-exclamation text-muted fa-2x mb-2"></i>
+                <p class="text-muted mb-0">لا توجد مرفقات مضافة</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-success" *ngIf="selectedAchievement?._id"
-          (click)="handleAction('approve', selectedAchievement._id!)">
-          <i class="fas fa-check"></i> اعتماد
-        </button>
+      <div class="modal-footer border-0 bg-light rounded-bottom-3">
+        <div class="w-100">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <small class="text-muted">
+                <i class="fa-solid fa-id-badge me-1"></i>
+                معرف الإنجاز: {{ selectedAchievement._id }}
+              </small>
+            </div>
+            <div class="col-md-6 text-start">
+              <div class="action-buttons">
+                <button class="btn btn-success btn-sm me-2" *ngIf="selectedAchievement.status !== 'معتمد'"
+                  (click)="updateActivityStatus(selectedAchievement._id!, 'معتمد')">
+                  <i class="fa-solid fa-check me-1"></i>اعتماد
+                </button>
 
-        <button class="btn btn-warning text-white" *ngIf="selectedAchievement?._id"
-          (click)="handleAction('reassign', selectedAchievement._id!)">
-          <i class="fas fa-redo-alt"></i> إعادة للمراجعة
-        </button>
+                <button class="btn btn-danger btn-sm me-2" (click)="openRejectModal(selectedAchievement)">
+                  <i class="fa-solid fa-times me-1"></i>رفض
+                </button>
 
-        <button class="btn btn-danger" (click)="openRejectModal(selectedAchievement!)">
-          <i class="fas fa-times"></i> رفض
-        </button>
+                <button class="btn btn-secondary btn-sm" (click)="closeDetailsModal()">
+                  <i class="fa-solid fa-times me-1"></i>إغلاق
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <button class="btn btn-secondary" (click)="closeDetailsModal()">
-          إغلاق
+<div *ngIf="showRejectModal" class="modal-backdrop fade show" (click)="closeRejectModal()"></div>
+<div *ngIf="showRejectModal" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3 border-0 shadow-lg">
+      <div class="modal-header bg-gradient-danger text-white rounded-top-3">
+        <h5 class="modal-title fw-bold">
+          <i class="fa-solid fa-times-circle me-2"></i>رفض الإنجاز
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeRejectModal()"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-exclamation-triangle me-2"></i>
+          أنت على وشك رفض الإنجاز: <strong>{{ selectedAchievement?.activityTitle }}</strong>
+        </div>
+
+        <div class="mb-3">
+          <label for="rejectionReason" class="form-label">سبب الرفض (اختياري)</label>
+          <textarea class="form-control" id="rejectionReason" rows="3" [(ngModel)]="rejectionReason"
+            placeholder="أدخل سبب الرفض إذا رغبت..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" (click)="closeRejectModal()">
+          <i class="fa-solid fa-times me-1"></i>إلغاء
         </button>
+        <button type="button" class="btn btn-danger" (click)="submitRejection()">
+          <i class="fa-solid fa-ban me-1"></i>تأكيد الرفض
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showImageModal" class="modal-backdrop fade show" (click)="closeImageModal()"></div>
+<div *ngIf="showImageModal" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded-3 border-0 shadow-lg">
+      <div class="modal-header bg-gradient-primary text-white rounded-top-3">
+        <h5 class="modal-title fw-bold">
+          <i class="fa-solid fa-image me-2"></i>عرض الصورة
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeImageModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-0">
+        <img [src]="selectedImage" alt="صورة مرفق" class="img-fluid rounded-bottom-3">
+      </div>
+      <div class="modal-footer border-0 bg-light rounded-bottom-3">
+        <button type="button" class="btn btn-secondary" (click)="closeImageModal()">
+          <i class="fa-solid fa-times me-1"></i>إغلاق
+        </button>
+        <a [href]="selectedImage" download class="btn btn-primary">
+          <i class="fa-solid fa-download me-1"></i>تحميل الصورة
+        </a>
       </div>
     </div>
   </div>

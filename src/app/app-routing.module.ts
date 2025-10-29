@@ -8,16 +8,13 @@ import { AddAchievementComponent } from './components/add-achievement/add-achiev
 import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
 import { DraftsComponent } from './components/draft/draft.component';
 import { ArchivedActivitiesComponent } from './components/archives/archives.component';
-// import { AuthGuard } from './guards/auth.guard';
-// import { LoginGuard } from './guards/login.guard';
+
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  // صفحة تسجيل الدخول - محمية بـ LoginGuard لمنع الوصول بعد تسجيل الدخول
   { path: 'login', component: LoginComponent },
 
-  // الصفحات الداخلية المحمية
   {
     path: 'administration',
     component: AdministrationComponent,
@@ -38,11 +35,12 @@ const routes: Routes = [
     path: 'my-achievements',
     component: MyAchievementsComponent,
   },
-  { path: 'add-achievement/:id', component: AddAchievementComponent }, 
-
-  { path: 'drafts', component: DraftsComponent }, // المسودة
+  {
+    path: 'edit-achievement/:id',
+    component: AddAchievementComponent,
+  },
+  { path: 'drafts', component: DraftsComponent }, 
   { path: 'archive', component: ArchivedActivitiesComponent },
-  // أي مسار غير معروف يعيد إلى login
   { path: '**', redirectTo: 'login' },
 ];
 

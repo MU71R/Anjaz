@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Activity } from '../model/achievement';
 
 @Injectable({
@@ -15,17 +15,13 @@ export class ActivityService {
     const token =
       localStorage.getItem('token') || localStorage.getItem('authToken');
     let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', token);
-    }
+    if (token) headers = headers.set('Authorization', token);
     return headers;
   }
 
   addActivity(data: FormData): Observable<any> {
-    const headers = this.getAuthHeaders();
-
     return this.http.post<any>(`${this.API_BASE_URL}/add`, data, {
-      headers: headers,
+      headers: this.getAuthHeaders(),
     });
   }
 
@@ -88,10 +84,49 @@ export class ActivityService {
   }
 
   getDrafts(): Observable<{ success: boolean; data: Activity[] }> {
-    return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/draft`,
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http
+      .get<{ success: boolean; data: Activity[] }>(
+        `${this.API_BASE_URL}/draft`,
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('[Service] Drafts API Response:', response);
+          if (response.success && response.data) {
+            response.data.forEach((activity, index) => {
+              console.log(`[Service] Activity ${index + 1}:`, {
+                title: activity.activityTitle,
+                attachments: activity.Attachments,
+                attachmentsCount: activity.Attachments?.length || 0,
+                fullActivity: activity,
+              });
+            });
+          }
+        })
+      );
+  }
+
+  getDraftById(
+    id: string
+  ): Observable<{ success: boolean; activity: Activity }> {
+    return this.http
+      .get<{ success: boolean; activity: Activity }>(
+        `${this.API_BASE_URL}/draft/${id}`,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        tap((response) => {
+          console.log('[Service] Single Draft API Response:', response);
+          if (response.success && response.activity) {
+            console.log(
+              '[Service] Draft Attachments:',
+              response.activity.Attachments
+            );
+          }
+        })
+      );
   }
 
   search(query: string): Observable<{ success: boolean; data: Activity[] }> {
@@ -112,35 +147,31 @@ export class ActivityService {
     );
   }
 
-  getArchivedActivities(): Observable<{ success: boolean; data: Activity[] }> {
-    return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/archived`,
-      { headers: this.getAuthHeaders() }
-    );
-  }
-
-  getDraftActivities(): Observable<{ success: boolean; data: Activity[] }> {
-    return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/draft`,
-      { headers: this.getAuthHeaders() }
-    );
-  }
-
-  // في achievement-service.service.ts
-  getActivityById(id: string): Observable<any> {
-    return this.http.get(`${this.API_BASE_URL}/${id}`);
-  }
-
-  updateActivity(id: string, activityData: FormData): Observable<any> {
-    return this.http.put(`${this.API_BASE_URL}/update/${id}`, activityData);
-  }
-
-  // ===== إضافة في ActivityService =====
   getRecentAchievements(): Observable<
     { message: string; time: string; id: string }[]
   > {
     return this.http.get<{ message: string; time: string; id: string }[]>(
       `${this.API_BASE_URL}/recent-achievements`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  updateDraftActivity(
+    id: string,
+    updates: FormData | Partial<Activity>
+  ): Observable<{ success: boolean; message: string; activity: Activity }> {
+    return this.http.put<{
+      success: boolean;
+      message: string;
+      activity: Activity;
+    }>(`${this.API_BASE_URL}/update-draft/${id}`, updates, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteDraft(id: string): Observable<{ success: boolean; message: string }> {
+    return this.http.delete<{ success: boolean; message: string }>(
+      `${this.API_BASE_URL}/delete-draft/${id}`,
       { headers: this.getAuthHeaders() }
     );
   }

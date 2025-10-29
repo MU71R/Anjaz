@@ -1,15 +1,9 @@
-/* ===============================
-   تنسيق واجهة إضافة إنجاز
-   =============================== */
-
-/* الحاوية العامة */
 .container {
   width: 1250px;
   margin: 2px;
   padding: 1rem;
 }
 
-/* الحاوية الرئيسية */
 .add-achievement-container {
   margin: 3rem auto;
   padding: 0 2rem 5rem;
@@ -18,7 +12,6 @@
   direction: rtl;
 }
 
-/* العناوين */
 .add-achievement-container h2 {
   font-weight: 700;
   color: #0f235f;
@@ -32,7 +25,6 @@
   margin-bottom: 2rem;
 }
 
-/* البطاقة */
 .card {
   width: 100%;
   border: 1px solid #e2e8f0;
@@ -43,7 +35,6 @@
   margin-bottom: 2rem;
 }
 
-/* عنوان البطاقة */
 .card h5 {
   color: #0f235f;
   font-weight: 700;
@@ -52,7 +43,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* الحقول */
 .mb-3 {
   margin-bottom: 1.5rem !important;
 }
@@ -80,7 +70,6 @@
   box-shadow: 0 0 0 0.15rem rgba(23, 48, 122, 0.25);
 }
 
-/* شريط الأدوات */
 .toolbar {
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
@@ -107,7 +96,6 @@
   border-color: #17307a;
 }
 
-/* المحرر */
 .editor {
   width: 100%;
   min-height: 180px;
@@ -125,7 +113,6 @@
   color: #9ca3af;
 }
 
-/* المرفقات */
 .list-unstyled li {
   background: #f9fafb;
   border: 1px solid #e2e8f0;
@@ -139,7 +126,6 @@
   background: #f1f5f9;
 }
 
-/* الأزرار العامة */
 .btn {
   border-radius: 10px;
   font-weight: 500;
@@ -155,7 +141,6 @@
   cursor: pointer;
 }
 
-/* الأزرار الأساسية */
 .btn-primary {
   background-color: #17307a;
   border: none;
@@ -186,7 +171,6 @@
   background-color: #f8fafc;
 }
 
-/* أزرار التحكم السفلية */
 .form-footer {
   margin-top: 40px;
   display: flex;
@@ -201,7 +185,6 @@
   min-width: 150px;
 }
 
-/* زر الإلغاء */
 .cancel-btn {
   background-color: #f9f9f9;
   border: 1px solid #ccc;
@@ -214,7 +197,6 @@
   background-color: #ececec;
 }
 
-/* زر الحفظ كمسودة */
 .draft-btn {
   background-color: #ffffff;
   border: 1px solid #999;
@@ -227,7 +209,6 @@
   background-color: #f4f4f4;
 }
 
-/* زر الإرسال للمراجعة */
 .submit-btn {
   background-color: #0553a6;
   color: #fff;
@@ -239,7 +220,6 @@
   background-color: #0069d9;
 }
 
-/* زر رفع الملفات */
 .custom-upload {
   width: 100%;
   background-color: #f5f8ff;
@@ -273,7 +253,6 @@
   transform: translateY(-3px);
 }
 
-/* التنبيهات */
 .alert {
   border-radius: 10px;
   font-weight: 500;
@@ -291,28 +270,275 @@
   border: 1px solid #fecaca;
 }
 
-/* إضافة هذه التنسيقات لملف CSS */
-
-/* مؤشر التحميل */
 .spinner-border {
   width: 3rem;
   height: 3rem;
 }
 
-/* تعطيل الأزرار أثناء التحميل */
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* تحسين عرض رسائل الخطأ */
 .invalid-feedback {
   display: block;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
-/* تحسين استجابة الشاشات الصغيرة */
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  min-width: 250px;
+  position: relative;
+}
+
+.attachment-item:hover {
+  border-color: #0d6efd;
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.current-attachment {
+  border-left: 4px solid #28a745;
+}
+
+.new-attachment {
+  border-left: 4px solid #0d6efd;
+}
+
+.attachment-image {
+  margin-left: 12px;
+}
+
+.attachment-preview {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.attachment-preview:hover {
+  transform: scale(1.1);
+}
+
+.attachment-icon {
+  margin-left: 12px;
+}
+
+.attachment-icon i {
+  font-size: 2rem;
+}
+
+.attachment-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attachment-name {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-type,
+.attachment-size {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.attachment-status {
+  font-size: 0.75rem;
+}
+
+.attachment-status:not(.new) {
+  color: #28a745;
+}
+
+.attachment-status.new {
+  color: #0d6efd;
+}
+
+.attachment-delete {
+  margin-right: auto;
+}
+
+.custom-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  gap: 8px;
+  color: #6c757d;
+  cursor: pointer;
+  width: 100%;
+}
+
+.custom-upload:hover:not(.disabled) {
+  border-color: #0d6efd;
+  background-color: #e7f1ff;
+  color: #0d6efd;
+}
+
+.custom-upload i {
+  font-size: 1.2rem;
+}
+
+.custom-upload.disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  color: #333;
+  height: 8px;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+  color: white;
+}
+
+.draft-btn {
+  background-color: #ffffff;
+  border: 1px solid #999;
+  color: #333;
+  height: 8px;
+}
+
+.draft-btn:hover {
+  background-color: #f4f4f4;
+}
+
+.submit-btn {
+  background-color: #0553a6;
+  color: #fff;
+  border: none;
+  height: 8px;
+}
+
+.submit-btn:hover {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+.editor {
+  min-height: 120px;
+  background: white;
+  line-height: 1.6;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.editor:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
+.toolbar .btn {
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  border: 1px solid #dee2e6;
+}
+
+.toolbar .btn:hover {
+  background-color: #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .attachment-item {
+    min-width: 100%;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .attachment-image,
+  .attachment-icon {
+    margin-left: 0;
+    margin-bottom: 8px;
+  }
+
+  .attachment-info {
+    text-align: center;
+  }
+
+  .attachment-name {
+    max-width: 100%;
+  }
+
+  .form-footer {
+    flex-direction: column;
+  }
+
+  .form-footer .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .d-flex.flex-wrap.gap-3 {
+    gap: 12px !important;
+  }
+}
+
+.add-achievement-content {
+  padding: 20px;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.text-danger {
+  font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
   .form-footer {
     flex-direction: column;
@@ -324,7 +550,6 @@
   }
 }
 
-/* استجابة للشاشات الصغيرة */
 @media (max-width: 768px) {
   .add-achievement-container {
     padding: 1rem;

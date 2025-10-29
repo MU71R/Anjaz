@@ -1,13 +1,201 @@
-.header-box {
-    background-color: #007bff;
-    color: white;
+/* التدرج اللوني للنجاح */
+.bg-gradient-success {
+    background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important;
 }
 
-.card {
-    border-radius: 12px;
-    transition: transform 0.2s ease;
+/* تحسينات البطاقات */
+.activity-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
 }
 
-.card:hover {
+.activity-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* عناصر المعلومات */
+.info-item {
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    border-right: 3px solid #00b09b;
+}
+
+.info-item:hover {
+    background: #e9ecef;
+    transition: background 0.3s ease;
+}
+
+/* تحسينات المرفقات */
+.attachments-section {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+}
+
+.section-header {
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #00b09b;
+}
+
+.attachment-card {
+    transition: all 0.3s ease;
+    background: #fff;
+    border: 1px solid #e9ecef !important;
+}
+
+.attachment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-color: #00b09b !important;
+}
+
+.attachment-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.attachment-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 176, 155, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.attachment-image-container:hover .image-overlay {
+    opacity: 1;
+}
+
+.attachment-image-container:hover .attachment-preview {
+    transform: scale(1.05);
+}
+
+.image-overlay i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.attachment-icon {
+    padding: 1rem 0;
+}
+
+/* أزرار الأفعال */
+.action-buttons .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+}
+
+/* معلومات الجدول الزمني */
+.timeline-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* نمط النقاط في الخلفية */
+.pattern-dots {
+    background-image: radial-gradient(#ffffff 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* تحسينات للعرض على الجوال */
+@media (max-width: 768px) {
+    .activity-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .timeline-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+        text-align: center !important;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* تحسينات الـ Modal */
+.modal-content {
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow: hidden;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1.5rem;
+}
+
+/* تأثيرات التمرير */
+.container-fluid {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تحسينات عامة */
+.fs-7 {
+    font-size: 0.8rem !important;
+}
+
+.rounded-3 {
+    border-radius: 0.75rem !important;
+}
+
+.badge {
+    font-size: 0.75em;
 }

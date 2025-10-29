@@ -12,6 +12,8 @@ export class ArchivedActivitiesComponent implements OnInit {
   archivedActivities: Activity[] = [];
   loading = true;
   errorMessage = '';
+  selectedImage: string = '';
+  showImageModal = false;
 
   constructor(private activityService: ActivityService) {}
 
@@ -20,10 +22,11 @@ export class ArchivedActivitiesComponent implements OnInit {
   }
 
   loadArchivedActivities(): void {
-    this.activityService.getArchivedActivities().subscribe({
+    this.activityService.getArchived().subscribe({
       next: (res) => {
         this.archivedActivities = res.data || [];
         this.loading = false;
+        console.log('Archived activities loaded:', this.archivedActivities);
       },
       error: (err) => {
         this.loading = false;
@@ -35,8 +38,99 @@ export class ArchivedActivitiesComponent implements OnInit {
   }
 
   getCriteriaName(criteria: any): string {
-    if (!criteria) return '-';
+    if (!criteria) return 'غير محدد';
     if (typeof criteria === 'string') return criteria;
-    return criteria.name || '-';
+    return criteria.name || 'غير محدد';
+  }
+
+  // دالة جديدة للحصول على اسم المستخدم
+  getUserName(user: any): string {
+    if (!user) return 'غير محدد';
+    if (typeof user === 'string') return user;
+    return user.name || 'غير محدد';
+  }
+
+  // التحقق من نوع الملف
+  isImage(attachment: string): boolean {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+    return imageExtensions.some(
+      (ext) =>
+        attachment.toLowerCase().endsWith(ext) ||
+        attachment.toLowerCase().includes(ext)
+    );
+  }
+
+  isPdf(attachment: string): boolean {
+    return attachment.toLowerCase().includes('.pdf');
+  }
+
+  // الحصول على الرابط الكامل للمرفق
+  getFullAttachmentUrl(attachment: string): string {
+    if (attachment.startsWith('http')) {
+      return attachment;
+    } else {
+      return `http://localhost:3000${attachment}`;
+    }
+  }
+
+  // فتح الصورة في modal
+  openImageModal(attachment: string): void {
+    this.selectedImage = this.getFullAttachmentUrl(attachment);
+    this.showImageModal = true;
+  }
+
+  // إغلاق modal
+  closeImageModal(): void {
+    this.showImageModal = false;
+    this.selectedImage = '';
+  }
+
+  // تنسيق التاريخ
+  formatDate(dateString: string | Date | undefined | null): string {
+    if (!dateString) return 'غير محدد';
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'غير محدد';
+      }
+
+      return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'غير محدد';
+    }
+  }
+
+  // تحميل كـ PDF
+  downloadAsPDF(activity: Activity): void {
+    const pdfUrl = this.getFullAttachmentUrl(
+      activity.Attachments?.find((att) => att.includes('.pdf')) || ''
+    );
+    if (pdfUrl) {
+      window.open(pdfUrl, '_blank');
+    } else {
+      Swal.fire('info', 'لا يوجد ملف PDF متاح للتحميل', 'info');
+    }
+  }
+
+  // تحميل كـ Word
+  downloadAsWord(activity: Activity): void {
+    const wordUrl = this.getFullAttachmentUrl(
+      activity.Attachments?.find(
+        (att) => att.includes('.docx') || att.includes('.doc')
+      ) || ''
+    );
+    if (wordUrl) {
+      window.open(wordUrl, '_blank');
+    } else {
+      Swal.fire('info', 'لا يوجد ملف Word متاح للتحميل', 'info');
+    }
   }
 }

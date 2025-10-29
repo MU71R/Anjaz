@@ -7,8 +7,8 @@
     <div class="col-md-">
       <div class="add-achievement-content">
 
-        <h2 class="mb-1">إضافة إنجاز جديد</h2>
-        <p class="text-muted mb-4">قم بتعبئة جميع الحقول المطلوبة لتسجيل الإنجاز</p>
+        <h2 class="mb-1">{{ isEditing ? 'تعديل المسودة' : 'إضافة إنجاز جديد' }}</h2>
+        <p class="text-muted mb-4">{{ isEditing ? 'قم بتعديل بيانات المسودة' : 'قم بتعبئة جميع الحقول المطلوبة لتسجيل الإنجاز' }}</p>
 
         <form [formGroup]="form" (ngSubmit)="submitForReview()">
           <div class="card p-4 mb-3 shadow-sm border-0">
@@ -109,30 +109,99 @@
               <label class="form-label fw-semibold">المرفقات</label>
               <link rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-              <div class="input-group w-100">
-                <label class="custom-upload w-100">
-                  <i class="bi bi-cloud-arrow-up-fill"></i>
-                  <span>رفع ملف</span>
-                  <input type="file" (change)="onFilesSelected($event)" accept="image/*,.pdf" multiple hidden>
-                </label>
+              <div *ngIf="isEditing && existingAttachments.length > 0" class="mb-3">
+                <h6 class="text-secondary mb-3">المرفقات الحالية:</h6>
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let attachment of existingAttachments; let i = index"
+                    class="attachment-item current-attachment">
+
+                    <div *ngIf="isImage(attachment)" class="attachment-image">
+                      <img [src]="getFullAttachmentUrl(attachment)" class="attachment-preview" alt="معاينة المرفق"
+                        (click)="viewAttachment(attachment)">
+                    </div>
+
+                    <div *ngIf="!isImage(attachment)" class="attachment-icon">
+                      <i class="fa-solid fa-file-pdf text-danger"></i>
+                    </div>
+
+                    <div class="attachment-info">
+                      <small class="attachment-name" [title]="getFileName(attachment)">
+                        {{ getFileName(attachment) }}
+                      </small>
+                      <small class="attachment-type">{{ getFileType(attachment) }}</small>
+                      <small class="attachment-status">
+                        <i class="fa-solid fa-check-circle me-1"></i> مرفق موجود
+                      </small>
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-outline-danger attachment-delete"
+                      (click)="removeExistingAttachment(i)" title="حذف المرفق">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <small class="text-muted d-block mt-1">يمكنك رفع صورتين أو ملفات PDF كحد أقصى</small>
+              <div *ngIf="isEditing && existingAttachments.length === 0" class="mb-3">
+                <div class="alert alert-info py-2">
+                  <small><i class="fa-solid fa-info-circle me-1"></i> لا توجد مرفقات في هذه المسودة</small>
+                </div>
+              </div>
 
-              <ul class="list-unstyled mt-2">
-                <li *ngFor="let f of attachments; let i = index"
-                  class="d-flex align-items-center justify-content-between py-1 border-bottom">
-                  <div>
-                    <i class="bi bi-paperclip ms-2 text-secondary"></i>
-                    <strong>{{ f.name }}</strong>
-                    <small class="text-muted d-block">{{ (f.size / 1024 / 1024) | number:'1.1-2' }} MB</small>
+              <div *ngIf="attachments.length > 0" class="mb-3">
+                <h6 class="text-secondary mb-3">المرفقات الجديدة:</h6>
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let file of attachments; let i = index" class="attachment-item new-attachment">
+
+                    <div *ngIf="isImageFile(file)" class="attachment-image">
+                      <img [src]="getFilePreview(file)" class="attachment-preview" alt="معاينة الملف">
+                    </div>
+
+                    <div *ngIf="!isImageFile(file)" class="attachment-icon">
+                      <i class="fa-solid fa-file-pdf text-danger"></i>
+                    </div>
+
+                    <div class="attachment-info">
+                      <small class="attachment-name" [title]="file.name">
+                        {{ file.name }}
+                      </small>
+                      <small class="attachment-size">{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</small>
+                      <small class="attachment-status new">
+                        <i class="fa-solid fa-plus-circle me-1"></i> جديد
+                      </small>
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-outline-danger attachment-delete"
+                      (click)="removeAttachment(i)" title="حذف المرفق">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
                   </div>
-                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAttachment(i)">
-                    حذف
-                  </button>
-                </li>
-              </ul>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="input-group w-100">
+                  <label class="custom-upload"
+                    [class.disabled]="(attachments.length + existingAttachments.length) >= maxFiles">
+                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                    <span>
+                      {{ (attachments.length + existingAttachments.length) >= maxFiles ? 'تم الوصول للحد الأقصى' : 'رفع ملف' }}
+                    </span>
+                    <input type="file" (change)="onFilesSelected($event)" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
+                      multiple hidden [disabled]="(attachments.length + existingAttachments.length) >= maxFiles">
+                  </label>
+                </div>
+
+                <div class="form-text mt-2">
+                  <i class="fa-solid fa-circle-info me-1"></i>
+                  الحد الأقصى {{ maxFiles }} ملفات (PDF أو صور) - حجم الملف لا يتعدى {{ maxFileSizeMB }}MB
+                  <span *ngIf="(attachments.length + existingAttachments.length) > 0" class="fw-bold text-primary">
+                    • المرفقات المضافة: {{ attachments.length + existingAttachments.length }}/{{ maxFiles }}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div class="form-footer d-flex gap-2">
@@ -141,11 +210,11 @@
               </button>
 
               <button class="btn draft-btn" type="button" (click)="saveAsDraft()">
-                <i class="bi bi-save"></i> حفظ كمسودة
+                <i class="bi bi-save"></i> {{ isEditing ? 'تحديث المسودة' : 'حفظ كمسودة' }}
               </button>
 
               <button class="btn submit-btn" type="submit">
-                <i class="bi bi-send"></i> إرسال للمراجعة
+                <i class="bi bi-send"></i> {{ isEditing ? 'تحديث وإرسال' : 'إرسال للمراجعة' }}
               </button>
             </div>
           </div>
