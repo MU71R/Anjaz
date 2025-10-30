@@ -10,6 +10,9 @@
           <div class="welcome-section">
             <h1 class="page-title">لوحة التحكم</h1>
             <p class="welcome-message">مرحباً {{ currentUser.fullName }}، نتمنى لك يوماً مثمراً</p>
+            <div class="user-role-badge">
+              <span class="badge" [class]="getRoleBadgeClass()">{{ getRoleDisplayName() }}</span>
+            </div>
           </div>
           <button class="btn btn-primary add-achievement-btn" routerLink="/add-achievement" routerLinkActive="active">
             <i class="fas fa-plus-circle"></i>
@@ -18,6 +21,7 @@
         </div>
       </div>
 
+      <!-- إحصائيات المستخدم الحالي -->
       <div class="stats-section">
         <div class="row g-3">
           <div class="col-6 col-lg-3">
@@ -26,8 +30,9 @@
                 <i class="fas fa-chart-bar"></i>
               </div>
               <div class="card-content">
-                <h6 class="stat-label">إجمالي الأنشطة</h6>
-                <h3 class="stat-value">{{ getStatValue('total') }}</h3>
+                <h6 class="stat-label">إجمالي أنشطتي</h6>
+                <h3 class="stat-value">{{ userStats.totalActivities }}</h3>
+                <small class="stat-subtext">جميع الأنشطة المقدمة</small>
               </div>
             </div>
           </div>
@@ -38,7 +43,8 @@
               </div>
               <div class="card-content">
                 <h6 class="stat-label">قيد المراجعة</h6>
-                <h3 class="stat-value">{{ getStatValue('pending') }}</h3>
+                <h3 class="stat-value">{{ userStats.pendingActivities }}</h3>
+                <small class="stat-subtext">بانتظار الموافقة</small>
               </div>
             </div>
           </div>
@@ -49,7 +55,8 @@
               </div>
               <div class="card-content">
                 <h6 class="stat-label">المعتمدة</h6>
-                <h3 class="stat-value">{{ getStatValue('approved') }}</h3>
+                <h3 class="stat-value">{{ userStats.approvedActivities }}</h3>
+                <small class="stat-subtext">تمت الموافقة عليها</small>
               </div>
             </div>
           </div>
@@ -60,36 +67,133 @@
               </div>
               <div class="card-content">
                 <h6 class="stat-label">المرفوضة</h6>
-                <h3 class="stat-value">{{ getStatValue('rejected') }}</h3>
+                <h3 class="stat-value">{{ userStats.rejectedActivities }}</h3>
+                <small class="stat-subtext">تم رفضها</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- إحصائيات إضافية -->
+        <div class="row mt-3" *ngIf="userStats.draftActivities > 0">
+          <div class="col-12">
+            <div class="stat-card draft">
+              <div class="card-icon">
+                <i class="fas fa-edit"></i>
+              </div>
+              <div class="card-content">
+                <h6 class="stat-label">المسودات</h6>
+                <h3 class="stat-value">{{ userStats.draftActivities }}</h3>
+                <small class="stat-subtext">أنشطة غير مكتملة</small>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- الإنجازات الحديثة للمستخدم الحالي -->
       <div class="recent-achievements-section">
         <div class="section-card">
           <div class="card-header">
-            <h5 class="card-title">أحدث الإنجازات</h5>
+            <h5 class="card-title">
+              <i class="fas fa-history me-2"></i>
+              أحدث إنجازاتي
+            </h5>
+            <button class="btn btn-sm btn-outline-primary" (click)="loadRecentAchievements()">
+              <i class="fas fa-sync-alt"></i>
+              تحديث
+            </button>
           </div>
           <div class="card-body">
             <div *ngIf="recentAchievements.length === 0" class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <p>لا توجد إنجازات حديثة</p>
-              <button class="btn btn-outline-primary" routerLink="/add-achievement">إضافة أول إنجاز</button>
+              <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+              <p class="text-muted">لا توجد إنجازات حديثة</p>
+              <button class="btn btn-primary mt-2" routerLink="/add-achievement">
+                <i class="fas fa-plus-circle me-2"></i>
+                إضافة أول إنجاز
+              </button>
             </div>
-      
+
             <div class="achievements-list" *ngIf="recentAchievements.length > 0">
-              <div *ngFor="let r of recentAchievements; let i = index" class="achievement-item">
+              <div *ngFor="let achievement of recentAchievements; let i = index" class="achievement-item"
+                [class]="getAchievementStatusClass(achievement)">
                 <div class="achievement-counter">
                   <span class="counter-badge">{{ i + 1 }}</span>
                 </div>
-      
+
                 <div class="achievement-content">
-                  <div class="achievement-message" [innerHTML]="r.message"></div>
+                  <div class="achievement-message" [innerHTML]="achievement.message"></div>
                   <div class="achievement-meta">
+                    <span class="achievement-time">
+                      <i class="fas fa-clock me-1"></i>
+                      {{ achievement.time }}
+                    </span>
+                    <span class="achievement-status" *ngIf="getAchievementStatus(achievement)">
+                      <i class="fas fa-circle me-1"></i>
+                      {{ getAchievementStatus(achievement) }}
+                    </span>
                   </div>
                 </div>
+
+                <div class="achievement-actions" *ngIf="achievement.activityId">
+                  <button class="btn btn-sm btn-outline-secondary" [routerLink]="['/activity', achievement.activityId]">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- الأنشطة الحديثة للمستخدم الحالي -->
+      <div class="recent-activities-section" *ngIf="userActivities.length > 0">
+        <div class="section-card">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="fas fa-list-alt me-2"></i>
+              أنشطتي الحديثة
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="activities-table">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>العنوان</th>
+                      <th>الحالة</th>
+                      <th>التاريخ</th>
+                      <th>الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let activity of userActivities.slice(0, 5)">
+                      <td>
+                        <strong>{{ activity.activityTitle }}</strong>
+                        <small class="text-muted d-block">
+                          {{ (activity.activityDescription || '').slice(0, 50) }}...
+                        </small>
+                      </td>
+                      <td>
+                        <span class="badge" [class]="getStatusClass(activity.status)">
+                          {{ activity.status }}
+                        </span>
+                      </td>
+                      <td>
+                        <small class="text-muted">
+                          <!-- ✅ تصحيح: تمرير string بدلاً من Date مباشرة -->
+                          {{ formatDate(activity.createdAt) }}
+                        </small>
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary" [routerLink]="['/activity', activity._id]">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

@@ -1,13 +1,10 @@
 <div class="container-fluid mt-4" dir="rtl">
     <div class="row">
-        <!-- القائمة الجانبية -->
         <div class="col-md-3 col-lg-2">
             <app-sidebar></app-sidebar>
         </div>
 
-        <!-- المحتوى الرئيسي -->
         <div class="col-md-9 col-lg-10">
-            <!-- الهيدر المحسّن -->
             <div
                 class="header-box mb-4 p-4 rounded-3 shadow-sm bg-gradient-success text-white position-relative overflow-hidden">
                 <div class="position-absolute top-0 end-0 w-100 h-100 opacity-10">
@@ -24,13 +21,11 @@
                 </div>
             </div>
 
-            <!-- حالة التحميل -->
             <div *ngIf="loading" class="text-center my-5 py-5">
                 <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;"></div>
                 <p class="text-muted fs-6">جاري تحميل الإنجازات المؤرشفة...</p>
             </div>
 
-            <!-- حالة عدم وجود إنجازات -->
             <div *ngIf="!loading && archivedActivities.length === 0"
                 class="alert alert-light text-center border-0 shadow-sm rounded-3 py-5 my-4">
                 <i class="fa-solid fa-archive text-muted fa-3x mb-3"></i>
@@ -38,11 +33,9 @@
                 <p class="text-muted mb-0">لم يتم اعتماد أي إنجازات حتى الآن</p>
             </div>
 
-            <!-- قائمة الإنجازات المؤرشفة -->
             <div class="row g-4" *ngIf="!loading && archivedActivities.length > 0">
                 <div class="col-12" *ngFor="let activity of archivedActivities; let i = index">
                     <div class="card shadow-sm border-0 rounded-3 activity-card h-100">
-                        <!-- الهيدر مع التدرج اللوني -->
                         <div class="card-header bg-gradient-success border-0 rounded-top-3 text-white py-3">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
@@ -68,9 +61,7 @@
                             </div>
                         </div>
 
-                        <!-- محتوى البطاقة -->
                         <div class="card-body py-4">
-                            <!-- المعلومات الأساسية -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <div class="info-item">
@@ -112,7 +103,6 @@
                                 </div>
                             </div>
 
-                            <!-- المرفقات -->
                             <div class="attachments-section"
                                 *ngIf="activity.Attachments && activity.Attachments.length > 0">
                                 <div class="section-header mb-3">
@@ -127,7 +117,6 @@
                                     <div class="col-xl-3 col-lg-4 col-md-6"
                                         *ngFor="let attachment of activity.Attachments; let i = index">
                                         <div class="attachment-card border rounded-2 p-3 h-100">
-                                            <!-- عرض الصور -->
                                             <div *ngIf="isImage(attachment)" class="text-center">
                                                 <div class="attachment-image-container mb-2">
                                                     <img [src]="getFullAttachmentUrl(attachment)"
@@ -140,7 +129,6 @@
                                                 <p class="small text-muted mb-0">صورة {{ i + 1 }}</p>
                                             </div>
 
-                                            <!-- عرض ملفات PDF -->
                                             <div *ngIf="isPdf(attachment)" class="text-center">
                                                 <div class="attachment-icon mb-2">
                                                     <i class="fa-solid fa-file-pdf text-danger fa-2x"></i>
@@ -152,7 +140,6 @@
                                                 </a>
                                             </div>
 
-                                            <!-- عرض الملفات الأخرى -->
                                             <div *ngIf="!isImage(attachment) && !isPdf(attachment)" class="text-center">
                                                 <div class="attachment-icon mb-2">
                                                     <i class="fa-solid fa-file text-secondary fa-2x"></i>
@@ -168,7 +155,6 @@
                                 </div>
                             </div>
 
-                            <!-- رسالة عدم وجود مرفقات -->
                             <div *ngIf="!activity.Attachments || activity.Attachments.length === 0"
                                 class="text-center py-4 border rounded-2 bg-light">
                                 <i class="fa-solid fa-file-circle-exclamation text-muted fa-2x mb-2"></i>
@@ -176,7 +162,6 @@
                             </div>
                         </div>
 
-                        <!-- الفوتر مع المعلومات الإضافية -->
                         <div class="card-footer bg-transparent border-0 pt-0">
                             <div class="row align-items-center">
                                 <div class="col-md-6">
@@ -200,7 +185,6 @@
     </div>
 </div>
 
-<!-- Modal لعرض الصور -->
 <div *ngIf="showImageModal" class="modal-backdrop fade show" (click)="closeImageModal()"></div>
 <div *ngIf="showImageModal" class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered">

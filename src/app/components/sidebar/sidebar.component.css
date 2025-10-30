@@ -1,10 +1,34 @@
+/* CSS محسن بعرض أكبر */
 :host {
     direction: rtl;
     font-family: "Tajawal", sans-serif;
 }
 
+.sidebar-container {
+    position: relative;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .sidebar {
-    width: 260px;
+    width: 240px;
+    /* زيادة العرض من 200px إلى 240px */
     min-height: 100vh;
     background-color: #ffffff;
     display: flex;
@@ -13,77 +37,278 @@
     top: 0;
     right: 0;
     z-index: 1000;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
 }
 
 .sidebar-header {
-    background: #f8f9fa;
-    padding-top: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px 16px 16px;
+    /* زيادة padding */
+    position: relative;
 }
 
 .logo-section i {
     color: #4e73df;
+    filter: drop-shadow(0 2px 3px rgba(78, 115, 223, 0.2));
+}
+
+.sidebar-header h5 {
+    color: #2d3748;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
 }
 
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
-    color: #555;
-    font-weight: 500;
-    border-radius: 8px;
+    padding: 12px 16px;
+    /* زيادة padding */
+    color: #4a5568;
+    font-weight: 600;
+    border-radius: 0;
     text-decoration: none;
     transition: all 0.25s ease;
+    border-right: 3px solid transparent;
+    margin: 2px 0;
+    position: relative;
+    overflow: hidden;
+    font-size: 0.9rem;
+    /* زيادة حجم الخط قليلاً */
 }
 
 .nav-link i {
     font-size: 1.1rem;
-    width: 22px;
+    /* زيادة حجم الأيقونات */
+    width: 30px;
     text-align: center;
+    transition: transform 0.2s ease;
+    margin-left: 8px;
 }
 
-.nav-link:hover,
+.nav-text {
+    flex: 1;
+}
+
+.nav-link:hover {
+    background-color: #f7fafc;
+    color: #4e73df;
+    border-right-color: #4e73df;
+    transform: none;
+}
+
+.nav-link:hover i {
+    transform: scale(1.05);
+}
+
 .nav-link.active {
-    background-color: #4e73df;
+    background: linear-gradient(135deg, #4e73df 0%, #3a56c4 100%);
     color: #fff !important;
-    transform: translateX(-4px);
+    border-right-color: #2d4bb7;
+    box-shadow: 0 2px 4px rgba(78, 115, 223, 0.2);
+}
+
+.nav-link.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-footer {
     background: #f8f9fa;
-    padding-bottom: 15px;
+    padding: 16px 16px 20px;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    width: 100%;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-btn:hover {
+    background-color: #fed7d7;
+    color: #c53030;
+    transform: translateY(-1px);
 }
 
 .toggle-btn {
     position: fixed;
-    top: 15px;
-    right: 15px;
+    top: 18px;
+    right: 18px;
     z-index: 1100;
     background: #4e73df;
     color: #fff;
     border: none;
     border-radius: 6px;
-    padding: 8px 12px;
+    padding: 9px 12px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 5px rgba(78, 115, 223, 0.3);
 }
 
 .toggle-btn:hover {
     background: #3a5db0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(78, 115, 223, 0.4);
 }
 
 .toggle-btn i {
     font-size: 1.2rem;
+    transition: transform 0.3s ease;
 }
 
+.toggle-btn:hover i {
+    transform: scale(1.05);
+}
+
+/* تحسينات للشاشات الصغيرة */
 @media (max-width: 992px) {
     .sidebar {
-        right: -260px;
-        transition: right 0.3s ease-in-out;
+        transform: translateX(100%);
+        width: 220px;
+        /* عرض مناسب للشاشات الصغيرة */
     }
 
     .sidebar.open {
-        right: 0;
+        transform: translateX(0);
+    }
+
+    .toggle-btn {
+        display: block !important;
+    }
+}
+
+/* تحسينات للشاشات المتوسطة */
+@media (min-width: 993px) and (max-width: 1200px) {
+    .sidebar {
+        width: 220px;
+        /* عرض ثابت للشاشات المتوسطة */
+    }
+
+    .nav-link {
+        padding: 11px 14px;
+        font-size: 0.88rem;
+    }
+}
+
+/* تحسينات للشاشات الكبيرة جداً */
+@media (min-width: 1400px) {
+    .sidebar {
+        width: 260px;
+        /* عرض أكبر للشاشات الكبيرة */
+    }
+
+    .sidebar-header {
+        padding: 24px 20px 18px;
+    }
+
+    .nav-link {
+        padding: 14px 18px;
+        font-size: 0.95rem;
+    }
+}
+
+/* تحسينات إضافية للشاشات الصغيرة جداً */
+@media (max-width: 576px) {
+    .sidebar {
+        width: 80vw;
+        max-width: 240px;
+    }
+
+    .toggle-btn {
+        top: 15px;
+        right: 15px;
+        padding: 8px 10px;
+    }
+
+    .sidebar-header {
+        padding: 18px 14px 14px;
+    }
+
+    .nav-link {
+        padding: 11px 14px;
+    }
+}
+
+/* تحسينات للوضع الأفقي على الهواتف */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        overflow-y: auto;
+    }
+
+    .sidebar-header {
+        padding: 16px 14px 12px;
+    }
+
+    .sidebar-nav {
+        margin-top: 16px;
+    }
+
+    .nav-link {
+        padding: 10px 14px;
+    }
+}
+
+/* تحسينات للوصولية */
+@media (prefers-reduced-motion: reduce) {
+
+    .sidebar,
+    .nav-link,
+    .toggle-btn,
+    .sidebar-overlay {
+        transition: none;
+    }
+}
+
+/* تحسينات للوضع المظلم */
+@media (prefers-color-scheme: dark) {
+    .sidebar {
+        background-color: #1a202c;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar-header {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    }
+
+    .sidebar-header h5 {
+        color: #e2e8f0;
+    }
+
+    .nav-link {
+        color: #cbd5e0;
+    }
+
+    .nav-link:hover {
+        background-color: #2d3748;
+        color: #63b3ed;
+    }
+
+    .sidebar-footer {
+        background: #2d3748;
+    }
+
+    .logout-btn:hover {
+        background-color: #742a2a;
     }
 }

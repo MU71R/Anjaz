@@ -43,14 +43,12 @@ export class ArchivedActivitiesComponent implements OnInit {
     return criteria.name || 'غير محدد';
   }
 
-  // دالة جديدة للحصول على اسم المستخدم
   getUserName(user: any): string {
     if (!user) return 'غير محدد';
     if (typeof user === 'string') return user;
     return user.name || 'غير محدد';
   }
 
-  // التحقق من نوع الملف
   isImage(attachment: string): boolean {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
     return imageExtensions.some(
@@ -64,7 +62,6 @@ export class ArchivedActivitiesComponent implements OnInit {
     return attachment.toLowerCase().includes('.pdf');
   }
 
-  // الحصول على الرابط الكامل للمرفق
   getFullAttachmentUrl(attachment: string): string {
     if (attachment.startsWith('http')) {
       return attachment;
@@ -73,19 +70,16 @@ export class ArchivedActivitiesComponent implements OnInit {
     }
   }
 
-  // فتح الصورة في modal
   openImageModal(attachment: string): void {
     this.selectedImage = this.getFullAttachmentUrl(attachment);
     this.showImageModal = true;
   }
 
-  // إغلاق modal
   closeImageModal(): void {
     this.showImageModal = false;
     this.selectedImage = '';
   }
 
-  // تنسيق التاريخ
   formatDate(dateString: string | Date | undefined | null): string {
     if (!dateString) return 'غير محدد';
 
@@ -108,7 +102,6 @@ export class ArchivedActivitiesComponent implements OnInit {
     }
   }
 
-  // تحميل كـ PDF
   downloadAsPDF(activity: Activity): void {
     const pdfUrl = this.getFullAttachmentUrl(
       activity.Attachments?.find((att) => att.includes('.pdf')) || ''
@@ -120,7 +113,6 @@ export class ArchivedActivitiesComponent implements OnInit {
     }
   }
 
-  // تحميل كـ Word
   downloadAsWord(activity: Activity): void {
     const wordUrl = this.getFullAttachmentUrl(
       activity.Attachments?.find(

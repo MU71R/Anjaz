@@ -1,66 +1,103 @@
-<button class="toggle-btn d-lg-none" (click)="isSidebarOpen = !isSidebarOpen" aria-label="Toggle sidebar">
-    <i class="fa-solid fa-bars"></i>
-</button>
+<!-- HTML محسن بعرض أكبر ودعم الصلاحيات -->
+<div class="sidebar-container">
+    <div class="sidebar-overlay" [class.active]="isSidebarOpen" (click)="isSidebarOpen = false"></div>
 
-<aside class="sidebar shadow-sm" [class.open]="isSidebarOpen">
-    <div class="sidebar-header text-center border-bottom pb-3">
-        <div class="logo-section mb-2">
-            <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
+    <button class="toggle-btn d-lg-none" (click)="toggleSidebar()" aria-label="Toggle sidebar"
+        [attr.aria-expanded]="isSidebarOpen">
+        <i class="fa-solid" [class.fa-bars]="!isSidebarOpen" [class.fa-xmark]="isSidebarOpen"></i>
+    </button>
+
+    <aside class="sidebar shadow-sm" [class.open]="isSidebarOpen" role="navigation" aria-label="القائمة الرئيسية">
+        <!-- رأس السايدبار مع بيانات المستخدم -->
+        <div class="sidebar-header text-center border-bottom pb-3">
+            <div class="logo-section mb-2">
+                <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
+            </div>
+            <h5 class="fw-bold mb-1">{{ userName }}</h5>
+            <span class="badge" [class]="getRoleBadgeClass()">{{ getRoleDisplayName() }}</span>
         </div>
-        <h5 class="fw-bold mb-1">لوحة التحكم</h5>
-        <span class="badge bg-primary">مسؤول النظام</span>
-    </div>
 
-    <nav class="sidebar-nav mt-4 flex-grow-1">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a routerLink="/dashboard-admin" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-house me-2"></i> الرئيسية
-                </a>
-            </li>
+        <!-- قائمة التنقل الديناميكية -->
+        <nav class="sidebar-nav mt-4 flex-grow-1">
+            <ul class="nav flex-column">
+                <!-- الرئيسية - متاحة للجميع -->
+                <li class="nav-item" *ngIf="canShowItem('dashboard')">
+                    <a routerLink="/dashboard" routerLinkActive="active" class="nav-link" aria-current="page">
+                        <i class="fa-solid fa-house me-2"></i>
+                        <span class="nav-text">الرئيسية</span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/add-achievement" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-circle-plus me-2"></i> إضافة إنجاز
-                </a>
-            </li>
+                <!-- إضافة إنجاز - متاحة للجميع -->
+                <li class="nav-item" *ngIf="canShowItem('add-achievement')">
+                    <a routerLink="/add-achievement" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-circle-plus me-2"></i>
+                        <span class="nav-text">إضافة إنجاز</span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/my-achievements" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-medal me-2"></i> إنجازاتي
-                </a>
-            </li>
+                <!-- إنجازاتي - متاحة للجميع -->
+                <li class="nav-item" *ngIf="canShowItem('my-achievements')">
+                    <a routerLink="/my-achievements" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-medal me-2"></i>
+                        <span class="nav-text">إنجازاتي</span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/administration" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-users-gear me-2"></i> إدارة المستخدمين
-                </a>
-            </li>
+                <!-- إدارة المستخدمين - للمشرفين فقط -->
+                <li class="nav-item" *ngIf="canShowItem('administration')">
+                    <a routerLink="/administration" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-users-gear me-2"></i>
+                        <span class="nav-text">إدارة المستخدمين</span>
+                        <span class="admin-badge" *ngIf="isAdmin()"></span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/criteria-management" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-layer-group me-2"></i> إدارة المعايير
-                </a>
-            </li>
+                <!-- إدارة المعايير - للمشرفين فقط -->
+                <li class="nav-item" *ngIf="canShowItem('criteria-management')">
+                    <a routerLink="/criteria-management" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-layer-group me-2"></i>
+                        <span class="nav-text">إدارة المعايير</span>
+                        <span class="admin-badge" *ngIf="isAdmin()"></span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/archive" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-box-archive me-2"></i> الأرشيف
-                </a>
-            </li>
+                <!-- الأرشيف - متاح للجميع -->
+                <li class="nav-item" *ngIf="canShowItem('archive')">
+                    <a routerLink="/archive" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-box-archive me-2"></i>
+                        <span class="nav-text">الأرشيف</span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a routerLink="/drafts" routerLinkActive="active" class="nav-link">
-                    <i class="fa-solid fa-file-pen me-2"></i> المسودات
-                </a>
-            </li>
+                <!-- المسودات - متاح للجميع -->
+                <li class="nav-item" *ngIf="canShowItem('drafts')">
+                    <a routerLink="/drafts" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-file-pen me-2"></i>
+                        <span class="nav-text">المسودات</span>
+                    </a>
+                </li>
 
-        </ul>
-    </nav>
+                <!-- التقارير - متاح للجميع -->
+                <!-- <li class="nav-item" *ngIf="canShowItem('reports')">
+                    <a routerLink="/reports" routerLinkActive="active" class="nav-link">
+                        <i class="fa-solid fa-chart-bar me-2"></i>
+                        <span class="nav-text">التقارير</span>
+                    </a>
+                </li> -->
 
-    <div class="sidebar-footer border-top pt-3 text-center">
-        <a (click)="logout()" class="nav-link text-danger fw-semibold">
-            <i class="fa-solid fa-right-from-bracket me-2"></i> تسجيل الخروج
-        </a>
-    </div>
-</aside>
+            </ul>
+        </nav>
+
+        <!-- قسم تسجيل الخروج -->
+        <div class="sidebar-footer border-top pt-3 text-center">
+            <div class="user-info-small mb-2">
+                <small class="text-muted">مسجل كـ {{ getRoleDisplayName() }}</small>
+            </div>
+            <button (click)="logout()" class="logout-btn w-100" aria-label="تسجيل الخروج">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>
+                <span class="nav-text">تسجيل الخروج</span>
+            </button>
+        </div>
+    </aside>
+</div>

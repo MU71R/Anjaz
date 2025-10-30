@@ -1,10 +1,8 @@
-/* container styling */
 :host {
   display: block;
   font-family: "Segoe UI", Tahoma, Arial, "Noto Naskh Arabic", sans-serif;
 }
 
-/* Layout container */
 .container {
   display: flex;
   gap: 20px;
@@ -12,32 +10,26 @@
   padding: 0 15px;
 }
 
-/* Sidebar container */
 .sidebar-container {
   width: 250px;
   flex-shrink: 0;
 }
 
-/* Main content area */
 .main-content {
   flex: 1;
   min-width: 0;
-  /* Prevents content from overflowing */
 }
 
-/* header gradient */
 .bg-gradient {
   background: linear-gradient(90deg, rgba(235, 245, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-/* dashed border for empty state */
 .border-dashed {
   border-style: dashed !important;
 }
 
-/* avatar circle for sub item index */
 .avatar-circle {
   width: 36px;
   height: 36px;
@@ -50,13 +42,10 @@
   font-weight: 600;
 }
 
-/* Empty state icon */
 .empty-state-icon {
   font-size: 38px;
 }
 
-
-/* purple badge */
 .bg-purple {
   background-color: #efe6ff;
   border: 1px solid #ecd7ff;
@@ -65,7 +54,6 @@
   color: #5b21b6;
 }
 
-/* small visual tweaks */
 .card {
   border-radius: 12px;
   overflow: hidden;
@@ -79,17 +67,14 @@
   border-style: dashed;
 }
 
-/* spacing */
 .gap-3 {
   gap: 0.75rem;
 }
 
-/* RTL input text alignment */
 .text-end {
   text-align: right;
 }
 
-/* Modal backdrop */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -104,13 +89,11 @@
   z-index: 1050;
 }
 
-/* Close button positioning for RTL */
 .btn-close-ltr {
   margin-left: 0;
   margin-right: auto;
 }
 
-/* responsive tweaks */
 @media (max-width: 991px) {
   .container {
     flex-direction: column;
@@ -120,7 +103,6 @@
   .sidebar-container {
     width: 100%;
     order: 2;
-    /* يضع الـ sidebar أسفل المحتوى في الأجهزة الصغيرة */
   }
 
   .main-content {

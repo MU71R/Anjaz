@@ -390,6 +390,79 @@
   gap: 8px;
 }
 
+
+/* إضافة هذه الأنماط لتحسين المظهر */
+.user-role-badge {
+  margin-top: 0.5rem;
+}
+
+.stat-subtext {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+.achievement-item {
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e9ecef;
+}
+
+.achievement-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.achievement-approved {
+  border-right: 4px solid #28a745;
+  background-color: #f8fff9;
+}
+
+.achievement-rejected {
+  border-right: 4px solid #dc3545;
+  background-color: #fff8f8;
+}
+
+.achievement-pending {
+  border-right: 4px solid #ffc107;
+  background-color: #fffdf6;
+}
+
+.achievement-default {
+  border-right: 4px solid #6c757d;
+  background-color: #f8f9fa;
+}
+
+.achievement-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.achievement-time, .achievement-status {
+  color: #6c757d;
+}
+
+.achievement-actions {
+  margin-right: auto;
+  margin-left: 1rem;
+}
+
+.activities-table {
+  margin-top: 1rem;
+}
+
+.dashboard-footer {
+  margin-top: 3rem;
+  padding: 1rem;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  color: #6c757d;
+}
+
 @media (max-width: 768px) {
   .dashboard-layout {
     flex-direction: column;
