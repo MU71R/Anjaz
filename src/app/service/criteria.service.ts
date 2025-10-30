@@ -69,7 +69,7 @@ export class CriteriaService {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `${token}`, 
+      Authorization: `${token}`,
     });
   }
 

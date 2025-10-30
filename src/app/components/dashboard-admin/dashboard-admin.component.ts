@@ -1,18 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivityService } from '../../service/achievements-service.service';
 import { Activity } from 'src/app/model/achievement';
+import { LoginService } from 'src/app/service/login.service';
 import Swal from 'sweetalert2';
 
 interface User {
   id: string;
   fullName: string;
   role: 'admin' | 'user';
+  username?: string;
 }
 
 interface RecentAchievement {
   message: string;
   time: string;
   id: string;
+  activityId?: string;
+  status?: string;
+}
+
+interface UserStats {
+  totalActivities: number;
+  pendingActivities: number;
+  approvedActivities: number;
+  rejectedActivities: number;
+  draftActivities: number;
 }
 
 @Component({
@@ -22,177 +34,181 @@ interface RecentAchievement {
 })
 export class DashboardAdminComponent implements OnInit {
   currentUser: User = {
-    id: localStorage.getItem('userId') || '',
-    fullName: localStorage.getItem('fullname') || '',
-    role: (localStorage.getItem('role') as 'admin' | 'user') || 'user',
+    id: '',
+    fullName: '',
+    role: 'user',
+    username: '',
   };
 
-  activities: Activity[] = [];
-  filteredActivities: Activity[] = [];
+  userActivities: Activity[] = [];
   recentAchievements: RecentAchievement[] = [];
-
-  searchQuery = '';
-  statusFilter = 'all';
-  departmentFilter = 'all';
-  departments: string[] = [];
-
-  stats = {
-    total: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
+  userStats: UserStats = {
+    totalActivities: 0,
+    pendingActivities: 0,
+    approvedActivities: 0,
+    rejectedActivities: 0,
+    draftActivities: 0,
   };
 
-  constructor(private activityService: ActivityService) {}
+  isLoading = false;
+
+  constructor(
+    private activityService: ActivityService,
+    private loginService: LoginService
+  ) {}
 
   ngOnInit(): void {
-    this.loadActivities();
-    this.loadRecentAchievements();
+    this.loadCurrentUser();
+    this.loadUserData();
   }
 
-  loadActivities(): void {
-    this.activityService.getAll().subscribe({
-      next: (res) => {
-        this.activities = res.activities.filter(
-          (a) => a.SaveStatus !== 'مسودة'
-        );
-        this.departments = Array.from(
-          new Set(
-            this.activities
-              .map((a) => (a as any).department || a.name || '')
-              .filter((d) => d)
-          )
-        );
-        this.applyFilters();
+  loadCurrentUser(): void {
+    const storedUser = this.loginService.getCurrentUser();
+    this.currentUser = {
+      id: storedUser?._id || localStorage.getItem('userId') || '',
+      fullName:
+        storedUser?.fullname || localStorage.getItem('fullname') || 'مستخدم',
+      role:
+        (storedUser?.role as 'admin' | 'user') ||
+        (localStorage.getItem('role') as 'admin' | 'user') ||
+        'user',
+      username: storedUser?.username || '',
+    };
+  }
+
+  loadUserData(): void {
+    this.isLoading = true;
+
+    // تحميل الإحصائيات
+    this.activityService.getUserStats().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.userStats = response.data;
+        }
       },
-      error: (err) => {
-        Swal.fire('خطأ', err.error?.message || 'فشل تحميل الأنشطة', 'error');
+      error: (error) => {
+        console.error('Error loading user stats:', error);
       },
     });
+
+    // تحميل الأنشطة
+    this.activityService.getUserActivities().subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.success) {
+          this.userActivities = response.activities;
+          // ✅ تصحيح: استخدام string بدلاً من Date مباشرة
+          this.userActivities.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error loading user activities:', error);
+        Swal.fire('خطأ', 'فشل تحميل الأنشطة', 'error');
+      },
+    });
+
+    // تحميل الإنجازات الحديثة
+    this.loadRecentAchievements();
   }
 
   loadRecentAchievements(): void {
     this.activityService.getRecentAchievements().subscribe({
-      next: (res: any) => {
-        this.recentAchievements = res.map((a: any) => {
-          let message = a.message || '';
-          let formattedTime = '';
-          const rawTime = a.time || a.createdAt;
+      next: (achievements: RecentAchievement[]) => {
+        this.recentAchievements = achievements
+          .map((achievement) => {
+            // تحسين تنسيق الرسالة والوقت
+            let message = achievement.message || '';
+            let time = achievement.time || '';
 
-          if (rawTime) {
-            const dateObj = new Date(rawTime);
-            if (!isNaN(dateObj.getTime())) {
-              formattedTime = dateObj.toLocaleString('ar-EG', {
-                timeZone: 'Africa/Cairo',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true,
-              });
-              if (!message.includes('')) {
-                message += `<small>${formattedTime}</small>`;
+            // إذا كانت الرسالة تحتوي على توقيت، نعيد تنسيقه
+            if (message.includes('<small>')) {
+              const timeMatch = message.match(/<small>(.*?)<\/small>/);
+              if (timeMatch) {
+                time = timeMatch[1];
+                message = message.replace(/<small>.*?<\/small>/, '');
               }
             }
-          }
 
-          return {
-            id: a.id,
-            message,
-            time: formattedTime,
-          };
-        });
+            return {
+              ...achievement,
+              message: message.trim(),
+              time: time,
+            };
+          })
+          .slice(0, 10); // عرض آخر 10 إنجازات فقط
       },
-      error: (err: any) => {
-        console.error('خطأ في تحميل الإنجازات الحديثة:', err);
+      error: (error) => {
+        console.error('Error loading recent achievements:', error);
       },
     });
   }
 
-  applyFilters(): void {
-    let filtered = this.activities;
-
-    if (this.currentUser.role === 'user') {
-      filtered = filtered.filter(
-        (a) => a.user === this.currentUser.id && a.SaveStatus !== 'مسودة'
-      );
-    }
-
-    if (this.searchQuery.trim()) {
-      const q = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (a) =>
-          a.activityTitle?.toLowerCase().includes(q) ||
-          a.activityDescription?.toLowerCase().includes(q) ||
-          (a.name?.toLowerCase().includes(q) ?? false)
-      );
-    }
-
-    if (this.statusFilter !== 'all') {
-      filtered = filtered.filter(
-        (a) => a.status === this.getArabicStatus(this.statusFilter)
-      );
-    }
-
-    if (this.departmentFilter !== 'all') {
-      filtered = filtered.filter(
-        (a) => (a as any).department === this.departmentFilter
-      );
-    }
-
-    this.filteredActivities = filtered;
-    this.updateStats();
+  getRoleDisplayName(): string {
+    return this.currentUser.role === 'admin' ? 'مدير النظام' : 'مستخدم';
   }
 
-  getArabicStatus(status: string): string {
-    switch (status) {
-      case 'pending':
-        return 'قيد المراجعة';
-      case 'approved':
-        return 'معتمد';
-      case 'rejected':
-        return 'مرفوض';
-      default:
-        return status;
-    }
+  getRoleBadgeClass(): string {
+    return this.currentUser.role === 'admin'
+      ? 'badge bg-danger'
+      : 'badge bg-primary';
   }
 
-  updateStats(): void {
-    const data = this.activities.filter((a) => a.SaveStatus !== 'مسودة');
-    this.stats.total = data.length;
-    this.stats.pending = data.filter((a) => a.status === 'قيد المراجعة').length;
-    this.stats.approved = data.filter((a) => a.status === 'معتمد').length;
-    this.stats.rejected = data.filter((a) => a.status === 'مرفوض').length;
-  }
-
-  getStatValue(stat: keyof typeof this.stats): number {
-    return this.stats[stat];
-  }
-
-  resetFilters(): void {
-    this.searchQuery = '';
-    this.statusFilter = 'all';
-    this.departmentFilter = 'all';
-    this.applyFilters();
-  }
-
-  getStatusLabel(status: Activity['status']): string {
-    return status;
-  }
-
-  getStatusClass(status: Activity['status']): string {
+  getStatusClass(status: string): string {
     switch (status) {
       case 'قيد المراجعة':
-        return 'badge-warning';
+        return 'badge bg-warning';
       case 'معتمد':
-        return 'badge-success';
+        return 'badge bg-success';
       case 'مرفوض':
-        return 'badge-danger';
+        return 'badge bg-danger';
       case 'مسودة':
-        return 'badge-secondary';
+        return 'badge bg-secondary';
       default:
-        return '';
+        return 'badge bg-light text-dark';
     }
+  }
+
+  getAchievementStatusClass(achievement: RecentAchievement): string {
+    const message = achievement.message.toLowerCase();
+    if (message.includes('معتمد')) return 'achievement-approved';
+    if (message.includes('مرفوض')) return 'achievement-rejected';
+    if (message.includes('مراجعة')) return 'achievement-pending';
+    return 'achievement-default';
+  }
+
+  getAchievementStatus(achievement: RecentAchievement): string {
+    const message = achievement.message.toLowerCase();
+    if (message.includes('معتمد')) return 'معتمد';
+    if (message.includes('مرفوض')) return 'مرفوض';
+    if (message.includes('مراجعة')) return 'قيد المراجعة';
+    return '';
+  }
+
+  // ✅ تصحيح: التحقق من وجود التاريخ قبل التنسيق
+  formatDate(dateString: string | Date | undefined): string {
+    if (!dateString) return 'غير محدد';
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'غير محدد';
+
+      return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return 'غير محدد';
+    }
+  }
+
+  // دالة مساعدة للحصول على قيمة الإحصائيات
+  getStatValue(stat: keyof UserStats): number {
+    return this.userStats[stat] || 0;
   }
 }

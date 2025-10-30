@@ -25,9 +25,21 @@ export class ActivityService {
     });
   }
 
+  // ✅ جلب جميع أنشطة المستخدم الحالي فقط
   getAll(): Observable<{ success: boolean; activities: Activity[] }> {
     return this.http.get<{ success: boolean; activities: Activity[] }>(
       `${this.API_BASE_URL}/all`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  // ✅ جلب أنشطة المستخدم الحالي فقط
+  getUserActivities(): Observable<{
+    success: boolean;
+    activities: Activity[];
+  }> {
+    return this.http.get<{ success: boolean; activities: Activity[] }>(
+      `${this.API_BASE_URL}/user-activities`,
       { headers: this.getAuthHeaders() }
     );
   }
@@ -76,27 +88,29 @@ export class ActivityService {
     );
   }
 
+  // ✅ الأرشيف للمستخدم الحالي فقط
   getArchived(): Observable<{ success: boolean; data: Activity[] }> {
     return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/archived`,
+      `${this.API_BASE_URL}/user-archived`,
       { headers: this.getAuthHeaders() }
     );
   }
 
+  // ✅ المسودات للمستخدم الحالي فقط
   getDrafts(): Observable<{ success: boolean; data: Activity[] }> {
     return this.http
       .get<{ success: boolean; data: Activity[] }>(
-        `${this.API_BASE_URL}/draft`,
+        `${this.API_BASE_URL}/user-drafts`,
         {
           headers: this.getAuthHeaders(),
         }
       )
       .pipe(
         tap((response) => {
-          console.log('[Service] Drafts API Response:', response);
+          console.log('[Service] User Drafts API Response:', response);
           if (response.success && response.data) {
             response.data.forEach((activity, index) => {
-              console.log(`[Service] Activity ${index + 1}:`, {
+              console.log(`[Service] User Draft ${index + 1}:`, {
                 title: activity.activityTitle,
                 attachments: activity.Attachments,
                 attachmentsCount: activity.Attachments?.length || 0,
@@ -129,25 +143,38 @@ export class ActivityService {
       );
   }
 
+  // ✅ البحث في أنشطة المستخدم الحالي فقط
   search(query: string): Observable<{ success: boolean; data: Activity[] }> {
     const params = new HttpParams().set('query', query);
     return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/search`,
+      `${this.API_BASE_URL}/user-search`,
       { params, headers: this.getAuthHeaders() }
     );
   }
 
+  // ✅ التصفية في أنشطة المستخدم الحالي فقط
   filterByStatus(
     status: Activity['status']
   ): Observable<{ success: boolean; data: Activity[] }> {
     const params = new HttpParams().set('status', status);
     return this.http.get<{ success: boolean; data: Activity[] }>(
-      `${this.API_BASE_URL}/filter`,
+      `${this.API_BASE_URL}/user-filter`,
       { params, headers: this.getAuthHeaders() }
     );
   }
 
+  // ✅ الإنجازات الحديثة للمستخدم الحالي فقط
   getRecentAchievements(): Observable<
+    { message: string; time: string; id: string }[]
+  > {
+    return this.http.get<{ message: string; time: string; id: string }[]>(
+      `${this.API_BASE_URL}/user-recent-achievements`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  // ✅ الإنجازات الحديثة لجميع المستخدمين (للمشرفين)
+  getAllRecentAchievements(): Observable<
     { message: string; time: string; id: string }[]
   > {
     return this.http.get<{ message: string; time: string; id: string }[]>(
@@ -174,5 +201,30 @@ export class ActivityService {
       `${this.API_BASE_URL}/delete-draft/${id}`,
       { headers: this.getAuthHeaders() }
     );
+  }
+
+  // ✅ إحصائيات المستخدم الحالي
+  getUserStats(): Observable<{
+    success: boolean;
+    data: {
+      totalActivities: number;
+      pendingActivities: number;
+      approvedActivities: number;
+      rejectedActivities: number;
+      draftActivities: number;
+    };
+  }> {
+    return this.http.get<{
+      success: boolean;
+      data: {
+        totalActivities: number;
+        pendingActivities: number;
+        approvedActivities: number;
+        rejectedActivities: number;
+        draftActivities: number;
+      };
+    }>(`${this.API_BASE_URL}/user-stats`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }

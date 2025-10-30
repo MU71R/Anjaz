@@ -17,35 +17,24 @@ import Swal from 'sweetalert2';
   styleUrls: ['./department-criteria-management.component.css'],
 })
 export class DepartmentCriteriaManagementComponent implements OnInit {
-  // State
   departments: Department[] = [];
   sectors: Sector[] = [];
-
   mainCriteria: MainCriteria[] = [];
   subCriteria: SubCriteria[] = [];
-
   expandedCriteria = new Set<string>();
-
-  // Modal states and form models (Main)
   isMainModalOpen = false;
   editingMain: MainCriteria | null = null;
   mainName = '';
   mainLevel: 'ALL' | 'SECTOR' | 'DEPARTMENT' = 'SECTOR';
   mainSectorId = '';
   mainDeptId = '';
-
-  // Modal states and form models (Sub)
   isSubModalOpen = false;
   editingSub: SubCriteria | null = null;
   subName = '';
   subMainId = '';
-
-  // Confirmation modal state
   isConfirmOpen = false;
   confirmMessage = '';
   private confirmCallback: ((confirmed: boolean) => void) | null = null;
-
-  // Loading states
   isLoading = false;
   isSubmitting = false;
   isLoadingSectorsDepts = false;
@@ -71,7 +60,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
   loadAllData(): void {
     this.isLoading = true;
 
-    // Load main criteria
     this.criteriaService.getAllMainCriteria().subscribe({
       next: (data) => {
         this.mainCriteria = data;
@@ -89,7 +77,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       },
     });
 
-    // Load sub criteria
     this.criteriaService.getAllSubCriteria().subscribe({
       next: (data) => {
         this.subCriteria = data;
@@ -105,7 +92,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       },
     });
 
-    // Load sectors and departments from API
     this.loadSectorsAndDepartments();
   }
 
@@ -114,13 +100,11 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
     this.criteriaService.getAllSectors().subscribe({
       next: (response) => {
-        console.log('Sectors API Response:', response); // إضافة للتصحيح
+        console.log('Sectors API Response:', response); 
         if (response.success) {
           this.sectors = response.data;
-          console.log('Sectors loaded:', this.sectors); // إضافة للتصحيح
-          console.log('Number of sectors:', this.sectors.length); // إضافة للتصحيح
-
-          // تحقق من هيكل البيانات
+          console.log('Sectors loaded:', this.sectors); 
+          console.log('Number of sectors:', this.sectors.length); 
           if (this.sectors.length > 0) {
             console.log('First sector sample:', this.sectors[0]);
           }
@@ -142,7 +126,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
     this.criteriaService.getAllDepartments().subscribe({
       next: (departments) => {
-        console.log('Departments loaded:', departments); // إضافة للتصحيح
+        console.log('Departments loaded:', departments); 
         this.departments = departments;
         this.isLoadingSectorsDepts = false;
       },
@@ -159,14 +143,9 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     });
   }
 
-  // أضف هذه الدالة في الـ component
   getSectorDisplayName(sector: any): string {
     if (!sector) return 'غير محدد';
-
-    // إذا كان القطاع كائن عادي
     if (sector.name) return sector.name;
-
-    // إذا كان القطاع من نوع مختلف
     if (sector.sectorName) return sector.sectorName;
     if (sector.title) return sector.title;
     if (sector.sector) return sector.sector;
@@ -176,15 +155,12 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
   getSectorId(sector: any): string {
     if (!sector) return '';
-
-    // إذا كان القطاع كائن عادي
     if (sector._id) return sector._id;
     if (sector.id) return sector.id;
 
     return '';
   }
 
-  // ---------- Helpers ----------
   toggleExpanded(id: string) {
     if (this.expandedCriteria.has(id)) this.expandedCriteria.delete(id);
     else this.expandedCriteria.add(id);
@@ -219,7 +195,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         const sector = this.sectors.find((s) => s._id === sectorId);
         return sector?.name || 'غير محدد';
       } else {
-        // التعامل مع object مباشرة
         return (main.sector as any).name || 'غير محدد';
       }
     }
@@ -235,7 +210,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         );
         return dept?.fullname || 'غير محدد';
       } else {
-        // التعامل مع object مباشرة
         return (main.departmentUser as any).fullname || 'غير محدد';
       }
     }
@@ -243,7 +217,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     return '';
   }
 
-  // دالة مساعدة محسنة
   getMainCriteriaInfo(main: MainCriteria): string {
     switch (main.level) {
       case 'ALL':
@@ -259,10 +232,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     }
   }
 
-  // ---------- Main criterion modals & actions ----------
-  // ---------- Main criterion modals & actions ----------
   openMainModal(edit?: MainCriteria) {
-    // إعادة تحميل القطاعات والأقسام للتأكد من أنها محدثة
     this.loadSectorsAndDepartments();
 
     console.log('Opening main modal, sectors:', this.sectors);
@@ -275,7 +245,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
       console.log('Editing main criteria:', edit);
 
-      // معالجة sector سواء كان string أو object
       if (edit.sector) {
         if (typeof edit.sector === 'string') {
           this.mainSectorId = edit.sector;
@@ -286,7 +255,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         this.mainSectorId = '';
       }
 
-      // معالجة departmentUser سواء كان string أو object
       if (edit.departmentUser) {
         if (typeof edit.departmentUser === 'string') {
           this.mainDeptId = edit.departmentUser;
@@ -355,14 +323,12 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     this.isSubmitting = true;
 
     if (this.editingMain) {
-      // تحديث معيار موجود
       const updateData: any = {
         id: this.editingMain._id,
         name: name,
         level: this.mainLevel,
       };
 
-      // إضافة الحقول بناءً على المستوى
       if (this.mainLevel === 'SECTOR') {
         updateData.sector = this.mainSectorId;
         updateData.departmentUser = null;
@@ -398,13 +364,10 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         },
       });
     } else {
-      // إضافة معيار جديد - استخدام any بدلاً من AddMainCriteriaRequest
       const criteriaData: any = {
         name,
         level: this.mainLevel,
       };
-
-      // استخدام null بدلاً من undefined للتأكد من حفظ القيم
       if (this.mainLevel === 'SECTOR') {
         criteriaData.sector = this.mainSectorId;
         criteriaData.departmentUser = null;
@@ -417,8 +380,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       }
 
       console.log('Sending CREATE data:', criteriaData);
-
-      // استخدام addMainCriteria مع any
       this.criteriaService.addMainCriteria(criteriaData).subscribe({
         next: (newCriteria) => {
           console.log('CREATE response:', newCriteria);
@@ -492,16 +453,14 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     );
   }
 
-  // ---------- Sub criterion modals & actions ----------
   openSubModal(mainId: string, edit?: SubCriteria) {
     if (edit) {
       this.editingSub = { ...edit };
       this.subName = edit.name;
-      // لا نحتاج لحفظ subMainId في حالة التعديل
     } else {
       this.editingSub = null;
       this.subName = '';
-      this.subMainId = mainId; // يتم تعيينه تلقائياً من mainId
+      this.subMainId = mainId; 
     }
     this.isSubModalOpen = true;
   }
@@ -513,19 +472,15 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     this.subMainId = '';
   }
 
-  // دالة للحصول على اسم المعيار الرئيسي الحالي
   getCurrentMainCriteriaName(): string {
     if (this.editingSub) {
-      // في حالة التعديل
       return this.getMainCriteriaName(this.editingSub.mainCriteria);
     } else {
-      // في حالة الإضافة
       const main = this.mainCriteria.find((m) => m._id === this.subMainId);
       return main?.name || 'غير معروف';
     }
   }
 
-  // دالة للحصول على اسم المعيار الرئيسي
   getMainCriteriaName(
     mainCriteria: string | { _id: string; name: string }
   ): string {
@@ -640,7 +595,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     );
   }
 
-  // ---------- Simple confirm modal ----------
   private openConfirm(message: string, cb: (confirmed: boolean) => void) {
     this.confirmMessage = message;
     this.confirmCallback = cb;

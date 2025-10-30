@@ -1,7 +1,9 @@
+// في login.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from '@angular/router'; // ✅ إضافة Router
 import {
   User,
   LoginCredentials,
@@ -13,11 +15,9 @@ import {
   providedIn: 'root',
 })
 export class LoginService {
-  removeToken() {
-    throw new Error('Method not implemented.');
-  }
   private readonly userKey = 'userData';
   private readonly tokenKey = 'token';
+  private readonly roleKey = 'userRole';
   private readonly apiUrl = 'http://localhost:3000';
 
   private userBehaviorSubject = new BehaviorSubject<User | null>(
@@ -30,11 +30,76 @@ export class LoginService {
   );
   isLoggedIn$ = this.loggedIn.asObservable();
 
-  constructor(private http: HttpClient) {
+  private userRole = new BehaviorSubject<string | null>(
+    this.getUserRoleFromStorage()
+  );
+  userRole$ = this.userRole.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    private router: Router // ✅ إضافة Router
+  ) {
     const savedUser = this.getUserFromLocalStorage();
     if (savedUser) {
       this.userBehaviorSubject.next(savedUser);
       this.loggedIn.next(true);
+      this.userRole.next(savedUser.role);
+    }
+  }
+
+  // ✅ دوال التحقق من الصلاحيات
+  hasPermission(permission: string): boolean {
+    const userRole = this.getUserRole();
+
+    const permissions: { [key: string]: string[] } = {
+      admin: [
+        'manage_users',
+        'manage_criteria',
+        'view_archive',
+        'view_dashboard',
+        'access_admin_dashboard',
+      ],
+      user: ['view_dashboard', 'access_user_dashboard'],
+    };
+
+    return permissions[userRole!]?.includes(permission) || false;
+  }
+
+  canManageUsers(): boolean {
+    return this.hasPermission('manage_users');
+  }
+
+  canManageCriteria(): boolean {
+    return this.hasPermission('manage_criteria');
+  }
+
+  canViewArchive(): boolean {
+    return this.hasPermission('view_archive');
+  }
+
+  canViewDashboard(): boolean {
+    return this.hasPermission('view_dashboard');
+  }
+
+  isAdmin(): boolean {
+    return this.getUserRole() === 'admin';
+  }
+
+  isUser(): boolean {
+    return this.getUserRole() === 'user';
+  }
+
+  // ✅ دالة لتوجيه المستخدم بعد التسجيل
+  redirectBasedOnRole(): void {
+    const userRole = this.getUserRole();
+
+    if (userRole === 'admin') {
+      this.router.navigate(['/dashboard-admin']);
+    } else if (userRole === 'user') {
+      this.router.navigate(['/dashboard-admin']);
+    } else {
+      // إذا لم يكن هناك role محدد، توجيه إلى الصفحة الرئيسية
+      this.router.navigate(['/']);
     }
   }
 
@@ -45,24 +110,17 @@ export class LoginService {
         tap((response: LoginResponse) => {
           if (response.token) {
             localStorage.setItem(this.tokenKey, response.token);
+
             if (response.user) {
               this.setUser(response.user);
-            } else {
-              const decoded = this.decodeToken();
-              if (decoded) {
-                const user: User = {
-                  _id: decoded.userId,
-                  fullname: decoded.name ?? '',
-                  username: decoded.email ?? '',
-                  role: decoded.role ?? 'user',
-                  sector: '',
-                  status: 'active',
-                };
-                this.setUser(user);
-              }
+              localStorage.setItem(this.roleKey, response.user.role);
+              this.userRole.next(response.user.role);
             }
 
             this.loggedIn.next(true);
+
+            // ✅ توجيه المستخدم بناءً على الـ Role بعد التسجيل
+            this.redirectBasedOnRole();
           }
         }),
         catchError((error: unknown) => {
@@ -75,8 +133,23 @@ export class LoginService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.roleKey);
     this.userBehaviorSubject.next(null);
     this.loggedIn.next(false);
+    this.userRole.next(null);
+    this.router.navigate(['/login']); // ✅ توجيه إلى صفحة Login بعد التسجيل الخروج
+  }
+
+  getUserRole(): string | null {
+    return this.userRole.value;
+  }
+
+  getUserRoleFromStorage(): string | null {
+    return localStorage.getItem(this.roleKey);
+  }
+
+  getCurrentUser(): User | null {
+    return this.userBehaviorSubject.value;
   }
 
   decodeToken(): DecodedToken | null {
@@ -107,7 +180,9 @@ export class LoginService {
 
   setUser(user: User): void {
     localStorage.setItem(this.userKey, JSON.stringify(user));
+    localStorage.setItem(this.roleKey, user.role);
     this.userBehaviorSubject.next(user);
+    this.userRole.next(user.role);
     this.loggedIn.next(true);
   }
 

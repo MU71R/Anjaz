@@ -1,9 +1,7 @@
-/* التدرج اللوني للنجاح */
 .bg-gradient-success {
     background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important;
 }
 
-/* تحسينات البطاقات */
 .activity-card {
     transition: all 0.3s ease;
     border: 1px solid #e9ecef;
@@ -14,7 +12,6 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* عناصر المعلومات */
 .info-item {
     padding: 0.75rem;
     background: #f8f9fa;
@@ -27,7 +24,6 @@
     transition: background 0.3s ease;
 }
 
-/* تحسينات المرفقات */
 .attachments-section {
     border-top: 1px solid #e9ecef;
     padding-top: 1.5rem;
@@ -97,7 +93,6 @@
     padding: 1rem 0;
 }
 
-/* أزرار الأفعال */
 .action-buttons .btn {
     border-radius: 0.5rem;
     font-weight: 500;
@@ -108,7 +103,6 @@
     transform: translateY(-2px);
 }
 
-/* معلومات الجدول الزمني */
 .timeline-info {
     display: flex;
     align-items: center;
@@ -116,13 +110,11 @@
     gap: 1rem;
 }
 
-/* نمط النقاط في الخلفية */
 .pattern-dots {
     background-image: radial-gradient(#ffffff 1px, transparent 1px);
     background-size: 20px 20px;
 }
 
-/* تحسينات للعرض على الجوال */
 @media (max-width: 768px) {
     .activity-card {
         margin-bottom: 1.5rem;
@@ -149,7 +141,6 @@
     }
 }
 
-/* تحسينات الـ Modal */
 .modal-content {
     border: none;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -170,7 +161,6 @@
     padding: 1.5rem;
 }
 
-/* تأثيرات التمرير */
 .container-fluid {
     animation: fadeIn 0.5s ease-in;
 }
@@ -187,7 +177,6 @@
     }
 }
 
-/* تحسينات عامة */
 .fs-7 {
     font-size: 0.8rem !important;
 }

@@ -15,10 +15,13 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   showPassword: boolean = false;
 
+  // ✅ توجيه جميع المستخدمين إلى /dashboard بغض النظر عن الـ role
+  private targetRoute: string = '/dashboard';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private loginService: LoginService,
+    public loginService: LoginService,
     private toastr: ToastrService
   ) {
     this.loginForm = this.fb.group({
@@ -42,6 +45,17 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // ✅ التحقق إذا كان المستخدم مسجل دخول بالفعل وتوجيهه مباشرة إلى dashboard
+    if (
+      this.loginService.getTokenFromLocalStorage() &&
+      !this.loginService.isTokenExpired(
+        this.loginService.getTokenFromLocalStorage()!
+      )
+    ) {
+      this.redirectToDashboard();
+      return;
+    }
+
     const loggedOut = localStorage.getItem('loggedOut');
     if (loggedOut) {
       this.toastr.info('تم تسجيل الخروج بنجاح', 'تسجيل الخروج');
@@ -80,15 +94,12 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('token', response.token);
           this.loginService.setUser(response.user);
 
-          const role = response.user.role;
+          const userName = response.user.fullname || response.user.username;
 
-          this.toastr.success('تم تسجيل الدخول بنجاح!', 'نجاح');
+          this.toastr.success(`مرحباً ${userName}!`, 'تم تسجيل الدخول بنجاح');
 
-          if (role === 'admin') {
-            this.router.navigate(['/dashboard-admin']);
-          } else {
-            this.router.navigate(['/home']);
-          }
+          // ✅ توجيه جميع المستخدمين إلى dashboard
+          this.redirectToDashboard();
         } else {
           this.errorMessage = 'لم يتم استلام بيانات الدخول بشكل صحيح.';
           this.toastr.error(this.errorMessage, 'خطأ');
@@ -96,10 +107,53 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error?.error?.message || 'حدث خطأ غير متوقع.';
+        this.errorMessage = this.extractErrorMessage(error);
         this.toastr.error(this.errorMessage, 'فشل تسجيل الدخول');
       },
     });
+  }
+
+  /**
+   * ✅ توجيه جميع المستخدمين إلى dashboard
+   */
+  private redirectToDashboard(): void {
+    // تأخير بسيط لضمان حفظ البيانات قبل التوجيه
+    setTimeout(() => {
+      this.router.navigate([this.targetRoute]);
+    }, 100);
+  }
+
+  /**
+   * استخراج رسالة الخطأ
+   */
+  private extractErrorMessage(error: any): string {
+    if (this.isHttpError(error)) {
+      const status = error.status;
+
+      if (status === 401) {
+        return 'اسم المستخدم أو كلمة المرور غير صحيحة.';
+      }
+
+      if (status === 403) {
+        return 'الحساب غير نشط. يرجى الاتصال بالمسؤول.';
+      }
+
+      if (status === 500) {
+        return 'حدث خطأ داخلي في الخادم. حاول لاحقًا.';
+      }
+
+      const message =
+        typeof error.error === 'object' &&
+        error.error !== null &&
+        'message' in error.error &&
+        typeof error.error['message'] === 'string'
+          ? (error.error['message'] as string)
+          : 'فشل تسجيل الدخول.';
+
+      return message;
+    }
+
+    return error?.error?.message || 'حدث خطأ غير متوقع.';
   }
 
   private isHttpError(
@@ -113,38 +167,40 @@ export class LoginComponent implements OnInit {
     );
   }
 
-  private extractErrorMessage(error: {
-    status: number;
-    error: Record<string, unknown>;
-  }): string {
-    const status = error.status;
-
-    if (status === 401) {
-      return 'اسم المستخدم أو كلمة المرور غير صحيحة.';
-    }
-
-    if (status === 500) {
-      return 'حدث خطأ داخلي في الخادم. حاول لاحقًا.';
-    }
-
-    const message =
-      typeof error.error === 'object' &&
-      error.error !== null &&
-      'message' in error.error &&
-      typeof error.error['message'] === 'string'
-        ? (error.error['message'] as string)
-        : 'فشل تسجيل الدخول.';
-
-    return message;
-  }
-
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  logout(): void {
-    this.loginService.logout();
-    localStorage.setItem('loggedOut', 'true');
-    this.router.navigate(['/login']);
+  /**
+   * دالة مساعدة لعرض أسماء الـ Roles في الـ template
+   */
+  getRoleDisplayName(role: string | null): string {
+    const roleNames: { [key: string]: string } = {
+      admin: 'مدير النظام',
+      supervisor: 'مشرف',
+      user: 'مستخدم',
+      student: 'طالب',
+    };
+
+    return role ? roleNames[role] || role : 'زائر';
+  }
+
+  /**
+   * دالة مساعدة للوصول إلى role المستخدم من الـ template
+   */
+  getUserRole(): string | null {
+    return this.loginService.getUserRole();
+  }
+
+  /**
+   * ✅ دالة للتحقق إذا كان المستخدم مسجل دخول (للعرض في الـ template)
+   */
+  isLoggedIn(): boolean {
+    return (
+      this.loginService.getTokenFromLocalStorage() !== null &&
+      !this.loginService.isTokenExpired(
+        this.loginService.getTokenFromLocalStorage()!
+      )
+    );
   }
 }

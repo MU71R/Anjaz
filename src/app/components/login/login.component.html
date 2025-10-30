@@ -2,7 +2,14 @@
   <div class="overlay"></div>
 
   <div class="card login-card shadow-lg p-4 text-center">
-    <div class="mb-4">
+    <div class="mb-4 position-relative">
+      <!-- عرض الـ Role إذا كان مستخدم مسجل -->
+      <div *ngIf="getUserRole()" class="role-badge">
+        <span class="badge bg-primary">
+          {{ getRoleDisplayName(getUserRole()) }}
+        </span>
+      </div>
+
       <div class="icon-circle mx-auto mb-3">
         <i class="bi bi-people-fill fs-1"></i>
       </div>
@@ -30,8 +37,8 @@
           placeholder="أدخل كلمة المرور" [ngClass]="{
             'is-invalid': f['password'].touched && f['password'].invalid
           }" />
-        <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'" (click)="togglePassword()"
-          class="password-toggle"></i>
+        <i class="bi password-toggle" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+          (click)="togglePassword()"></i>
 
         <div class="invalid-feedback text-end" *ngIf="f['password'].touched && f['password'].errors">
           <span *ngIf="f['password'].errors['required']">كلمة المرور مطلوبة</span>
@@ -39,7 +46,6 @@
           <span *ngIf="f['password'].errors['maxlength']">كلمة المرور يجب ألا تتجاوز 20 حرفًا</span>
         </div>
       </div>
-
 
       <button type="submit" class="btn btn-primary w-100 mt-2 py-2 fw-semibold" [disabled]="isLoading">
         <span *ngIf="!isLoading">
@@ -52,6 +58,7 @@
       </button>
 
       <div *ngIf="errorMessage" class="alert alert-danger mt-3 py-2">
+        <i class="bi bi-exclamation-triangle me-2"></i>
         {{ errorMessage }}
       </div>
     </form>
