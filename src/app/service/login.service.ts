@@ -1,9 +1,8 @@
-// في login.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
-import { Router } from '@angular/router'; // ✅ إضافة Router
+import { Router } from '@angular/router';
 import {
   User,
   LoginCredentials,
@@ -35,10 +34,7 @@ export class LoginService {
   );
   userRole$ = this.userRole.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router // ✅ إضافة Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     const savedUser = this.getUserFromLocalStorage();
     if (savedUser) {
       this.userBehaviorSubject.next(savedUser);
@@ -47,7 +43,6 @@ export class LoginService {
     }
   }
 
-  // ✅ دوال التحقق من الصلاحيات
   hasPermission(permission: string): boolean {
     const userRole = this.getUserRole();
 
@@ -89,7 +84,6 @@ export class LoginService {
     return this.getUserRole() === 'user';
   }
 
-  // ✅ دالة لتوجيه المستخدم بعد التسجيل
   redirectBasedOnRole(): void {
     const userRole = this.getUserRole();
 
@@ -98,7 +92,6 @@ export class LoginService {
     } else if (userRole === 'user') {
       this.router.navigate(['/dashboard-admin']);
     } else {
-      // إذا لم يكن هناك role محدد، توجيه إلى الصفحة الرئيسية
       this.router.navigate(['/']);
     }
   }
@@ -119,7 +112,6 @@ export class LoginService {
 
             this.loggedIn.next(true);
 
-            // ✅ توجيه المستخدم بناءً على الـ Role بعد التسجيل
             this.redirectBasedOnRole();
           }
         }),
@@ -137,7 +129,7 @@ export class LoginService {
     this.userBehaviorSubject.next(null);
     this.loggedIn.next(false);
     this.userRole.next(null);
-    this.router.navigate(['/login']); // ✅ توجيه إلى صفحة Login بعد التسجيل الخروج
+    this.router.navigate(['/login']);
   }
 
   getUserRole(): string | null {

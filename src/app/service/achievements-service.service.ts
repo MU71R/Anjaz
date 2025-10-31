@@ -175,7 +175,6 @@ export class ActivityService {
     });
   }
 
-  // ✅ عرض ملف PDF الذي تم توليده من السيرفر
  viewPDF(filename: string): Observable<Blob> {
   const url = `${this.API_BASE_URL}/pdf/${filename}`;
   const headers = this.getAuthHeaders();

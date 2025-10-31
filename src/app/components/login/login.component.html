@@ -3,13 +3,6 @@
 
   <div class="card login-card shadow-lg p-4 text-center">
     <div class="mb-4 position-relative">
-      <!-- عرض الـ Role إذا كان مستخدم مسجل -->
-      <div *ngIf="getUserRole()" class="role-badge">
-        <span class="badge bg-primary">
-          {{ getRoleDisplayName(getUserRole()) }}
-        </span>
-      </div>
-
       <div class="icon-circle mx-auto mb-3">
         <i class="bi bi-people-fill fs-1"></i>
       </div>
@@ -20,27 +13,33 @@
     <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
       <div class="mb-3 text-end">
         <label class="form-label fw-semibold">اسم المستخدم</label>
-        <input type="text" formControlName="username" class="form-control text-end" placeholder="أدخل اسم المستخدم"
-          [ngClass]="{
-            'is-invalid': f['username'].touched && f['username'].invalid
-          }" />
-        <div class="invalid-feedback text-end" *ngIf="f['username'].touched && f['username'].errors">
+        <div class="position-relative">
+          <input type="text" formControlName="username" class="form-control text-end pe-4"
+            placeholder="أدخل اسم المستخدم" [ngClass]="{
+              'is-invalid': f['username'].touched && f['username'].invalid,
+              'is-valid': f['username'].touched && f['username'].valid
+            }" />
+          <i class="bi bi-person input-icon"></i>
+        </div>
+        <div class="invalid-feedback text-end mt-1" *ngIf="f['username'].touched && f['username'].errors">
           <span *ngIf="f['username'].errors['required']">اسم المستخدم مطلوب</span>
           <span *ngIf="f['username'].errors['minlength']">اسم المستخدم يجب أن يكون 3 أحرف على الأقل</span>
           <span *ngIf="f['username'].errors['maxlength']">اسم المستخدم يجب ألا يتجاوز 20 حرفًا</span>
         </div>
       </div>
 
-      <div class="mb-3 text-end position-relative">
+      <div class="mb-3 text-end">
         <label class="form-label fw-semibold">كلمة المرور</label>
-        <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-control text-end"
-          placeholder="أدخل كلمة المرور" [ngClass]="{
-            'is-invalid': f['password'].touched && f['password'].invalid
-          }" />
-        <i class="bi password-toggle" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
-          (click)="togglePassword()"></i>
-
-        <div class="invalid-feedback text-end" *ngIf="f['password'].touched && f['password'].errors">
+        <div class="position-relative">
+          <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+            class="form-control text-end pe-4" placeholder="أدخل كلمة المرور" [ngClass]="{
+              'is-invalid': f['password'].touched && f['password'].invalid,
+              'is-valid': f['password'].touched && f['password'].valid
+            }" />
+          <i class="bi password-toggle" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+            (click)="togglePassword()"></i>
+        </div>
+        <div class="invalid-feedback text-end mt-1" *ngIf="f['password'].touched && f['password'].errors">
           <span *ngIf="f['password'].errors['required']">كلمة المرور مطلوبة</span>
           <span *ngIf="f['password'].errors['minlength']">كلمة المرور يجب أن تكون 4 أحرف على الأقل</span>
           <span *ngIf="f['password'].errors['maxlength']">كلمة المرور يجب ألا تتجاوز 20 حرفًا</span>
@@ -57,9 +56,9 @@
         </span>
       </button>
 
-      <div *ngIf="errorMessage" class="alert alert-danger mt-3 py-2">
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3 py-2 d-flex align-items-center">
         <i class="bi bi-exclamation-triangle me-2"></i>
-        {{ errorMessage }}
+        <span>{{ errorMessage }}</span>
       </div>
     </form>
 
@@ -67,7 +66,7 @@
 
     <div class="text-muted small">
       © 2025 جامعة قنا<br />
-      <i class="bi bi-bank"></i> الجهة المطوّرة: كلية الحاسبات والمعلومات
+      <i class="bi bi-bank me-1"></i> الجهة المطوّرة: كلية الحاسبات والمعلومات
     </div>
   </div>
 </div>

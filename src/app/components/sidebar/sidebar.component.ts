@@ -12,7 +12,6 @@ export class SidebarComponent implements OnInit {
   userRole: string | null = null;
   userName: string | null = null;
 
-  // ✅ خريطة الصلاحيات لكل عنصر
   private menuPermissions: { [key: string]: string[] } = {
     dashboard: ['admin', 'user'],
     'add-achievement': ['admin', 'user'],
@@ -53,18 +52,15 @@ export class SidebarComponent implements OnInit {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  // ✅ التحقق من إمكانية عرض العنصر
   canShowItem(menuKey: string): boolean {
     const allowedRoles = this.menuPermissions[menuKey];
     return allowedRoles ? allowedRoles.includes(this.userRole!) : false;
   }
 
-  // ✅ التحقق إذا كان المستخدم مشرف
   isAdmin(): boolean {
     return this.userRole === 'admin';
   }
 
-  // ✅ الحصول على الاسم المعروض للدور
   getRoleDisplayName(): string {
     const roleNames: { [key: string]: string } = {
       admin: 'مدير النظام',
@@ -73,7 +69,6 @@ export class SidebarComponent implements OnInit {
     return this.userRole ? roleNames[this.userRole] || this.userRole : 'زائر';
   }
 
-  // ✅ الحصول على كلاس البادج بناءً على الدور
   getRoleBadgeClass(): string {
     return this.isAdmin() ? 'badge bg-danger' : 'badge bg-primary';
   }
