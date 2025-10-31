@@ -95,107 +95,157 @@
       <div class="recent-achievements-section">
         <div class="section-card">
           <div class="card-header">
-            <h5 class="card-title">
-              <i class="fas fa-history me-2"></i>
-              أحدث إنجازاتي
-            </h5>
-            <button class="btn btn-sm btn-outline-primary" (click)="loadRecentAchievements()">
-              <i class="fas fa-sync-alt"></i>
-              تحديث
-            </button>
+            <div class="header-title-section">
+              <h5 class="card-title">
+                <i class="fas fa-trophy me-2"></i>
+                السجل الزمني للإنجازات
+              </h5>
+              <span class="achievements-count">{{ recentAchievements.length }} إنجاز</span>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-sm btn-outline-primary" (click)="loadRecentAchievements()">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingAchievements"></i>
+                تحديث البيانات
+              </button>
+            </div>
           </div>
           <div class="card-body">
-            <div *ngIf="recentAchievements.length === 0" class="empty-state">
-              <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-              <p class="text-muted">لا توجد إنجازات حديثة</p>
-              <button class="btn btn-primary mt-2" routerLink="/add-achievement">
+
+            <!-- حالة التحميل -->
+            <div *ngIf="isLoadingAchievements" class="loading-state">
+              <div class="spinner-container">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                <p class="loading-text">جاري تحميل السجل الزمني...</p>
+              </div>
+            </div>
+
+            <!-- حالة عدم وجود بيانات -->
+            <div *ngIf="!isLoadingAchievements && recentAchievements.length === 0" class="empty-state">
+              <div class="empty-icon">
+                <i class="fas fa-clock fa-3x"></i>
+              </div>
+              <h4 class="empty-title">لا توجد سجلات حديثة</h4>
+              <p class="empty-description">لم يتم تسجيل أي إنجازات في الوقت الحالي</p>
+              <button class="btn btn-primary empty-action" routerLink="/add-achievement">
                 <i class="fas fa-plus-circle me-2"></i>
-                إضافة أول إنجاز
+                بدء إنجاز جديد
               </button>
             </div>
 
-            <div class="achievements-list" *ngIf="recentAchievements.length > 0">
-              <div *ngFor="let achievement of recentAchievements; let i = index" class="achievement-item"
-                [class]="getAchievementStatusClass(achievement)">
-                <div class="achievement-counter">
-                  <span class="counter-badge">{{ i + 1 }}</span>
-                </div>
+            <!-- عرض البيانات -->
+            <div *ngIf="!isLoadingAchievements && recentAchievements.length > 0" class="achievements-timeline">
+              <div class="timeline">
+                <div *ngFor="let achievement of recentAchievements; let i = index" class="timeline-item"
+                  [class]="getAchievementStatusClass(achievement)">
 
-                <div class="achievement-content">
-                  <div class="achievement-message" [innerHTML]="achievement.message"></div>
-                  <div class="achievement-meta">
-                    <span class="achievement-time">
-                      <i class="fas fa-clock me-1"></i>
-                      {{ achievement.time }}
-                    </span>
-                    <span class="achievement-status" *ngIf="getAchievementStatus(achievement)">
-                      <i class="fas fa-circle me-1"></i>
-                      {{ getAchievementStatus(achievement) }}
-                    </span>
+                  <!-- المؤشر الزمني -->
+                  <div class="timeline-marker">
+                    <div class="marker-icon">
+                      <i [class]="getAchievementIcon(achievement)"></i>
+                    </div>
+                    <div class="timeline-line"></div>
                   </div>
-                </div>
 
-                <div class="achievement-actions" *ngIf="achievement.activityId">
-                  <button class="btn btn-sm btn-outline-secondary" [routerLink]="['/activity', achievement.activityId]">
-                    <i class="fas fa-eye"></i>
-                  </button>
+                  <!-- محتوى البطاقة -->
+                  <div class="timeline-content">
+                    <div class="achievement-card">
+
+                      <!-- رأس البطاقة -->
+                      <div class="achievement-header">
+                        <div class="achievement-type-badge">
+                          <span class="type-badge" [class]="getAchievementTypeClass(achievement)">
+                            {{ getAchievementType(achievement) }}
+                          </span>
+                        </div>
+                        <div class="achievement-meta-info">
+                          <span class="achievement-date">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {{ formatAchievementDate(achievement.time) }}
+                          </span>
+                          <span class="achievement-time">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ getAchievementTime(achievement.time) }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- جسم البطاقة -->
+                      <div class="achievement-body">
+
+                        <!-- معلومات المستخدم -->
+                        <div class="user-info-section">
+                          <div class="user-avatar">
+                            <i class="fas fa-user-circle"></i>
+                          </div>
+                          <div class="user-details">
+                            <span class="user-name">{{ getAchievementUser(achievement.message) }}</span>
+                            <span class="user-action">{{ getAchievementAction(achievement.message) }}</span>
+                          </div>
+                        </div>
+
+                        <!-- تفاصيل الإنجاز -->
+                        <div class="achievement-details">
+
+                          <!-- عنوان النشاط -->
+                          <div class="activity-title-section" *ngIf="getActivityTitle(achievement.message)">
+                            <div class="detail-label">
+                              <i class="fas fa-heading me-2"></i>
+                              العنوان:
+                            </div>
+                            <div class="detail-value title-value">
+                              {{ getActivityTitle(achievement.message) }}
+                            </div>
+                          </div>
+
+                          <!-- المعيار -->
+                          <div class="activity-standard-section" *ngIf="getActivityStandard(achievement.message)">
+                            <div class="detail-label">
+                              <i class="fas fa-layer-group me-2"></i>
+                              المعيار:
+                            </div>
+                            <div class="detail-value standard-value">
+                              {{ getActivityStandard(achievement.message) }}
+                            </div>
+                          </div>
+
+                          <!-- المؤشر -->
+                          <div class="activity-indicator-section" *ngIf="getActivityIndicator(achievement.message)">
+                            <div class="detail-label">
+                              <i class="fas fa-bullseye me-2"></i>
+                              المؤشر:
+                            </div>
+                            <div class="detail-value indicator-value">
+                              {{ getActivityIndicator(achievement.message) }}
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      <!-- تذييلة البطاقة -->
+                      <div class="achievement-footer">
+                        <div class="status-section">
+                          <span class="status-badge" [class]="getStatusBadgeClass(achievement)">
+                            <i class="fas fa-circle me-1"></i>
+                            {{ getAchievementStatus(achievement) }}
+                          </span>
+                        </div>
+                        <div class="id-section">
+                          <span class="achievement-id">
+                            <i class="fas fa-hashtag me-1"></i>
+                            {{ achievement.id.slice(-8) }}
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- الأنشطة الحديثة للمستخدم الحالي -->
-      <div class="recent-activities-section" *ngIf="userActivities.length > 0">
-        <div class="section-card">
-          <div class="card-header">
-            <h5 class="card-title">
-              <i class="fas fa-list-alt me-2"></i>
-              أنشطتي الحديثة
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="activities-table">
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>العنوان</th>
-                      <th>الحالة</th>
-                      <th>التاريخ</th>
-                      <th>الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let activity of userActivities.slice(0, 5)">
-                      <td>
-                        <strong>{{ activity.activityTitle }}</strong>
-                        <small class="text-muted d-block">
-                          {{ (activity.activityDescription || '').slice(0, 50) }}...
-                        </small>
-                      </td>
-                      <td>
-                        <span class="badge" [class]="getStatusClass(activity.status)">
-                          {{ activity.status }}
-                        </span>
-                      </td>
-                      <td>
-                        <small class="text-muted">
-                          <!-- ✅ تصحيح: تمرير string بدلاً من Date مباشرة -->
-                          {{ formatDate(activity.createdAt) }}
-                        </small>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-outline-primary" [routerLink]="['/activity', activity._id]">
-                          <i class="fas fa-eye"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
         </div>
       </div>

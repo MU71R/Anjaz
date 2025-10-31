@@ -58,6 +58,25 @@
                                         </span>
                                     </div>
                                 </div>
+                                <!-- أزرار فتح التقارير فقط - محدثة -->
+                                <div class="d-flex gap-2 ms-3">
+                                    <button class="btn btn-light btn-sm text-danger"
+                                        (click)="viewGeneratedPDF(activity)" [title]="'فتح تقرير PDF'"
+                                        [disabled]="loadingPdf === activity._id">
+                                        <i class="fa-solid fa-file-pdf me-1"></i>
+                                        <span *ngIf="loadingPdf === activity._id"
+                                            class="spinner-border spinner-border-sm me-1"></span>
+                                        فتح PDF
+                                    </button>
+                                    <button class="btn btn-light btn-sm text-primary"
+                                        (click)="downloadGeneratedWord(activity)" [title]="'تحميل تقرير Word'"
+                                        [disabled]="loadingDocx === activity._id">
+                                        <i class="fa-solid fa-file-word me-1"></i>
+                                        <span *ngIf="loadingDocx === activity._id"
+                                            class="spinner-border spinner-border-sm me-1"></span>
+                                        تحميل Word
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -103,6 +122,57 @@
                                 </div>
                             </div>
 
+                            <!-- قسم الملفات المنشأة - محدث -->
+                            <div *ngIf="activity.generatedFiles && (activity.generatedFiles.pdf || activity.generatedFiles.docx)"
+                                class="generated-files-section mb-4">
+                                <div class="section-header mb-3">
+                                    <h6 class="text-dark fw-bold mb-0">
+                                        <i class="fa-solid fa-file-export text-success me-2"></i>
+                                        التقارير المنشأة تلقائياً
+                                    </h6>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6" *ngIf="activity.generatedFiles.pdf">
+                                        <div class="file-card border rounded-2 p-3 bg-light">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa-solid fa-file-pdf text-danger fa-2x me-3"></i>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">تقرير PDF</h6>
+                                                    <p class="text-muted small mb-0">تم إنشاؤه تلقائياً عند الاعتماد</p>
+                                                </div>
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                    (click)="viewGeneratedPDF(activity)" [title]="'فتح PDF'"
+                                                    [disabled]="loadingPdf === activity._id">
+                                                    <i class="fa-solid fa-eye me-1"></i>
+                                                    <span *ngIf="loadingPdf === activity._id"
+                                                        class="spinner-border spinner-border-sm me-1"></span>
+                                                    فتح PDF
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" *ngIf="activity.generatedFiles.docx">
+                                        <div class="file-card border rounded-2 p-3 bg-light">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa-solid fa-file-word text-primary fa-2x me-3"></i>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">تقرير Word</h6>
+                                                    <p class="text-muted small mb-0">تم إنشاؤه تلقائياً عند الاعتماد</p>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm"
+                                                    (click)="downloadGeneratedWord(activity)" [title]="'تحميل Word'"
+                                                    [disabled]="loadingDocx === activity._id">
+                                                    <i class="fa-solid fa-download me-1"></i>
+                                                    <span *ngIf="loadingDocx === activity._id"
+                                                        class="spinner-border spinner-border-sm me-1"></span>
+                                                    تحميل Word
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="attachments-section"
                                 *ngIf="activity.Attachments && activity.Attachments.length > 0">
                                 <div class="section-header mb-3">
@@ -134,10 +204,10 @@
                                                     <i class="fa-solid fa-file-pdf text-danger fa-2x"></i>
                                                 </div>
                                                 <p class="small text-muted mb-2">ملف PDF {{ i + 1 }}</p>
-                                                <a [href]="getFullAttachmentUrl(attachment)" target="_blank"
-                                                    class="btn btn-outline-danger btn-sm w-100">
+                                                <button class="btn btn-outline-danger btn-sm w-100"
+                                                    (click)="viewAttachmentPDF(attachment)">
                                                     <i class="fa-solid fa-eye me-1"></i>عرض الملف
-                                                </a>
+                                                </button>
                                             </div>
 
                                             <div *ngIf="!isImage(attachment) && !isPdf(attachment)" class="text-center">
