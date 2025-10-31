@@ -96,34 +96,41 @@ export class ArchivedActivitiesComponent implements OnInit {
   }
 
   // ✅ عرض PDF المولّد من السيرفر في نافذة جديدة
-  viewGeneratedPDF(activity: Activity): void {
-    if (!activity.generatedFiles?.pdf) {
-      Swal.fire('info', 'لا يوجد ملف PDF متاح للعرض', 'info');
-      return;
-    }
+viewGeneratedPDF(activity: Activity): void {
+  // لو مفيش generatedFiles استخدم أول مرفق من attachments
+  const pdfUrl =
+    activity.generatedFiles?.pdf ||
+    activity.Attachments?.find((att: string) => att.toLowerCase().endsWith('.pdf'));
 
-    this.loadingPdf = activity._id || null;
-    const filename = this.extractFilenameFromUrl(activity.generatedFiles.pdf);
-    if (!filename) {
-      Swal.fire('خطأ', 'تعذر تحديد اسم الملف', 'error');
-      this.loadingPdf = null;
-      return;
-    }
-
-    this.activityService.viewPDF(filename).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        this.loadingPdf = null;
-      },
-      error: (err) => {
-        console.error('❌ خطأ في عرض PDF:', err);
-        Swal.fire('خطأ', 'تعذر فتح ملف PDF', 'error');
-        this.loadingPdf = null;
-      },
-    });
+  if (!pdfUrl) {
+    Swal.fire('info', 'لا يوجد ملف PDF متاح للعرض', 'info');
+    return;
   }
+
+  this.loadingPdf = activity._id || null;
+  const filename = this.extractFilenameFromUrl(pdfUrl);
+
+  if (!filename) {
+    Swal.fire('خطأ', 'تعذر تحديد اسم الملف', 'error');
+    this.loadingPdf = null;
+    return;
+  }
+
+  this.activityService.viewPDF(filename).subscribe({
+    next: (blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+      this.loadingPdf = null;
+    },
+    error: (err) => {
+      console.error('❌ خطأ في عرض PDF:', err);
+      Swal.fire('خطأ', 'تعذر فتح ملف PDF', 'error');
+      this.loadingPdf = null;
+    },
+  });
+}
+
 
   // ✅ تحميل ملف Word (إن وجد)
   downloadGeneratedWord(activity: Activity): void {

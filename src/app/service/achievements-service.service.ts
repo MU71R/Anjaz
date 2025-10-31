@@ -176,10 +176,14 @@ export class ActivityService {
   }
 
   // ✅ عرض ملف PDF الذي تم توليده من السيرفر
-  viewPDF(filename: string): Observable<Blob> {
-    return this.http.get(`${this.API_BASE_URL}/view-pdf/${filename}`, {
-      headers: this.getAuthHeaders(),
-      responseType: 'blob',
-    });
-  }
+ viewPDF(filename: string): Observable<Blob> {
+  const url = `${this.API_BASE_URL}/pdf/${filename}`;
+  const headers = this.getAuthHeaders();
+  return this.http.get(url, {
+    headers,
+    responseType: 'blob',
+  });
+}
+
+
 }
