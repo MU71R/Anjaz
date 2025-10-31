@@ -1,21 +1,7 @@
-:root {
-  --primary-color: #3498db;
-  --secondary-color: #2c3e50;
-  --success-color: #2ecc71;
-  --warning-color: #f39c12;
-  --danger-color: #e74c3c;
-  --light-color: #f8f9fa;
-  --dark-color: #343a40;
-  --gray-color: #6c757d;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
-}
-
+/* ===== التصميم العام ===== */
 .dashboard-container {
-  background-color: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .dashboard-layout {
@@ -24,445 +10,583 @@
 }
 
 .sidebar-section {
-  width: 250px;
-  flex-shrink: 0;
+  width: 280px;
+  background: #fff;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .main-content {
   flex: 1;
   padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  overflow-x: hidden;
 }
 
+/* ===== الهيدر ===== */
 .dashboard-header {
-  background: white;
-  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: var(--box-shadow);
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  position: relative;
+  z-index: 2;
 }
 
-.welcome-section .page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--secondary-color);
+.page-title {
+  font-weight: 800;
   margin-bottom: 8px;
+  font-size: 2rem;
 }
 
-.welcome-section .welcome-message {
-  color: var(--gray-color);
-  margin: 0;
+.welcome-message {
+  opacity: 0.9;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.user-role-badge .badge {
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 20px;
 }
 
 .add-achievement-btn {
-  background: linear-gradient(135deg, var(--primary-color), #2980b9);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px 24px;
   font-weight: 600;
-  color: #228ed6;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: var(--transition);
-  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .add-achievement-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
 }
 
-.achievement-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.3s;
-}
-
-.achievement-item:hover {
-  background-color: #f8f9fa;
-}
-
-.achievement-counter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 16px;
-  margin-left: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.achievement-content {
-  flex: 1;
-}
-
-.achievement-message {
-  font-size: 16px;
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.achievement-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-.achievement-status {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.achievement-status.approved {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.achievement-status.pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.achievement-status.rejected {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-@media (max-width: 576px) {
-  .achievement-counter {
-    min-width: 32px;
-    height: 32px;
-    font-size: 14px;
-    margin-left: 10px;
-  }
-
-  .achievement-meta {
-    flex-direction: column;
-    gap: 5px;
-  }
-}
-
+/* ===== الإحصائيات ===== */
 .stats-section {
-  margin-bottom: 16px;
+  margin-bottom: 30px;
 }
 
 .stat-card {
-  background: white;
-  border-radius: var(--border-radius);
-  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
   height: 100%;
-  box-shadow: var(--box-shadow);
-  transition: var(--transition);
-  border-left: 4px solid;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card.total {
-  border-left-color: var(--primary-color);
+  border-right: 4px solid #007bff;
 }
 
 .stat-card.pending {
-  border-left-color: var(--warning-color);
+  border-right: 4px solid #ffc107;
 }
 
 .stat-card.approved {
-  border-left-color: var(--success-color);
+  border-right: 4px solid #28a745;
 }
 
 .stat-card.rejected {
-  border-left-color: var(--danger-color);
+  border-right: 4px solid #dc3545;
+}
+
+.stat-card.draft {
+  border-right: 4px solid #6c757d;
 }
 
 .card-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  font-size: 1.8rem;
+}
+
+.stat-card.total .card-icon {
+  background: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+}
+
+.stat-card.pending .card-icon {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.stat-card.approved .card-icon {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.stat-card.rejected .card-icon {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.stat-card.draft .card-icon {
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.stat-value {
+  color: #2c3e50;
+  font-weight: 800;
+  margin-bottom: 4px;
+  font-size: 2.2rem;
+}
+
+.stat-subtext {
+  color: #adb5bd;
+  font-size: 0.8rem;
+}
+
+/* ===== بطاقة السجل الزمني ===== */
+.section-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.card-header {
+  padding: 24px 30px;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.card-title {
+  color: #2c3e50;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+}
+
+.achievements-count {
+  background: #007bff;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.header-actions .btn {
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 0;
+}
+
+/* ===== حالات التحميل والفراغ ===== */
+.loading-state {
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.loading-text {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: 80px 30px;
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 20px;
+  color: #dee2e6;
+}
+
+.empty-title {
+  color: #6c757d;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.empty-description {
+  color: #adb5bd;
+  margin-bottom: 25px;
+}
+
+.empty-action {
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+}
+
+/* ===== الخط الزمني ===== */
+.achievements-timeline {
+  padding: 30px;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 20px;
+  position: relative;
+}
+
+.marker-icon {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.status-approved .marker-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.status-rejected .marker-icon {
+  background: linear-gradient(135deg, #dc3545, #e83e8c);
+}
+
+.status-pending .marker-icon {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.status-new .marker-icon {
+  background: linear-gradient(135deg, #007bff, #6f42c1);
+}
+
+.status-default .marker-icon {
+  background: linear-gradient(135deg, #6c757d, #adb5bd);
+}
+
+.timeline-line {
+  width: 3px;
+  flex: 1;
+  background: linear-gradient(to bottom, #e9ecef, transparent);
+  margin: 10px 0;
+  border-radius: 2px;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+/* ===== بطاقة الإنجاز ===== */
+.achievement-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f3f4;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.achievement-card:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.type-badge {
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-new {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.type-update {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.type-delete {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.type-default {
+  background: #f5f5f5;
+  color: #616161;
+}
+
+.achievement-meta-info {
+  display: flex;
+  gap: 20px;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.achievement-meta-info span {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== جسم البطاقة ===== */
+.achievement-body {
+  padding: 25px;
+}
+
+.user-info-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   font-size: 1.5rem;
 }
 
-.stat-card.total .card-icon {
-  background-color: rgba(52, 152, 219, 0.1);
-  color: var(--primary-color);
+.user-details {
+  display: flex;
+  flex-direction: column;
 }
 
-.stat-card.pending .card-icon {
-  background-color: rgba(243, 156, 18, 0.1);
-  color: var(--warning-color);
-}
-
-.stat-card.approved .card-icon {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
-}
-
-.stat-card.rejected .card-icon {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: var(--danger-color);
-}
-
-.card-content {
-  flex: 1;
-}
-
-.stat-label {
-  color: var(--gray-color);
-  font-size: 0.875rem;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.stat-value {
-  font-size: 1.75rem;
+.user-name {
   font-weight: 700;
-  margin: 0;
-  color: var(--secondary-color);
+  color: #2c3e50;
+  margin-bottom: 4px;
 }
 
-.recent-achievements-section {
-  flex: 1;
+.user-action {
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
-.section-card {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  overflow: hidden;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #eee;
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--secondary-color);
-  margin: 0;
-}
-
-.view-all-link {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: var(--transition);
-}
-
-.view-all-link:hover {
-  color: #2980b9;
-}
-
-.card-body {
-  padding: 24px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--gray-color);
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-}
-
-.achievements-list {
+/* ===== تفاصيل الإنجاز ===== */
+.achievement-details {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
 }
 
-.achievement-item {
-  background: var(--light-color);
+.activity-title-section,
+.activity-standard-section,
+.activity-indicator-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #fafbfc;
   border-radius: 10px;
-  padding: 16px;
-  transition: var(--transition);
-  border: 1px solid #eee;
+  border-right: 3px solid #e9ecef;
 }
 
-.achievement-item:hover {
-  background: #f0f7ff;
-  transform: translateX(-4px);
-}
-
-.achievement-content {
+.detail-label {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  font-weight: 700;
+  color: #495057;
+  min-width: 80px;
+  font-size: 0.9rem;
 }
 
-.achievement-message {
-  line-height: 1.6;
-  color: var(--dark-color);
+.detail-value {
+  flex: 1;
+  color: #2c3e50;
+  line-height: 1.5;
 }
 
-.achievement-meta {
+.title-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.standard-value {
+  font-weight: 600;
+  color: #495057;
+}
+
+.indicator-value {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* ===== تذييلة البطاقة ===== */
+.achievement-footer {
+  padding: 20px 25px;
+  border-top: 1px solid #f8f9fa;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
+  background: #fafbfc;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-.achievement-time {
-  color: var(--gray-color);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.achievement-status {
-  padding: 4px 12px;
+.status-section .badge {
+  padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
-.status-pending {
-  background-color: rgba(243, 156, 18, 0.1);
-  color: var(--warning-color);
+.badge-success {
+  background: #d4edda;
+  color: #155724;
 }
 
-.status-approved {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
+.badge-danger {
+  background: #f8d7da;
+  color: #721c24;
 }
 
-.status-rejected {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: var(--danger-color);
+.badge-warning {
+  background: #fff3cd;
+  color: #856404;
 }
 
+.badge-primary {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-secondary {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.achievement-id {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-family: 'Courier New', monospace;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+/* ===== الفوتر ===== */
 .dashboard-footer {
-  margin-top: auto;
-  padding: 20px 0;
   text-align: center;
-  color: var(--gray-color);
-  border-top: 1px solid #eee;
+  padding: 25px;
+  margin-top: 50px;
+  color: #6c757d;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 16px;
 }
 
 .footer-content {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 600;
 }
 
-
-/* إضافة هذه الأنماط لتحسين المظهر */
-.user-role-badge {
-  margin-top: 0.5rem;
-}
-
-.stat-subtext {
-  font-size: 0.75rem;
-  color: #6c757d;
-  margin-top: 0.25rem;
-}
-
-.achievement-item {
-  transition: all 0.3s ease;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  border: 1px solid #e9ecef;
-}
-
-.achievement-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.achievement-approved {
-  border-right: 4px solid #28a745;
-  background-color: #f8fff9;
-}
-
-.achievement-rejected {
-  border-right: 4px solid #dc3545;
-  background-color: #fff8f8;
-}
-
-.achievement-pending {
-  border-right: 4px solid #ffc107;
-  background-color: #fffdf6;
-}
-
-.achievement-default {
-  border-right: 4px solid #6c757d;
-  background-color: #f8f9fa;
-}
-
-.achievement-meta {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.achievement-time, .achievement-status {
-  color: #6c757d;
-}
-
-.achievement-actions {
-  margin-right: auto;
-  margin-left: 1rem;
-}
-
-.activities-table {
-  margin-top: 1rem;
-}
-
-.dashboard-footer {
-  margin-top: 3rem;
-  padding: 1rem;
-  border-top: 1px solid #e9ecef;
-  text-align: center;
-  color: #6c757d;
-}
-
+/* ===== التجاوب ===== */
 @media (max-width: 768px) {
   .dashboard-layout {
     flex-direction: column;
@@ -473,23 +597,80 @@
   }
 
   .main-content {
-    padding: 16px;
+    padding: 15px;
   }
 
   .header-content {
     flex-direction: column;
     align-items: flex-start;
+    gap: 15px;
   }
 
-  .achievement-meta {
+  .achievement-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .achievement-meta-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .timeline-item {
+    flex-direction: column;
+  }
+
+  .timeline-marker {
+    margin-left: 0;
+    margin-bottom: 15px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .timeline-line {
+    width: 100%;
+    height: 3px;
+    margin: 0 10px;
+  }
+
+  .achievement-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .activity-title-section,
+  .activity-standard-section,
+  .activity-indicator-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
 
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+  .detail-label {
+    min-width: auto;
   }
+}
+
+/* ===== شريط التمرير ===== */
+.achievements-timeline {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.achievements-timeline::-webkit-scrollbar {
+  width: 8px;
+}
+
+.achievements-timeline::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.achievements-timeline::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.achievements-timeline::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }

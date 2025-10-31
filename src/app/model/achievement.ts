@@ -34,6 +34,12 @@ export interface Activity {
   date?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+
+  // إضافة خاصية generatedFiles
+  generatedFiles?: {
+    pdf?: string;
+    docx?: string;
+  };
 }
 
 

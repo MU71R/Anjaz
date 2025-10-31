@@ -15,7 +15,6 @@ interface RecentAchievement {
   message: string;
   time: string;
   id: string;
-  activityId?: string;
   status?: string;
 }
 
@@ -51,6 +50,7 @@ export class DashboardAdminComponent implements OnInit {
   };
 
   isLoading = false;
+  isLoadingAchievements = false;
 
   constructor(
     private activityService: ActivityService,
@@ -65,13 +65,9 @@ export class DashboardAdminComponent implements OnInit {
   loadCurrentUser(): void {
     const storedUser = this.loginService.getCurrentUser();
     this.currentUser = {
-      id: storedUser?._id || localStorage.getItem('userId') || '',
-      fullName:
-        storedUser?.fullname || localStorage.getItem('fullname') || 'مستخدم',
-      role:
-        (storedUser?.role as 'admin' | 'user') ||
-        (localStorage.getItem('role') as 'admin' | 'user') ||
-        'user',
+      id: storedUser?._id || '',
+      fullName: storedUser?.fullname || 'مستخدم',
+      role: (storedUser?.role as 'admin' | 'user') || 'user',
       username: storedUser?.username || '',
     };
   }
@@ -79,74 +75,79 @@ export class DashboardAdminComponent implements OnInit {
   loadUserData(): void {
     this.isLoading = true;
 
-    // تحميل الإحصائيات
-    this.activityService.getUserStats().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.userStats = response.data;
-        }
-      },
-      error: (error) => {
-        console.error('Error loading user stats:', error);
-      },
-    });
-
-    // تحميل الأنشطة
-    this.activityService.getUserActivities().subscribe({
+    this.activityService.getAll().subscribe({
       next: (response) => {
         this.isLoading = false;
         if (response.success) {
           this.userActivities = response.activities;
-          // ✅ تصحيح: استخدام string بدلاً من Date مباشرة
+
           this.userActivities.sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
             return dateB - dateA;
           });
+
+          this.calculateStats(this.userActivities);
         }
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Error loading user activities:', error);
+        console.error('Error loading activities:', error);
         Swal.fire('خطأ', 'فشل تحميل الأنشطة', 'error');
       },
     });
 
-    // تحميل الإنجازات الحديثة
     this.loadRecentAchievements();
   }
 
+  calculateStats(activities: Activity[]): void {
+    this.userStats = {
+      totalActivities: activities.length,
+      pendingActivities: activities.filter((a) => a.status === 'قيد المراجعة')
+        .length,
+      approvedActivities: activities.filter((a) => a.status === 'معتمد').length,
+      rejectedActivities: activities.filter((a) => a.status === 'مرفوض').length,
+      draftActivities: activities.filter((a) => a.SaveStatus === 'مسودة')
+        .length,
+    };
+  }
+
   loadRecentAchievements(): void {
+    this.isLoadingAchievements = true;
+
     this.activityService.getRecentAchievements().subscribe({
-      next: (achievements: RecentAchievement[]) => {
-        this.recentAchievements = achievements
-          .map((achievement) => {
-            // تحسين تنسيق الرسالة والوقت
-            let message = achievement.message || '';
-            let time = achievement.time || '';
+      next: (response: any) => {
+        this.isLoadingAchievements = false;
 
-            // إذا كانت الرسالة تحتوي على توقيت، نعيد تنسيقه
-            if (message.includes('<small>')) {
-              const timeMatch = message.match(/<small>(.*?)<\/small>/);
-              if (timeMatch) {
-                time = timeMatch[1];
-                message = message.replace(/<small>.*?<\/small>/, '');
-              }
-            }
+        console.log('Raw achievements response:', response);
 
-            return {
-              ...achievement,
-              message: message.trim(),
-              time: time,
-            };
-          })
-          .slice(0, 10); // عرض آخر 10 إنجازات فقط
+        if (response && Array.isArray(response)) {
+          this.recentAchievements = response.slice(0, 10);
+        } else if (
+          response &&
+          response.success &&
+          Array.isArray(response.activities)
+        ) {
+          this.recentAchievements = response.activities.slice(0, 10);
+        } else if (response && response.activities) {
+          this.recentAchievements = response.activities.slice(0, 10);
+        } else {
+          this.recentAchievements = [];
+          console.warn('Unexpected response format:', response);
+        }
+
+        console.log('Processed achievements:', this.recentAchievements);
       },
       error: (error) => {
+        this.isLoadingAchievements = false;
         console.error('Error loading recent achievements:', error);
+        this.recentAchievements = [];
+        Swal.fire('خطأ', 'فشل تحميل السجل الزمني', 'error');
       },
     });
   }
+
+  // === دوال التنسيق والتصنيف ===
 
   getRoleDisplayName(): string {
     return this.currentUser.role === 'admin' ? 'مدير النظام' : 'مستخدم';
@@ -175,10 +176,20 @@ export class DashboardAdminComponent implements OnInit {
 
   getAchievementStatusClass(achievement: RecentAchievement): string {
     const message = achievement.message.toLowerCase();
-    if (message.includes('معتمد')) return 'achievement-approved';
-    if (message.includes('مرفوض')) return 'achievement-rejected';
-    if (message.includes('مراجعة')) return 'achievement-pending';
-    return 'achievement-default';
+    if (message.includes('معتمد')) return 'status-approved';
+    if (message.includes('مرفوض')) return 'status-rejected';
+    if (message.includes('مراجعة')) return 'status-pending';
+    if (message.includes('إضافة')) return 'status-new';
+    return 'status-default';
+  }
+
+  getAchievementIcon(achievement: RecentAchievement): string {
+    const message = achievement.message.toLowerCase();
+    if (message.includes('معتمد')) return 'fas fa-check-circle';
+    if (message.includes('مرفوض')) return 'fas fa-times-circle';
+    if (message.includes('مراجعة')) return 'fas fa-clock';
+    if (message.includes('إضافة')) return 'fas fa-plus-circle';
+    return 'fas fa-info-circle';
   }
 
   getAchievementStatus(achievement: RecentAchievement): string {
@@ -186,10 +197,120 @@ export class DashboardAdminComponent implements OnInit {
     if (message.includes('معتمد')) return 'معتمد';
     if (message.includes('مرفوض')) return 'مرفوض';
     if (message.includes('مراجعة')) return 'قيد المراجعة';
-    return '';
+    if (message.includes('إضافة')) return 'جديد';
+    return 'غير محدد';
   }
 
-  // ✅ تصحيح: التحقق من وجود التاريخ قبل التنسيق
+  getStatusBadgeClass(achievement: RecentAchievement): string {
+    const status = this.getAchievementStatus(achievement);
+    switch (status) {
+      case 'معتمد':
+        return 'badge-success';
+      case 'مرفوض':
+        return 'badge-danger';
+      case 'قيد المراجعة':
+        return 'badge-warning';
+      case 'جديد':
+        return 'badge-primary';
+      default:
+        return 'badge-secondary';
+    }
+  }
+
+  getAchievementType(achievement: RecentAchievement): string {
+    const message = achievement.message.toLowerCase();
+    if (message.includes('إضافة')) return 'إضافة إنجاز';
+    if (message.includes('تحديث')) return 'تحديث إنجاز';
+    if (message.includes('حذف')) return 'حذف إنجاز';
+    return 'نشاط';
+  }
+
+  getAchievementTypeClass(achievement: RecentAchievement): string {
+    const type = this.getAchievementType(achievement);
+    switch (type) {
+      case 'إضافة إنجاز':
+        return 'type-new';
+      case 'تحديث إنجاز':
+        return 'type-update';
+      case 'حذف إنجاز':
+        return 'type-delete';
+      default:
+        return 'type-default';
+    }
+  }
+
+  // === دوال استخراج المعلومات من الرسالة ===
+
+  getAchievementUser(message: string): string {
+    if (!message) return 'مستخدم غير معروف';
+
+    const userMatch = message.match(/بواسطة:\s*([^\n]+)/);
+    return userMatch ? userMatch[1].trim() : 'مستخدم غير معروف';
+  }
+
+  getAchievementAction(message: string): string {
+    if (!message) return '';
+
+    if (message.includes('تمت إضافة إنجاز جديد')) return 'أضاف إنجاز جديد';
+    if (message.includes('تم تحديث إنجاز')) return 'حدث الإنجاز';
+    if (message.includes('تم حذف إنجاز')) return 'حذف الإنجاز';
+    return 'قام بإجراء';
+  }
+
+  getActivityTitle(message: string): string {
+    if (!message) return '';
+
+    const titleMatch = message.match(/عنوان:\s*"([^"]+)"/);
+    return titleMatch ? titleMatch[1].trim() : '';
+  }
+
+  getActivityStandard(message: string): string {
+    if (!message) return '';
+
+    const standardMatch = message.match(/ضمن المعيار\s*"([^"]+)"/);
+    return standardMatch ? standardMatch[1].trim() : '';
+  }
+
+  getActivityIndicator(message: string): string {
+    if (!message) return '';
+
+    const indicatorMatch = message.match(/-\s*"([^"]+)"\s*[\n\r]/);
+    return indicatorMatch ? indicatorMatch[1].trim() : '';
+  }
+
+  // === دوال تنسيق التاريخ والوقت ===
+
+  formatAchievementDate(timeString: string): string {
+    if (!timeString) return 'غير محدد';
+
+    try {
+      const dateMatch = timeString.match(
+        /(\d{1,2})\u202F\/\u202F(\d{1,2})\u202F\/\u202F(\d{4})/
+      );
+      if (dateMatch) {
+        const day = dateMatch[1];
+        const month = dateMatch[2];
+        const year = dateMatch[3];
+        return `${year}/${month}/${day}`;
+      }
+
+      return timeString.split('،')[0] || timeString;
+    } catch {
+      return timeString;
+    }
+  }
+
+  getAchievementTime(timeString: string): string {
+    if (!timeString) return '';
+
+    try {
+      const timeMatch = timeString.match(/(\d{1,2}:\d{1,2}\s*[صمس])/);
+      return timeMatch ? timeMatch[1] : '';
+    } catch {
+      return '';
+    }
+  }
+
   formatDate(dateString: string | Date | undefined): string {
     if (!dateString) return 'غير محدد';
 
@@ -207,7 +328,6 @@ export class DashboardAdminComponent implements OnInit {
     }
   }
 
-  // دالة مساعدة للحصول على قيمة الإحصائيات
   getStatValue(stat: keyof UserStats): number {
     return this.userStats[stat] || 0;
   }
