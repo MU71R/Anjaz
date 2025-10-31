@@ -21,6 +21,42 @@
   overflow-x: hidden;
 }
 
+/* تنسيقات header actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-achievement-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.add-achievement-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* تنسيقات responsive */
+@media (max-width: 768px) {
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .add-achievement-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* ===== الهيدر ===== */
 .dashboard-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

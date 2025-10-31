@@ -15,6 +15,9 @@ import { AddAchievementComponent } from './components/add-achievement/add-achiev
 import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
 import { ArchivedActivitiesComponent } from './components/archives/archives.component';
 import { DraftsComponent } from './components/draft/draft.component';
+import { SocketService } from './service/socket.service';
+import { NotificationService } from './service/notification.service';
+import { NotificationComponent } from './components/notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +31,7 @@ import { DraftsComponent } from './components/draft/draft.component';
     MyAchievementsComponent,
     ArchivedActivitiesComponent,
     DraftsComponent,
+    NotificationComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,7 @@ import { DraftsComponent } from './components/draft/draft.component';
       preventDuplicates: true,
     }),
   ],
-  providers: [],
+  providers: [SocketService, NotificationService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

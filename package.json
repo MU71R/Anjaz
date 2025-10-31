@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-"build": "ng build --configuration=production",
+    "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "ngx-toastr": "^19.1.0",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.1",
     "sweetalert2": "^11.26.3",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
@@ -35,6 +36,7 @@
     "@angular/compiler-cli": "^16.2.0",
     "@types/bootstrap": "^5.2.10",
     "@types/jasmine": "~4.3.0",
+    "@types/socket.io-client": "^1.4.36",
     "autoprefixer": "^10.4.21",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
