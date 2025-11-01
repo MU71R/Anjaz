@@ -27,9 +27,9 @@
                 <i class="fas fa-chart-bar"></i>
               </div>
               <div class="card-content">
-                <h6 class="stat-label">إجمالي أنشطتي</h6>
+                <h6 class="stat-label">إجمالي انجازاتي</h6>
                 <h3 class="stat-value">{{ userStats.totalActivities }}</h3>
-                <small class="stat-subtext">جميع الأنشطة المقدمة</small>
+                <small class="stat-subtext">جميع الانجازات المقدمة</small>
               </div>
             </div>
           </div>
@@ -81,7 +81,7 @@
               <div class="card-content">
                 <h6 class="stat-label">المسودات</h6>
                 <h3 class="stat-value">{{ userStats.draftActivities }}</h3>
-                <small class="stat-subtext">أنشطة غير مكتملة</small>
+                <small class="stat-subtext">انجازات غير مكتملة</small>
               </div>
             </div>
           </div>
@@ -221,20 +221,7 @@
                       </div>
 
                       <!-- تذييلة البطاقة -->
-                      <div class="achievement-footer">
-                        <div class="status-section">
-                          <span class="status-badge" [class]="getStatusBadgeClass(achievement)">
-                            <i class="fas fa-circle me-1"></i>
-                            {{ getAchievementStatus(achievement) }}
-                          </span>
-                        </div>
-                        <div class="id-section">
-                          <span class="achievement-id">
-                            <i class="fas fa-hashtag me-1"></i>
-                            {{ achievement.id.slice(-8) }}
-                          </span>
-                        </div>
-                      </div>
+
 
                     </div>
                   </div>

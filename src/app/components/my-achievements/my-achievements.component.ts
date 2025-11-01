@@ -21,10 +21,69 @@ export class MyAchievementsComponent implements OnInit {
   showImageModal = false;
   selectedImage = '';
 
+  // متغير للتحقق من صلاحية المسؤول
+  isAdmin = false;
+  currentUser: any = null;
+
   constructor(private activityService: ActivityService) {}
 
   ngOnInit(): void {
     this.loadActivities();
+    this.checkAdminRole();
+  }
+
+  // دالة محسنة للتحقق من صلاحية المسؤول
+  checkAdminRole(): void {
+    try {
+      // الطريقة 1: من token الموجود في localStorage
+      const token =
+        localStorage.getItem('token') || localStorage.getItem('authToken');
+
+      if (token) {
+        // فك تشفير الـ token (إذا كان JWT)
+        const tokenPayload = this.decodeToken(token);
+        if (tokenPayload) {
+          this.currentUser = tokenPayload;
+          this.isAdmin =
+            tokenPayload.role === 'admin' || tokenPayload.isAdmin === true;
+          return;
+        }
+      }
+
+      // الطريقة 2: من user data في localStorage
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        this.currentUser = user;
+        this.isAdmin = user.role === 'admin' || user.isAdmin === true;
+        return;
+      }
+
+      // إذا لم يتم العثور على بيانات المستخدم
+      this.isAdmin = false;
+      console.warn('لم يتم العثور على بيانات المستخدم أو token');
+    } catch (error) {
+      console.error('خطأ في التحقق من صلاحية المستخدم:', error);
+      this.isAdmin = false;
+    }
+  }
+
+  // دالة لفك تشفير JWT token
+  private decodeToken(token: string): any {
+    try {
+      // إذا كان token يحتوي على ثلاثة أجزاء (JWT)
+      if (token.split('.').length === 3) {
+        const payload = token.split('.')[1];
+        const decodedPayload = atob(
+          payload.replace(/-/g, '+').replace(/_/g, '/')
+        );
+        return JSON.parse(decodedPayload);
+      }
+      return null;
+    } catch (error) {
+      console.error('خطأ في فك تشفير الـ token:', error);
+      return null;
+    }
   }
 
   loadActivities(): void {
@@ -44,6 +103,21 @@ export class MyAchievementsComponent implements OnInit {
     });
   }
 
+  // دالة لتنظيف وصف الإنجاز من HTML
+  getCleanDescription(description: string): string {
+    return this.activityService.cleanDescriptionForDisplay(description);
+  }
+
+  // دالة للحصول على وصف مختصر مع التنظيف
+  getShortDescription(description: string, length: number = 50): string {
+    const cleanDescription = this.getCleanDescription(
+      description || 'لا يوجد وصف'
+    );
+    return cleanDescription.length > length
+      ? cleanDescription.substring(0, length) + '...'
+      : cleanDescription;
+  }
+
   filteredAchievements(): Activity[] {
     let list = [...this.achievements];
     const term = this.searchTerm.trim().toLowerCase();
@@ -52,7 +126,9 @@ export class MyAchievementsComponent implements OnInit {
       list = list.filter(
         (a) =>
           a.activityTitle?.toLowerCase().includes(term) ||
-          a.activityDescription?.toLowerCase().includes(term) ||
+          this.getCleanDescription(a.activityDescription || '')
+            .toLowerCase()
+            .includes(term) ||
           a.name?.toLowerCase().includes(term) ||
           this.getUserName(a.user)?.toLowerCase().includes(term)
       );
@@ -99,6 +175,12 @@ export class MyAchievementsComponent implements OnInit {
     id: string,
     status: 'معتمد' | 'قيد المراجعة' | 'مرفوض'
   ): void {
+    // تحقق إضافي من الصلاحية قبل التنفيذ
+    if (!this.isAdmin) {
+      Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
+      return;
+    }
+
     this.activityService.updateStatus(id, status).subscribe({
       next: (res) => {
         if (res.success) {
@@ -114,6 +196,12 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   openRejectModal(activity: Activity): void {
+    // تحقق من الصلاحية قبل فتح نافذة الرفض
+    if (!this.isAdmin) {
+      Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
+      return;
+    }
+
     this.selectedAchievement = activity;
     this.rejectionReason = '';
     this.showRejectModal = true;
@@ -125,6 +213,12 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   submitRejection(): void {
+    // تحقق إضافي من الصلاحية قبل التنفيذ
+    if (!this.isAdmin) {
+      Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
+      return;
+    }
+
     const achievement = this.selectedAchievement;
     if (!achievement || !achievement._id) return;
 
@@ -144,6 +238,12 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   deleteActivity(id: string): void {
+    // تحقق من الصلاحية قبل الحذف
+    if (!this.isAdmin) {
+      Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
+      return;
+    }
+
     Swal.fire({
       title: 'هل أنت متأكد؟',
       text: 'سيتم حذف هذا الإنجاز نهائيًا',

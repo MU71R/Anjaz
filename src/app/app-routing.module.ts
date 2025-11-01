@@ -8,6 +8,7 @@ import { AddAchievementComponent } from './components/add-achievement/add-achiev
 import { MyAchievementsComponent } from './components/my-achievements/my-achievements.component';
 import { DraftsComponent } from './components/draft/draft.component';
 import { ArchivedActivitiesComponent } from './components/archives/archives.component';
+import { ReportsComponent } from './components/reports/reports.component';
 import { AuthGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
 
@@ -27,6 +28,7 @@ const routes: Routes = [
     component: DashboardAdminComponent,
     canActivate: [AuthGuard],
   },
+    { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
   {
     path: 'criteria-management',
     component: DepartmentCriteriaManagementComponent,

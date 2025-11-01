@@ -5,55 +5,74 @@
         </div>
 
         <div class="col-md-9 col-lg-10">
+            <!-- تحسين الهيدر -->
             <div
                 class="header-box mb-4 p-4 rounded-3 shadow-sm bg-gradient-primary text-white position-relative overflow-hidden">
                 <div class="position-absolute top-0 end-0 w-100 h-100 opacity-10">
                     <div class="pattern-dots"></div>
                 </div>
-                <div class="position-relative">
-                    <h2 class="fw-bold mb-2 display-6">
-                        <i class="fa-solid fa-file-lines me-2"></i>المسودات
-                    </h2>
-                    <p class="opacity-90 mb-0 fs-6">
-                        <i class="fa-solid fa-circle-info me-1"></i>
-                        إدارة الإنجازات المحفوظة كمسودة قيد التعديل
-                    </p>
+                <div class="position-relative d-flex align-items-center justify-content-between">
+                    <div>
+                        <h2 class="fw-bold mb-2 display-6">
+                            <i class="fa-solid fa-file-lines me-2"></i>المسودات
+                        </h2>
+                        <p class="opacity-90 mb-0 fs-6">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            إدارة الإنجازات المحفوظة كمسودة قيد التعديل
+                        </p>
+                    </div>
+                    <div class="draft-count-badge">
+                        <span class="badge bg-white text-primary fs-5 px-3 py-2 rounded-pill">
+                            <i class="fa-solid fa-file me-2"></i>
+                            {{draftActivities.length}} مسودة
+                        </span>
+                    </div>
                 </div>
             </div>
 
+            <!-- حالة التحميل -->
             <div *ngIf="loading" class="text-center my-5 py-5">
                 <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
                 <p class="text-muted fs-6">جاري تحميل المسودات...</p>
             </div>
 
+            <!-- حالة عدم وجود مسودات -->
             <div *ngIf="!loading && draftActivities.length === 0"
                 class="alert alert-light text-center border-0 shadow-sm rounded-3 py-5 my-4">
-                <i class="fa-solid fa-file-circle-question text-muted fa-3x mb-3"></i>
+                <div class="empty-state-icon mb-3">
+                    <i class="fa-solid fa-file-circle-question"></i>
+                </div>
                 <h5 class="text-muted mb-2">لا توجد مسودات</h5>
-                <p class="text-muted mb-0">لم تقم بحفظ أي إنجازات كمسودة بعد</p>
+                <p class="text-muted mb-3">لم تقم بحفظ أي إنجازات كمسودة بعد</p>
+                <button class="btn btn-primary px-4" routerLink="/add-achievement">
+                    <i class="fa-solid fa-plus me-2"></i>إضافة إنجاز جديد
+                </button>
             </div>
 
+            <!-- قائمة المسودات -->
             <div class="row g-4" *ngIf="!loading && draftActivities.length > 0">
                 <div class="col-12" *ngFor="let activity of draftActivities; let i = index">
                     <div class="card shadow-sm border-0 rounded-3 activity-card h-100">
-                        <div class="card-header bg-gradient-primary border-0 rounded-top-3 text-white py-3">
+                        <div
+                            class="card-header bg-gradient-primary border-0 rounded-top-3 text-white py-3 position-relative">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
                                     <h5 class="card-title mb-1 fw-bold fs-5">
                                         <i class="fa-solid fa-file-lines me-2"></i>
-                                        {{ activity.activityTitle }}
+                                        {{ activity.activityTitle || 'بدون عنوان' }}
                                     </h5>
-                                    <div class="d-flex align-items-center gap-3 mt-2">
+                                    <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
                                         <span class="badge bg-white text-primary fs-7">
                                             <i class="fa-solid fa-hashtag me-1"></i>
                                             {{ i + 1 }}
                                         </span>
                                         <span class="badge status-badge fs-7 text-white"
                                             [ngClass]="getStatusBadgeClass(activity.status)">
-                                            {{ activity.status }}
+                                            {{ activity.status || 'غير محدد' }}
                                         </span>
                                     </div>
                                 </div>
+                                
                             </div>
                         </div>
 
@@ -80,11 +99,14 @@
                                     <div class="info-item">
                                         <i class="fa-solid fa-align-left text-primary me-2"></i>
                                         <strong class="text-dark">الوصف:</strong>
-                                        <p class="text-muted mb-0 mt-1 lh-base">{{ activity.activityDescription }}</p>
+                                        <p class="text-muted mb-0 mt-1 lh-base description-text">
+                                            {{ activity.activityDescription || 'لا يوجد وصف' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- قسم المرفقات -->
                             <div class="attachments-section"
                                 *ngIf="activity.Attachments && activity.Attachments.length > 0">
                                 <div class="section-header mb-3">
@@ -137,6 +159,7 @@
                                 </div>
                             </div>
 
+                            <!-- حالة عدم وجود مرفقات -->
                             <div *ngIf="!activity.Attachments || activity.Attachments.length === 0"
                                 class="text-center py-4 border rounded-2 bg-light">
                                 <i class="fa-solid fa-file-circle-exclamation text-muted fa-2x mb-2"></i>
@@ -144,24 +167,25 @@
                             </div>
                         </div>
 
+                        <!-- تذييل البطاقة -->
                         <div class="card-footer bg-transparent border-0 pt-0">
                             <div class="row align-items-center">
                                 <div class="col-md-6">
-                                    <div class="timeline-info">
-                                        <small class="text-muted me-3">
+                                    <div class="timeline-info d-flex flex-wrap gap-3">
+                                        <small class="text-muted">
                                             <i class="fa-solid fa-calendar-plus me-1"></i>
-                                            {{ formatDate(activity.createdAt) }}
+                                            أنشئت في: {{ formatDate(activity.createdAt) }}
                                         </small>
                                         <small class="text-muted">
                                             <i class="fa-solid fa-pen-to-square me-1"></i>
-                                            {{ formatDate(activity.updatedAt) }}
+                                            عدلت في: {{ formatDate(activity.updatedAt) }}
                                         </small>
                                     </div>
                                 </div>
                                 <div class="col-md-6 text-start">
-                                    <div class="action-buttons">
-                                        <button class="btn btn-primary btn-sm me-2 px-3" (click)="editDraft(activity)">
-                                            <i class="fa-solid fa-pen-to-square me-1"></i>تعديل
+                                    <div class="action-buttons d-flex gap-2 justify-content-end">
+                                        <button class="btn btn-primary btn-sm px-3" (click)="editDraft(activity)">
+                                            <i class="fa-solid fa-pen-to-square me-1"></i>تعديل المسودة
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm px-3"
                                             (click)="deleteDraft(activity._id!)">
@@ -178,6 +202,7 @@
     </div>
 </div>
 
+<!-- مودال عرض الصورة -->
 <div *ngIf="showImageModal" class="modal-backdrop fade show" (click)="closeImageModal()"></div>
 <div *ngIf="showImageModal" class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered">
