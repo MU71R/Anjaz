@@ -18,6 +18,7 @@ import { DraftsComponent } from './components/draft/draft.component';
 import { SocketService } from './service/socket.service';
 import { NotificationService } from './service/notification.service';
 import { NotificationComponent } from './components/notification/notification.component';
+import { ReportsComponent } from './components/reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { NotificationComponent } from './components/notification/notification.co
     ArchivedActivitiesComponent,
     DraftsComponent,
     NotificationComponent,
+    ReportsComponent,
   ],
   imports: [
     BrowserModule,

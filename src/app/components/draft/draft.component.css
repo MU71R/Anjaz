@@ -1,24 +1,57 @@
+/* تحسينات CSS */
 .bg-gradient-primary {
-    background: #195dfba4;
+    background: linear-gradient(135deg, #195dfb 0%, #6c3bf5 100%);
+}
+
+.header-box {
+    box-shadow: 0 4px 20px rgba(25, 93, 251, 0.2);
+}
+
+.draft-count-badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.draft-ribbon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .activity-card {
     transition: all 0.3s ease;
     border: 1px solid #e4e7ec;
     background: #fff;
+    overflow: hidden;
 }
 
 .activity-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15) !important;
+    box-shadow: 0 12px 35px rgba(99, 102, 241, 0.15) !important;
+    border-color: #6366f1;
 }
 
-/* 🟢 شارات الحالة */
+/* شارات الحالة المحسنة */
 .status-badge {
     font-size: 0.75rem;
     padding: 0.4rem 0.9rem;
     border-radius: 2rem;
     letter-spacing: 0.3px;
+    font-weight: 600;
 }
 
 .bg-warning {
@@ -37,20 +70,31 @@
     background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
 }
 
-/* 🧾 عناصر المعلومات */
+/* عناصر المعلومات المحسنة */
 .info-item {
     padding: 0.9rem;
     background: #f9fafb;
     border-radius: 0.6rem;
     border-right: 4px solid #6366f1;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .info-item:hover {
     background: #eef2ff;
+    transform: translateX(-5px);
 }
 
-/* 📎 قسم المرفقات */
+.description-text {
+    line-height: 1.7;
+    max-height: 4.2em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* قسم المرفقات المحسن */
 .attachments-section {
     border-top: 1px solid #e5e7eb;
     padding-top: 1.5rem;
@@ -62,16 +106,17 @@
     border-bottom: 2px solid #6366f1;
 }
 
-/* 🖼️ بطاقات المرفقات */
+/* بطاقات المرفقات المحسنة */
 .attachment-card {
     transition: all 0.3s ease;
     background: #fff;
     border: 1px solid #e5e7eb !important;
+    position: relative;
 }
 
 .attachment-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
     border-color: #6366f1 !important;
 }
 
@@ -79,6 +124,7 @@
     position: relative;
     overflow: hidden;
     border-radius: 0.6rem;
+    cursor: pointer;
 }
 
 .attachment-preview {
@@ -86,13 +132,12 @@
     height: 130px;
     object-fit: cover;
     transition: transform 0.3s ease;
-    cursor: pointer;
 }
 
 .image-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(99, 102, 241, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -113,73 +158,73 @@
     font-size: 1.5rem;
 }
 
-/* 🧭 الأزرار */
+/* الأزرار المحسنة */
 .action-buttons .btn {
     border-radius: 0.5rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .action-buttons .btn-primary {
-    background: linear-gradient(135deg, #ebecf7, #230ae5);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     border: none;
 }
 
 .action-buttons .btn-primary:hover {
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
     transform: translateY(-2px);
 }
 
 .action-buttons .btn-outline-danger:hover {
-    background: linear-gradient(135deg, #ef4444, #f87171);
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
     color: white;
+    border-color: transparent;
 }
 
-/* 🕒 معلومات الوقت */
+/* معلومات الوقت المحسنة */
 .timeline-info small {
     font-size: 0.85rem;
     color: #6b7280;
+    background: #f8f9fa;
+    padding: 0.3rem 0.7rem;
+    border-radius: 1rem;
 }
 
 .timeline-info i {
     color: #6366f1;
 }
 
-/* 🔵 النقاط الخلفية */
+/* النقاط الخلفية */
 .pattern-dots {
     background-image: radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px);
     background-size: 18px 18px;
 }
 
-/* 📱 تحسين العرض على الجوال */
-@media (max-width: 768px) {
-    .activity-card {
-        margin-bottom: 1.5rem;
-    }
-
-    .info-item {
-        margin-bottom: 1rem;
-    }
-
-    .timeline-info {
-        flex-direction: column;
-        gap: 0.4rem;
-    }
-
-    .action-buttons {
-        text-align: center !important;
-    }
-
-    .action-buttons .btn {
-        width: 100%;
-        margin-bottom: 0.6rem;
-    }
+/* حالة عدم وجود بيانات */
+.empty-state-icon {
+    font-size: 4rem;
+    color: #d1d5db;
 }
 
-/* 🧰 المودال */
+/* المودال المحسن */
 .modal-content {
     border: none;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-header {
@@ -194,7 +239,7 @@
     background-color: #f9fafb;
 }
 
-/* ⚙️ تأثيرات عامة */
+/* تأثيرات عامة */
 .container-fluid {
     animation: fadeIn 0.6s ease-in-out;
 }
@@ -211,7 +256,7 @@
     }
 }
 
-/* 🔠 تحسين الخطوط */
+/* تحسينات الخطوط */
 .card-title {
     font-weight: 700;
     color: #1e1b4b;
@@ -223,4 +268,55 @@
 
 .fs-7 {
     font-size: 0.8rem !important;
+}
+
+/* القائمة المنسدلة */
+.dropdown-menu {
+    border: 1px solid #e5e7eb;
+}
+
+.dropdown-item {
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #f8fafc;
+    transform: translateX(-3px);
+}
+
+/* تحسينات للجوال */
+@media (max-width: 768px) {
+    .activity-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .timeline-info {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.6rem;
+    }
+
+    .header-box .d-flex {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .draft-count-badge {
+        align-self: center;
+    }
 }

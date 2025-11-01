@@ -20,7 +20,7 @@ export class SidebarComponent implements OnInit {
     'criteria-management': ['admin'],
     archive: ['admin'],
     drafts: ['admin', 'user'],
-    reports: ['admin', 'user'],
+    reports: ['admin'],
     statistics: ['admin'],
   };
 

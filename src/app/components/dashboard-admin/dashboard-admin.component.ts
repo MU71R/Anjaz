@@ -121,22 +121,30 @@ export class DashboardAdminComponent implements OnInit {
 
         console.log('Raw achievements response:', response);
 
+        let achievements: RecentAchievement[] = [];
+
         if (response && Array.isArray(response)) {
-          this.recentAchievements = response.slice(0, 10);
+          achievements = response;
         } else if (
           response &&
           response.success &&
           Array.isArray(response.activities)
         ) {
-          this.recentAchievements = response.activities.slice(0, 10);
+          achievements = response.activities;
         } else if (response && response.activities) {
-          this.recentAchievements = response.activities.slice(0, 10);
+          achievements = response.activities;
         } else {
-          this.recentAchievements = [];
+          achievements = [];
           console.warn('Unexpected response format:', response);
         }
 
-        console.log('Processed achievements:', this.recentAchievements);
+        // عرض 5 إنجازات فقط
+        this.recentAchievements = achievements.slice(0, 5);
+
+        console.log(
+          'Processed achievements (5 items):',
+          this.recentAchievements
+        );
       },
       error: (error) => {
         this.isLoadingAchievements = false;
@@ -159,62 +167,54 @@ export class DashboardAdminComponent implements OnInit {
       : 'badge bg-primary';
   }
 
-  getStatusClass(status: string): string {
+
+  getAchievementStatusClass(achievement: RecentAchievement): string {
+    const status = this.getAchievementStatus(achievement);
     switch (status) {
-      case 'قيد المراجعة':
-        return 'badge bg-warning';
       case 'معتمد':
-        return 'badge bg-success';
+        return 'status-approved';
       case 'مرفوض':
-        return 'badge bg-danger';
-      case 'مسودة':
-        return 'badge bg-secondary';
+        return 'status-rejected';
+      case 'قيد المراجعة':
+        return 'status-pending';
+      case 'جديد':
+        return 'status-new';
       default:
-        return 'badge bg-light text-dark';
+        return 'status-default';
     }
   }
 
-  getAchievementStatusClass(achievement: RecentAchievement): string {
-    const message = achievement.message.toLowerCase();
-    if (message.includes('معتمد')) return 'status-approved';
-    if (message.includes('مرفوض')) return 'status-rejected';
-    if (message.includes('مراجعة')) return 'status-pending';
-    if (message.includes('إضافة')) return 'status-new';
-    return 'status-default';
-  }
-
   getAchievementIcon(achievement: RecentAchievement): string {
-    const message = achievement.message.toLowerCase();
-    if (message.includes('معتمد')) return 'fas fa-check-circle';
-    if (message.includes('مرفوض')) return 'fas fa-times-circle';
-    if (message.includes('مراجعة')) return 'fas fa-clock';
-    if (message.includes('إضافة')) return 'fas fa-plus-circle';
-    return 'fas fa-info-circle';
+    const status = this.getAchievementStatus(achievement);
+    switch (status) {
+      case 'معتمد':
+        return 'fas fa-check-circle';
+      case 'مرفوض':
+        return 'fas fa-times-circle';
+      case 'قيد المراجعة':
+        return 'fas fa-clock';
+      case 'جديد':
+        return 'fas fa-plus-circle';
+      default:
+        return 'fas fa-info-circle';
+    }
   }
 
   getAchievementStatus(achievement: RecentAchievement): string {
+    // محاولة استخراج الحالة من الرسالة أولاً
     const message = achievement.message.toLowerCase();
+
     if (message.includes('معتمد')) return 'معتمد';
     if (message.includes('مرفوض')) return 'مرفوض';
     if (message.includes('مراجعة')) return 'قيد المراجعة';
     if (message.includes('إضافة')) return 'جديد';
-    return 'غير محدد';
-  }
 
-  getStatusBadgeClass(achievement: RecentAchievement): string {
-    const status = this.getAchievementStatus(achievement);
-    switch (status) {
-      case 'معتمد':
-        return 'badge-success';
-      case 'مرفوض':
-        return 'badge-danger';
-      case 'قيد المراجعة':
-        return 'badge-warning';
-      case 'جديد':
-        return 'badge-primary';
-      default:
-        return 'badge-secondary';
+    // إذا كان هناك حقل status مباشر في البيانات
+    if (achievement.status) {
+      return achievement.status;
     }
+
+    return 'غير محدد';
   }
 
   getAchievementType(achievement: RecentAchievement): string {

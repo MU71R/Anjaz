@@ -43,3 +43,17 @@ export interface Activity {
 }
 
 
+// src/app/model/report-filter.ts
+// في src/app/model/achievement.ts
+export interface ReportFilter {
+  startDate?: string;
+  endDate?: string;
+  MainCriteria?: string;
+  SubCriteria?: string;
+  user?: string;
+  status?: string;
+  // أضف هذه الخصائص الجديدة
+  username?: string;        // للبحث باسم المستخدم
+  performerName?: string;   // للبحث باسم القائم بالانجاز
+}
+  
