@@ -138,7 +138,6 @@ export class DashboardAdminComponent implements OnInit {
           console.warn('Unexpected response format:', response);
         }
 
-        // عرض 5 إنجازات فقط
         this.recentAchievements = achievements.slice(0, 5);
 
         console.log(
@@ -155,7 +154,6 @@ export class DashboardAdminComponent implements OnInit {
     });
   }
 
-  // === دوال التنسيق والتصنيف ===
 
   getRoleDisplayName(): string {
     return this.currentUser.role === 'admin' ? 'مدير النظام' : 'مستخدم';
@@ -201,7 +199,6 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   getAchievementStatus(achievement: RecentAchievement): string {
-    // محاولة استخراج الحالة من الرسالة أولاً
     const message = achievement.message.toLowerCase();
 
     if (message.includes('معتمد')) return 'معتمد';
@@ -209,7 +206,6 @@ export class DashboardAdminComponent implements OnInit {
     if (message.includes('مراجعة')) return 'قيد المراجعة';
     if (message.includes('إضافة')) return 'جديد';
 
-    // إذا كان هناك حقل status مباشر في البيانات
     if (achievement.status) {
       return achievement.status;
     }
@@ -239,7 +235,6 @@ export class DashboardAdminComponent implements OnInit {
     }
   }
 
-  // === دوال استخراج المعلومات من الرسالة ===
 
   getAchievementUser(message: string): string {
     if (!message) return 'مستخدم غير معروف';
@@ -278,7 +273,6 @@ export class DashboardAdminComponent implements OnInit {
     return indicatorMatch ? indicatorMatch[1].trim() : '';
   }
 
-  // === دوال تنسيق التاريخ والوقت ===
 
   formatAchievementDate(timeString: string): string {
     if (!timeString) return 'غير محدد';

@@ -1,10 +1,10 @@
-/* تحسينات CSS */
 .bg-gradient-primary {
-    background: linear-gradient(135deg, #195dfb 0%, #6c3bf5 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
 }
 
 .header-box {
-    box-shadow: 0 4px 20px rgba(25, 93, 251, 0.2);
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+    border: 1px solid #1e40af;
 }
 
 .draft-count-badge {
@@ -34,55 +34,60 @@
 
 .activity-card {
     transition: all 0.3s ease;
-    border: 1px solid #e4e7ec;
-    background: #fff;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
     overflow: hidden;
 }
 
 .activity-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 35px rgba(99, 102, 241, 0.15) !important;
-    border-color: #6366f1;
+    box-shadow: 0 12px 35px rgba(30, 58, 138, 0.15) !important;
+    border-color: #3b82f6;
 }
 
-/* شارات الحالة المحسنة */
 .status-badge {
     font-size: 0.75rem;
     padding: 0.4rem 0.9rem;
     border-radius: 2rem;
     letter-spacing: 0.3px;
     font-weight: 600;
+    border: 1px solid transparent;
 }
 
 .bg-warning {
-    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%) !important;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border-color: #b45309;
 }
 
 .bg-success {
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    border-color: #065f46;
 }
 
 .bg-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%) !important;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    border-color: #991b1b;
 }
 
 .bg-secondary {
-    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+    background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+    border-color: #1e293b;
 }
 
-/* عناصر المعلومات المحسنة */
 .info-item {
     padding: 0.9rem;
-    background: #f9fafb;
+    background: #f8fafc;
     border-radius: 0.6rem;
-    border-right: 4px solid #6366f1;
+    border-right: 4px solid #3b82f6;
     transition: all 0.3s ease;
     position: relative;
+    border: 1px solid #e2e8f0;
 }
 
 .info-item:hover {
-    background: #eef2ff;
+    background: #f0f9ff;
     transform: translateX(-5px);
+    border-right-color: #1e40af;
 }
 
 .description-text {
@@ -94,30 +99,29 @@
     -webkit-box-orient: vertical;
 }
 
-/* قسم المرفقات المحسن */
 .attachments-section {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #e2e8f0;
     padding-top: 1.5rem;
     margin-top: 1.5rem;
 }
 
 .section-header {
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #6366f1;
+    border-bottom: 2px solid #3b82f6;
 }
 
-/* بطاقات المرفقات المحسنة */
 .attachment-card {
     transition: all 0.3s ease;
-    background: #fff;
-    border: 1px solid #e5e7eb !important;
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
     position: relative;
 }
 
 .attachment-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
-    border-color: #6366f1 !important;
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15);
+    border-color: #3b82f6 !important;
+    background: #f8fafc;
 }
 
 .attachment-image-container {
@@ -125,6 +129,7 @@
     overflow: hidden;
     border-radius: 0.6rem;
     cursor: pointer;
+    background: #f1f5f9;
 }
 
 .attachment-preview {
@@ -132,12 +137,13 @@
     height: 130px;
     object-fit: cover;
     transition: transform 0.3s ease;
+    background: #f8fafc;
 }
 
 .image-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(99, 102, 241, 0.8);
+    background: rgba(30, 58, 138, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,61 +164,71 @@
     font-size: 1.5rem;
 }
 
-/* الأزرار المحسنة */
 .action-buttons .btn {
     border-radius: 0.5rem;
     font-weight: 600;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    border: 1px solid;
 }
 
 .action-buttons .btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    border: none;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border-color: #1e40af;
+    color: white;
 }
 
 .action-buttons .btn-primary:hover {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 20px rgba(30, 64, 175, 0.5);
     transform: translateY(-2px);
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+}
+
+.action-buttons .btn-outline-danger {
+    color: #dc2626;
+    border-color: #dc2626;
 }
 
 .action-buttons .btn-outline-danger:hover {
-    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: white;
     border-color: transparent;
+    transform: translateY(-2px);
 }
 
-/* معلومات الوقت المحسنة */
 .timeline-info small {
     font-size: 0.85rem;
-    color: #6b7280;
-    background: #f8f9fa;
+    color: #64748b;
+    background: #f8fafc;
     padding: 0.3rem 0.7rem;
     border-radius: 1rem;
+    border: 1px solid #e2e8f0;
 }
 
 .timeline-info i {
-    color: #6366f1;
+    color: #3b82f6;
 }
 
-/* النقاط الخلفية */
 .pattern-dots {
     background-image: radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px);
     background-size: 18px 18px;
 }
 
-/* حالة عدم وجود بيانات */
 .empty-state-icon {
     font-size: 4rem;
-    color: #d1d5db;
+    color: #cbd5e1;
 }
 
-/* المودال المحسن */
+.empty-state-icon i {
+    color: #94a3b8;
+}
+
 .modal-content {
     border: none;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 25px 60px rgba(30, 58, 138, 0.2);
     animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid #e2e8f0;
 }
 
 @keyframes modalSlideIn {
@@ -230,18 +246,18 @@
 .modal-header {
     border-bottom: none;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
 }
 
 .modal-body img {
     max-height: 75vh;
     object-fit: contain;
-    background-color: #f9fafb;
+    background-color: #f8fafc;
 }
 
-/* تأثيرات عامة */
 .container-fluid {
     animation: fadeIn 0.6s ease-in-out;
+    background: #f8fafc;
 }
 
 @keyframes fadeIn {
@@ -256,35 +272,84 @@
     }
 }
 
-/* تحسينات الخطوط */
 .card-title {
     font-weight: 700;
-    color: #1e1b4b;
+    color: #1e293b;
 }
 
 .text-muted {
-    color: #6b7280 !important;
+    color: #64748b !important;
+}
+
+.text-dark {
+    color: #1e293b !important;
 }
 
 .fs-7 {
     font-size: 0.8rem !important;
 }
 
-/* القائمة المنسدلة */
+.fa-file-lines, .fa-user, .fa-layer-group, .fa-sitemap,
+.fa-align-left, .fa-paperclip, .fa-hashtag, .fa-circle-info {
+    color: #3b82f6;
+}
+
+.fa-file-pdf {
+    color: #dc2626;
+}
+
+.fa-file {
+    color: #475569;
+}
+
 .dropdown-menu {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.1);
 }
 
 .dropdown-item {
     transition: all 0.2s ease;
+    color: #374151;
 }
 
 .dropdown-item:hover {
-    background: #f8fafc;
+    background: #f0f9ff;
     transform: translateX(-3px);
+    color: #1e40af;
 }
 
-/* تحسينات للجوال */
+.card-header.bg-gradient-primary {
+    border-bottom: 1px solid #1e40af;
+}
+
+.badge.bg-white {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1e3a8a !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.alert-light {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+.spinner-border.text-primary {
+    color: #3b82f6 !important;
+}
+
+.btn-outline-primary {
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-outline-primary:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
 @media (max-width: 768px) {
     .activity-card {
         margin-bottom: 1.5rem;
@@ -292,6 +357,12 @@
 
     .info-item {
         margin-bottom: 1rem;
+        border-right: none;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .info-item:hover {
+        transform: translateX(5px);
     }
 
     .timeline-info {
@@ -319,4 +390,47 @@
     .draft-count-badge {
         align-self: center;
     }
+
+    .card-footer .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .card-footer .text-start {
+        text-align: center !important;
+    }
+}
+
+.attachments-section .row {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.attachments-section .row::-webkit-scrollbar {
+    width: 6px;
+}
+
+.attachments-section .row::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.attachments-section .row::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.attachments-section .row::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.activity-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+    border-radius: 0.75rem 0.75rem 0 0;
 }

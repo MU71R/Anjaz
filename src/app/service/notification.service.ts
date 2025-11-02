@@ -1,96 +1,108 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Notification } from './socket.service';
+import { io, Socket } from 'socket.io-client';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Notification } from '../model/notification';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
+  private socket!: Socket;
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
-  constructor() {}
+  private API_URL = 'http://localhost:3000/notifications';
 
-  // إضافة دوال جديدة
-  markAsRead(notificationId: string): void {
-    const notifications = this.notificationsSubject.value.map((notification) =>
-      notification.id === notificationId
-        ? { ...notification, read: true }
-        : notification
-    );
-    this.notificationsSubject.next(notifications);
+  constructor(private http: HttpClient) {
+    this.requestNotificationPermission();
+    this.fetchNotificationsFromServer();
+    this.socket = io('http://localhost:3000', {
+      transports: ['websocket', 'polling'],
+    });
+
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user._id) {
+        this.socket.emit('registerUser', user._id); 
+        console.log('Registered user room:', user._id);
+      }
+    }
+    this.socket.on('notification', (notification: Notification) => {
+      this.addNotification(notification);
+      this.showBrowserNotification(notification.title, notification.message);
+    });
+
+    this.socket.on('connect', () => {
+      console.log('Connected to Socket.IO server');
+    });
   }
 
-  markAllAsRead(): void {
-    const notifications = this.notificationsSubject.value.map(
-      (notification) => ({ ...notification, read: true })
-    );
-    this.notificationsSubject.next(notifications);
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `${token}`,
+    });
   }
 
-  // الدوال الحالية مع تحديثات
-  removeNotification(notificationId: string): void {
-    const notifications = this.notificationsSubject.value.filter(
-      (notification) => notification.id !== notificationId
-    );
-    this.notificationsSubject.next(notifications);
-  }
-
-  clearNotifications(): void {
-    this.notificationsSubject.next([]);
-  }
-
-  addNotification(notification: Notification): void {
-    const currentNotifications = this.notificationsSubject.value;
-    const updatedNotifications = [notification, ...currentNotifications];
-    this.notificationsSubject.next(updatedNotifications);
-  }
-
-  sendTestNotification(): void {
-    // إنشاء ID فريد للإشعار
-    const notificationId = this.generateUniqueId();
-
-    const testNotification: Notification = {
-      id: notificationId,
-      title: 'إشعار تجريبي',
-      message: 'هذا إشعار تجريبي للاختبار',
-      type: 'info',
-      timestamp: new Date(),
-      read: false,
-    };
-
-    this.addNotification(testNotification);
-  }
-
-  // دالة مساعدة لإنشاء ID فريد
-  private generateUniqueId(): string {
-    return (
-      'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-    );
+  fetchNotificationsFromServer(): void {
+    this.http.get<Notification[]>(this.API_URL, {
+      headers: this.getAuthHeaders(),
+    }).subscribe({
+      next: (data) => this.notificationsSubject.next(data),
+      error: (err) => console.error('Error fetching notifications:', err),
+    });
   }
 
   requestNotificationPermission(): void {
     if ('Notification' in window) {
-      Notification.requestPermission();
+      window.Notification.requestPermission();
     }
   }
 
-  // دالة مساعدة للحصول على الإشعارات غير المقروءة
-  getUnreadNotifications(): Notification[] {
-    return this.notificationsSubject.value.filter(
-      (notification) => !notification.read
-    );
+  private showBrowserNotification(title: string, message: string): void {
+    if ('Notification' in window && window.Notification.permission === 'granted') {
+      new window.Notification(title, { body: message });
+    }
   }
 
-  // دالة مساعدة للحصول على عدد الإشعارات غير المقروءة
-  getUnreadCount(): number {
-    return this.getUnreadNotifications().length;
+  addNotification(notification: Notification): void {
+    const updated = [notification, ...this.notificationsSubject.value];
+    this.notificationsSubject.next(updated);
   }
 
-  // دالة لإضافة إشعارات من الخادم (إذا كنت تتصل بخادم)
-  addNotificationsFromServer(notifications: Notification[]): void {
-    const currentNotifications = this.notificationsSubject.value;
-    const updatedNotifications = [...notifications, ...currentNotifications];
-    this.notificationsSubject.next(updatedNotifications);
+  markAsRead(notificationId: string) {
+  return this.http.post<Notification>(  
+    `${this.API_URL}/${notificationId}`,
+    { seen: true },
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+
+  markAllAsRead() {
+    return this.http.put(`${this.API_URL}/markAllRead`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteNotification(notificationId: string) {
+    return this.http.delete(`${this.API_URL}/${notificationId}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  clearAllNotifications() {
+    return this.http.delete(`${this.API_URL}/clearAll`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  sendTestNotification() {
+    return this.http.post<Notification>(`${this.API_URL}/test`, {}, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }

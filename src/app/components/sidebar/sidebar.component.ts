@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../../service/login.service';
 
@@ -7,10 +7,11 @@ import { LoginService } from '../../service/login.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   isSidebarOpen = false;
   userRole: string | null = null;
   userName: string | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   private menuPermissions: { [key: string]: string[] } = {
     dashboard: ['admin', 'user'],
@@ -29,11 +30,35 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     this.checkScreenSize();
     this.loadUserData();
+    this.setupResizeObserver();
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  private setupResizeObserver(): void {
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          this.checkScreenSize();
+        }
+      });
+
+      this.resizeObserver.observe(document.body);
+    }
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any): void {
     this.checkScreenSize();
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange(): void {
+    setTimeout(() => this.checkScreenSize(), 100);
   }
 
   private checkScreenSize(): void {
@@ -50,6 +75,16 @@ export class SidebarComponent implements OnInit {
 
   toggleSidebar(): void {
     this.isSidebarOpen = !this.isSidebarOpen;
+    if (this.isSidebarOpen) {
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.classList.remove('sidebar-open');
+    }
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
+    document.body.classList.remove('sidebar-open');
   }
 
   canShowItem(menuKey: string): boolean {
