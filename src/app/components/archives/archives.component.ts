@@ -28,7 +28,7 @@ export class ArchivedActivitiesComponent implements OnInit {
       next: (res) => {
         this.archivedActivities = res.data || [];
         this.loading = false;
-        console.log('📦 Archived activities loaded:', this.archivedActivities);
+        console.log('Archived activities loaded:', this.archivedActivities);
       },
       error: (err) => {
         this.loading = false;
@@ -95,9 +95,7 @@ export class ArchivedActivitiesComponent implements OnInit {
     }
   }
 
-  // ✅ عرض PDF المولّد من السيرفر في نافذة جديدة
 viewGeneratedPDF(activity: Activity): void {
-  // لو مفيش generatedFiles استخدم أول مرفق من attachments
   const pdfUrl =
     activity.generatedFiles?.pdf ||
     activity.Attachments?.find((att: string) => att.toLowerCase().endsWith('.pdf'));
@@ -124,7 +122,7 @@ viewGeneratedPDF(activity: Activity): void {
       this.loadingPdf = null;
     },
     error: (err) => {
-      console.error('❌ خطأ في عرض PDF:', err);
+      console.error(' خطأ في عرض PDF:', err);
       Swal.fire('خطأ', 'تعذر فتح ملف PDF', 'error');
       this.loadingPdf = null;
     },
@@ -132,7 +130,6 @@ viewGeneratedPDF(activity: Activity): void {
 }
 
 
-  // ✅ تحميل ملف Word (إن وجد)
   downloadGeneratedWord(activity: Activity): void {
     const docxUrl = activity.generatedFiles?.docx;
 
@@ -174,14 +171,13 @@ viewGeneratedPDF(activity: Activity): void {
         this.loadingDocx = null;
       },
       error: (err) => {
-        console.error('❌ خطأ في تحميل Word:', err);
+        console.error('خطأ في تحميل Word:', err);
         this.downloadDirectFile(docxUrl, 'docx');
         this.loadingDocx = null;
       },
     });
   }
 
-  // ✅ عرض مرفق PDF داخل نافذة جديدة
   viewAttachmentPDF(attachment: string): void {
     const filename = this.extractFilenameFromUrl(attachment);
     if (!filename) {
@@ -196,13 +192,12 @@ viewGeneratedPDF(activity: Activity): void {
         setTimeout(() => window.URL.revokeObjectURL(url), 1000);
       },
       error: (err) => {
-        console.error('❌ خطأ في عرض مرفق PDF:', err);
+        console.error('خطأ في عرض مرفق PDF:', err);
         window.open(this.getFullAttachmentUrl(attachment), '_blank');
       },
     });
   }
 
-  // 📎 استخراج اسم الملف من الرابط
   private extractFilenameFromUrl(url: string): string | null {
     try {
       const urlObj = new URL(url);
@@ -212,7 +207,6 @@ viewGeneratedPDF(activity: Activity): void {
     }
   }
 
-  // 📥 تحميل مباشر احتياطي (في حال فشل blob)
   private downloadDirectFile(fileUrl: string, fileType: string): void {
     const link = document.createElement('a');
     link.href = fileUrl;

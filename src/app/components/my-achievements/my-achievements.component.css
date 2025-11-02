@@ -1,25 +1,23 @@
-/* ألوان وتدرجات احترافية */
 .bg-gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
 }
 
 .bg-gradient-danger {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
 }
 
 .bg-gradient-success {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
 }
 
 .bg-gradient-warning {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
 }
 
 .bg-gradient-secondary {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  background: linear-gradient(135deg, #475569 0%, #64748b 100%) !important;
 }
 
-/* تأثير دخول */
 .container-fluid {
   animation: fadeIn 0.6s ease-in-out;
 }
@@ -36,29 +34,31 @@
   }
 }
 
-/* البطاقات العامة */
-.card, .attachment-card {
+.card,
+.attachment-card,
+.achievement-card {
   border: none !important;
   border-radius: 1rem !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(30, 58, 138, 0.08);
   transition: all 0.3s ease;
   background: #fff;
+  border: 1px solid #e2e8f0 !important;
 }
 
-.card:hover, .attachment-card:hover {
+.card:hover,
+.attachment-card:hover,
+.achievement-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(30, 58, 138, 0.12);
 }
 
-/* رأس البطاقة */
 .card-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* عناوين الأقسام */
 .section-title {
-  color: #2d3748;
+  color: #1e293b;
   border-bottom: 2px solid #e2e8f0;
   padding-bottom: 0.75rem;
   margin-bottom: 1.25rem;
@@ -66,10 +66,10 @@
   font-size: 1.1rem;
 }
 
-/* جدول الإنجازات */
 .table-responsive {
   border-radius: 1rem;
   overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .table {
@@ -77,19 +77,19 @@
 }
 
 .table th {
-  color: #4a5568;
+  color: #1e293b;
   font-weight: 600;
   border-bottom: 2px solid #e2e8f0;
   white-space: nowrap;
   padding: 1rem 0.75rem;
-  background: #f8f9fa;
+  background: #f8fafc;
   font-size: 0.9rem;
 }
 
 .table td {
   vertical-align: middle;
   padding: 1rem 0.75rem;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .table-hover tbody tr:hover {
@@ -98,31 +98,30 @@
   transition: all 0.2s ease;
 }
 
-/* صف الإنجاز */
 .achievement-row {
   transition: all 0.3s ease;
 }
 
 .achievement-row:hover {
-  background-color: #f8fafc;
+  background-color: #f0f9ff;
 }
 
 .achievement-title {
   font-weight: 600;
-  color: #2d3748;
+  color: #1e293b;
   font-size: 0.95rem;
   margin-bottom: 0.25rem;
   line-height: 1.4;
 }
 
 .achievement-desc {
-  color: #718096;
+  color: #64748b;
   font-size: 0.85rem;
   line-height: 1.4;
 }
 
-/* نص المعايير والمقدم */
-.criteria-text, .applicant-text {
+.criteria-text,
+.applicant-text {
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -130,9 +129,9 @@
   white-space: nowrap;
   font-size: 0.9rem;
   line-height: 1.4;
+  color: #374151;
 }
 
-/* الأزرار */
 .action-buttons {
   display: flex;
   justify-content: center;
@@ -149,7 +148,7 @@
 
 .action-buttons .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
 }
 
 .view-btn {
@@ -161,15 +160,18 @@
   border-radius: 50%;
   font-size: 0.9rem;
   transition: all 0.3s ease;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #3b82f6;
 }
 
 .view-btn:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #fff;
   transform: translateY(-2px) scale(1.1);
+  border-color: #1e40af;
 }
 
-/* شارات الحالة */
 .status-badge {
   font-size: 0.8rem;
   padding: 0.5rem 0.75rem;
@@ -178,34 +180,39 @@
   white-space: nowrap;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
 }
 
 .status-badge.معتمد {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  border-color: #047857;
 }
 
 .status-badge.مرفوض {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+  border-color: #b91c1c;
 }
 
 .status-badge.قيد\ المراجعة {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+  border-color: #b45309;
 }
 
-/* عناصر المعلومات */
 .info-item {
   background: #f8fafc;
   padding: 1rem 1.25rem;
   border-radius: 0.75rem;
-  border-right: 4px solid #667eea;
+  border-right: 4px solid #3b82f6;
   transition: all 0.3s ease;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .info-item:hover {
-  background: #edf2f7;
+  background: #f0f9ff;
   transform: translateX(-4px);
+  border-right-color: #1e40af;
 }
 
 .info-grid {
@@ -213,7 +220,6 @@
   flex-direction: column;
 }
 
-/* المرفقات */
 .attachment-preview {
   width: 100%;
   height: 140px;
@@ -221,19 +227,22 @@
   border-radius: 0.75rem;
   transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+  border: 1px solid #e2e8f0;
 }
 
 .attachment-preview:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15);
 }
 
 .attachment-icon i {
   font-size: 2.5rem;
 }
 
-.attachments-grid .col-md-6, .attachments-grid .col-lg-4, .attachments-grid .col-xl-3 {
+.attachments-grid .col-md-6,
+.attachments-grid .col-lg-4,
+.attachments-grid .col-xl-3 {
   display: flex;
   align-items: stretch;
 }
@@ -241,49 +250,134 @@
 .attachment-card {
   width: 100%;
   transition: all 0.3s ease;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0 !important;
 }
 
 .attachment-card:hover {
   transform: translateY(-4px);
+  background: #f0f9ff;
 }
 
-/* حالة فارغة */
 .empty-state {
   padding: 2rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
 .empty-state i {
   opacity: 0.7;
+  color: #64748b;
 }
 
-/* شريط التصفية */
 .filter-bar {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
 }
 
 .filter-bar .input-group-text {
   border-color: #e2e8f0;
-  background: #f8f9fa;
+  background: #f8fafc;
+  color: #64748b;
 }
 
-.filter-bar .form-control, .filter-bar .form-select {
+.filter-bar .form-control,
+.filter-bar .form-select {
   border-color: #e2e8f0;
   background: #fff;
+  color: #374151;
 }
 
-.filter-bar .form-control:focus, .filter-bar .form-select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+.filter-bar .form-control:focus,
+.filter-bar .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
 }
 
-/* تحسين العرض للجوال */
+.filter-bar .btn-outline-secondary {
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.filter-bar .btn-outline-secondary:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.mobile-achievements-list {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.achievement-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.header-box {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  border: 1px solid #1e40af;
+}
+
+.header-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+}
+
+.modal-content {
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+}
+
+.modal-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-footer {
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border-color: #1e40af;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border-color: #1e3a8a;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  border-color: #059669;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border-color: #dc2626;
+}
+
 @media (max-width: 768px) {
   .achievement-desc {
     display: none;
   }
 
-  .criteria-text, .applicant-text {
+  .criteria-text,
+  .applicant-text {
     white-space: normal;
     max-height: 2.8em;
     line-height: 1.4em;
@@ -296,7 +390,8 @@
     border-radius: 0.75rem;
   }
 
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 0.75rem 0.5rem;
   }
 
@@ -307,7 +402,8 @@
 
   .info-item {
     border-right: none;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #3b82f6;
+    padding: 0.75rem 1rem;
   }
 
   .modal-dialog {
@@ -325,24 +421,43 @@
   .header-box h2 {
     font-size: 1.75rem;
   }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .attachment-preview {
+    height: 120px;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
 }
 
-/* تحسينات إضافية للاستجابة */
 @media (max-width: 576px) {
   .header-box h2 {
     font-size: 1.5rem;
   }
 
-  .filter-bar .col-md-6, .filter-bar .col-md-4, .filter-bar .col-md-2 {
+  .header-box p {
+    font-size: 0.9rem;
+  }
+
+  .filter-bar .col-md-6,
+  .filter-bar .col-md-4,
+  .filter-bar .col-md-2 {
     margin-bottom: 0.75rem;
   }
 
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 0.6rem 0.4rem;
     font-size: 0.8rem;
   }
 
-  .criteria-text, .applicant-text {
+  .criteria-text,
+  .applicant-text {
     max-width: 100px;
   }
 
@@ -359,11 +474,26 @@
   .card-header h6 {
     font-size: 0.9rem;
   }
+
+  .info-item {
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .attachment-card {
+    padding: 1rem !important;
+  }
+
+  .modal-footer .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
 }
 
-/* للأجهزة اللوحية */
 @media (max-width: 992px) and (min-width: 769px) {
-  .criteria-text, .applicant-text {
+
+  .criteria-text,
+  .applicant-text {
     max-width: 150px;
   }
 
@@ -375,37 +505,73 @@
     font-size: 0.8rem;
   }
 
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 0.9rem 0.6rem;
+  }
+
+  .modal-dialog {
+    max-width: 90%;
   }
 }
 
-/* تأثيرات إضافية */
-.header-box {
-  position: relative;
-  overflow: hidden;
-}
-
-.header-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
-}
-
-/* تحسينات النص */
 .text-muted {
-  color: #6c757d !important;
+  color: #64748b !important;
 }
 
-/* تحسينات الظل */
 .shadow-sm {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.08) !important;
 }
 
 .shadow-lg {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 30px rgba(30, 58, 138, 0.12) !important;
+}
+
+.badge {
+  font-weight: 500;
+}
+
+.alert {
+  border: 1px solid;
+  border-radius: 0.75rem;
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+@media print {
+  .d-print-none {
+    display: none !important;
+  }
+
+  .modal-dialog {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .modal-content {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+.mobile-achievements-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-achievements-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.mobile-achievements-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.mobile-achievements-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

@@ -34,17 +34,11 @@ export interface Activity {
   date?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-
-  // إضافة خاصية generatedFiles
   generatedFiles?: {
     pdf?: string;
     docx?: string;
   };
 }
-
-
-// src/app/model/report-filter.ts
-// في src/app/model/achievement.ts
 export interface ReportFilter {
   startDate?: string;
   endDate?: string;
@@ -52,8 +46,7 @@ export interface ReportFilter {
   SubCriteria?: string;
   user?: string;
   status?: string;
-  // أضف هذه الخصائص الجديدة
-  username?: string;        // للبحث باسم المستخدم
-  performerName?: string;   // للبحث باسم القائم بالانجاز
+  username?: string;       
+  performerName?: string;   
 }
   

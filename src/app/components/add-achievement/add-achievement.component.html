@@ -1,17 +1,17 @@
 <div class="container" dir="rtl">
   <div class="row">
-    <div class="col">
+    <div class="col-12 col-lg-3 col-xl-2">
       <app-sidebar></app-sidebar>
     </div>
 
-    <div class="col-md-">
+    <div class="col-12 col-lg-9 col-xl-10">
       <div class="add-achievement-content">
 
         <h2 class="mb-1">{{ isEditing ? 'تعديل المسودة' : 'إضافة إنجاز جديد' }}</h2>
         <p class="text-muted mb-4">{{ isEditing ? 'قم بتعديل بيانات المسودة' : 'قم بتعبئة جميع الحقول المطلوبة لتسجيل الإنجاز' }}</p>
 
         <form [formGroup]="form" (ngSubmit)="submitForReview()">
-          <div class="card p-4 mb-3 shadow-sm border-0">
+          <div class="card p-3 p-md-4 mb-3 shadow-sm border-0">
             <h5 class="mb-3 fw-bold text-primary">معلومات الإنجاز</h5>
 
             <div class="mb-3">
@@ -57,7 +57,7 @@
             <div class="mb-3">
               <label class="form-label fw-semibold">وصف الإنجاز <span class="text-danger">*</span></label>
 
-              <div class="toolbar mb-2 d-flex flex-wrap gap-2">
+              <div class="toolbar mb-2 d-flex flex-wrap gap-1 gap-sm-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('bold')" title="عريض">
                   <strong>B</strong>
                 </button>
@@ -68,7 +68,7 @@
                   title="تسطير">
                   <u>U</u>
                 </button>
-                <div class="vr"></div>
+                <div class="vr d-none d-sm-block"></div>
                 <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('justifyRight')"
                   title="يمين">
                   <i class="bi bi-text-right"></i>
@@ -83,7 +83,7 @@
                 </button>
               </div>
 
-              <div #descriptionEditor class="editor border rounded p-3" contenteditable="true"
+              <div #descriptionEditor class="editor border rounded p-2 p-sm-3" contenteditable="true"
                 (input)="syncDescriptionToForm()"></div>
               <small class="form-text text-muted mt-1 d-block">يمكنك استخدام شريط الأدوات أعلاه لتنسيق النص</small>
               <div class="text-end text-muted small">
@@ -113,9 +113,9 @@
 
               <div *ngIf="isEditing && existingAttachments.length > 0" class="mb-3">
                 <h6 class="text-secondary mb-3">المرفقات الحالية:</h6>
-                <div class="d-flex flex-wrap gap-3">
+                <div class="d-flex flex-wrap gap-2 gap-sm-3">
                   <div *ngFor="let attachment of existingAttachments; let i = index"
-                    class="attachment-item current-attachment">
+                    class="attachment-item current-attachment w-100 w-sm-auto">
 
                     <div *ngIf="isImage(attachment)" class="attachment-image">
                       <img [src]="getFullAttachmentUrl(attachment)" class="attachment-preview" alt="معاينة المرفق"
@@ -126,8 +126,8 @@
                       <i class="fa-solid fa-file-pdf text-danger"></i>
                     </div>
 
-                    <div class="attachment-info">
-                      <small class="attachment-name" [title]="getFileName(attachment)">
+                    <div class="attachment-info flex-grow-1">
+                      <small class="attachment-name d-block" [title]="getFileName(attachment)">
                         {{ getFileName(attachment) }}
                       </small>
                       <small class="attachment-type">{{ getFileType(attachment) }}</small>
@@ -152,8 +152,9 @@
 
               <div *ngIf="attachments.length > 0" class="mb-3">
                 <h6 class="text-secondary mb-3">المرفقات الجديدة:</h6>
-                <div class="d-flex flex-wrap gap-3">
-                  <div *ngFor="let file of attachments; let i = index" class="attachment-item new-attachment">
+                <div class="d-flex flex-wrap gap-2 gap-sm-3">
+                  <div *ngFor="let file of attachments; let i = index"
+                    class="attachment-item new-attachment w-100 w-sm-auto">
 
                     <div *ngIf="isImageFile(file)" class="attachment-image">
                       <img [src]="getFilePreview(file)" class="attachment-preview" alt="معاينة الملف">
@@ -163,8 +164,8 @@
                       <i class="fa-solid fa-file-pdf text-danger"></i>
                     </div>
 
-                    <div class="attachment-info">
-                      <small class="attachment-name" [title]="file.name">
+                    <div class="attachment-info flex-grow-1">
+                      <small class="attachment-name d-block" [title]="file.name">
                         {{ file.name }}
                       </small>
                       <small class="attachment-size">{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</small>
@@ -204,16 +205,16 @@
               </div>
             </div>
 
-            <div class="form-footer d-flex gap-2">
-              <button class="btn cancel-btn" type="button" (click)="cancel()">
+            <div class="form-footer d-flex flex-column flex-sm-row gap-2">
+              <button class="btn cancel-btn flex-fill" type="button" (click)="cancel()">
                 <i class="bi bi-x-circle"></i> إلغاء
               </button>
 
-              <button class="btn draft-btn" type="button" (click)="saveAsDraft()">
+              <button class="btn draft-btn flex-fill" type="button" (click)="saveAsDraft()">
                 <i class="bi bi-save"></i> {{ isEditing ? 'تحديث المسودة' : 'حفظ كمسودة' }}
               </button>
 
-              <button class="btn submit-btn" type="submit">
+              <button class="btn submit-btn flex-fill" type="submit">
                 <i class="bi bi-send"></i> {{ isEditing ? 'تحديث وإرسال' : 'إرسال للمراجعة' }}
               </button>
             </div>

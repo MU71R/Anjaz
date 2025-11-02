@@ -146,7 +146,6 @@ export class DraftsComponent implements OnInit {
             this.draftActivities
           );
 
-          // إشعار عند عدم وجود مسودات
           if (this.draftActivities.length === 0) {
             Swal.fire({
               icon: 'info',

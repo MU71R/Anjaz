@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MainCriterion } from 'src/app/model/criteria';
 import { CriteriaService, SubCriteria } from 'src/app/service/criteria.service';
@@ -27,6 +33,7 @@ export class AddAchievementComponent implements OnInit {
   draftId: string = '';
   originalDraftData: any = null;
   deletedAttachments: string[] = [];
+  isMobileView = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,9 +44,19 @@ export class AddAchievementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.checkViewport();
     this.initializeForm();
     this.loadMainCriteria();
     this.checkEditMode();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.checkViewport();
+  }
+
+  private checkViewport(): void {
+    this.isMobileView = window.innerWidth < 992;
   }
 
   checkEditMode(): void {
@@ -60,21 +77,17 @@ export class AddAchievementComponent implements OnInit {
       try {
         this.originalDraftData = JSON.parse(savedDraft);
         this.populateFormWithDraftData();
-        console.log('Loaded draft data for editing:', this.originalDraftData);
       } catch (error) {
         console.error('Error parsing draft data:', error);
-        Swal.fire('خطأ', 'حدث خطأ في تحميل بيانات المسودة', 'error');
+        this.showError('حدث خطأ في تحميل بيانات المسودة');
       }
     } else {
-      console.warn('No draft data found in localStorage');
-      Swal.fire('تنبيه', 'لم يتم العثور على بيانات المسودة', 'warning');
+      this.showWarning('لم يتم العثور على بيانات المسودة');
     }
   }
 
   populateFormWithDraftData(): void {
     if (this.originalDraftData && this.form) {
-      console.log('Populating form with draft data...');
-
       this.form.patchValue({
         activityTitle: this.originalDraftData.activityTitle,
         activityDescription: this.originalDraftData.activityDescription,
@@ -92,16 +105,7 @@ export class AddAchievementComponent implements OnInit {
         Array.isArray(this.originalDraftData.Attachments)
       ) {
         this.existingAttachments = [...this.originalDraftData.Attachments];
-        console.log(
-          'Loaded existing attachments:',
-          this.existingAttachments
-        );
-        console.log(
-          'Number of attachments:',
-          this.existingAttachments.length
-        );
       } else {
-        console.warn('No attachments found in draft data');
         this.existingAttachments = [];
       }
 
@@ -117,9 +121,6 @@ export class AddAchievementComponent implements OnInit {
         this.descriptionEditor.nativeElement.innerHTML =
           this.originalDraftData.activityDescription || '';
       }
-
-      console.log('Form populated successfully');
-      console.log('Final existingAttachments:', this.existingAttachments);
     }
   }
 
@@ -147,15 +148,9 @@ export class AddAchievementComponent implements OnInit {
     this.criteriaService.getAllMainCriteria().subscribe({
       next: (res: any[]) => {
         this.mainCriteria = res;
-        console.log(' Main Criteria:', res);
       },
       error: () => {
-        Swal.fire({
-          title: 'خطأ',
-          text: 'تعذر تحميل المعايير الرئيسية من الخادم.',
-          icon: 'error',
-          confirmButtonText: 'حسناً',
-        });
+        this.showError('تعذر تحميل المعايير الرئيسية من الخادم.');
         this.mainCriteria = [];
       },
     });
@@ -183,16 +178,10 @@ export class AddAchievementComponent implements OnInit {
               : sub.mainCriteria._id;
           return mcId === mainId;
         });
-        console.log('Filtered Subcriteria:', this.subCriteria);
       },
       error: (err) => {
         console.error('Error loading sub-criteria:', err);
-        Swal.fire({
-          title: 'خطأ',
-          text: 'حدث خطأ أثناء تحميل المعايير الفرعية من الخادم.',
-          icon: 'error',
-          confirmButtonText: 'حسناً',
-        });
+        this.showError('حدث خطأ أثناء تحميل المعايير الفرعية من الخادم.');
         this.subCriteria = [];
       },
     });
@@ -226,7 +215,7 @@ export class AddAchievementComponent implements OnInit {
       this.attachments.length + files.length + this.existingAttachments.length;
 
     if (totalFiles > this.maxFiles) {
-      Swal.fire('تنبيه', `الحد الأقصى ${this.maxFiles} ملفات فقط.`, 'warning');
+      this.showWarning(`الحد الأقصى ${this.maxFiles} ملفات فقط.`);
       return;
     }
 
@@ -236,30 +225,15 @@ export class AddAchievementComponent implements OnInit {
       const allowedImage = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'];
 
       if (ext === 'pdf') {
-        Swal.fire({
-          title: 'تأكيد',
-          text: 'هل تريد حقاً إضافة ملف PDF؟',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'نعم',
-          cancelButtonText: 'لا',
-        }).then((result) => {
-          if (!result.isConfirmed) {
-            return; 
-          }
-        });
+        // يمكن إضافة تأكيد لرفع ملفات PDF إذا لزم الأمر
       }
 
       if (!(ext === 'pdf' || allowedImage.includes(ext))) {
-        Swal.fire(
-          'خطأ',
-          'نوع ملف غير مدعوم. يُسمح فقط بالصور أو PDF.',
-          'error'
-        );
+        this.showError('نوع ملف غير مدعوم. يُسمح فقط بالصور أو PDF.');
         continue;
       }
       if (sizeMB > this.maxFileSizeMB) {
-        Swal.fire('خطأ', `حجم الملف أكبر من ${this.maxFileSizeMB}MB.`, 'error');
+        this.showError(`حجم الملف أكبر من ${this.maxFileSizeMB}MB.`);
         continue;
       }
       this.attachments.push(f);
@@ -270,26 +244,21 @@ export class AddAchievementComponent implements OnInit {
 
   removeAttachment(index: number) {
     this.attachments.splice(index, 1);
-    Swal.fire('تم', 'تم حذف الملف بنجاح.', 'success');
+    this.showSuccess('تم حذف الملف بنجاح.');
   }
 
   removeExistingAttachment(index: number) {
     const attachmentToRemove = this.existingAttachments[index];
 
-    Swal.fire({
-      title: 'تأكيد الحذف',
-      text: 'هل تريد حذف هذا المرفق؟',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'نعم، احذف',
-      cancelButtonText: 'إلغاء',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.deletedAttachments.push(attachmentToRemove);
-        this.existingAttachments.splice(index, 1);
-        Swal.fire('تم', 'تم حذف الملف بنجاح.', 'success');
+    this.showConfirm('تأكيد الحذف', 'هل تريد حذف هذا المرفق؟', 'warning').then(
+      (result) => {
+        if (result.isConfirmed) {
+          this.deletedAttachments.push(attachmentToRemove);
+          this.existingAttachments.splice(index, 1);
+          this.showSuccess('تم حذف الملف بنجاح.');
+        }
       }
-    });
+    );
   }
 
   submitForReview() {
@@ -312,7 +281,7 @@ export class AddAchievementComponent implements OnInit {
     this.syncDescriptionToForm();
 
     if (this.form.get('activityTitle')?.invalid) {
-      Swal.fire('تنبيه', 'العنوان مطلوب لحفظ المسودة.', 'warning');
+      this.showWarning('العنوان مطلوب لحفظ المسودة.');
       return;
     }
 
@@ -326,14 +295,7 @@ export class AddAchievementComponent implements OnInit {
   private addNewActivity(status: string, saveStatus: string) {
     const payload = this.createFormData(status, saveStatus);
 
-    Swal.fire({
-      title: 'جاري الحفظ...',
-      text: 'يرجى الانتظار قليلاً.',
-      icon: 'info',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
+    this.showLoading('جاري الحفظ...', 'يرجى الانتظار قليلاً.');
 
     this.activityService.addActivity(payload).subscribe({
       next: () => {
@@ -341,23 +303,13 @@ export class AddAchievementComponent implements OnInit {
           saveStatus === 'مسودة'
             ? 'تم حفظ المسودة بنجاح'
             : 'تم إرسال النشاط بنجاح للمراجعة';
-        Swal.fire({
-          title: 'تم',
-          text: message,
-          icon: 'success',
-          confirmButtonText: 'حسناً',
-        }).then(() => {
+        this.showSuccess(message).then(() => {
           this.cleanupForm();
         });
       },
       error: (err) => {
         console.error('خطأ أثناء الحفظ:', err);
-        Swal.fire({
-          title: 'خطأ',
-          text: err?.error?.message || 'حدث خطأ أثناء الحفظ.',
-          icon: 'error',
-          confirmButtonText: 'حسناً',
-        });
+        this.showError(err?.error?.message || 'حدث خطأ أثناء الحفظ.');
       },
     });
   }
@@ -365,14 +317,7 @@ export class AddAchievementComponent implements OnInit {
   private updateDraft(status: string, saveStatus: string) {
     const payload = this.createFormData(status, saveStatus);
 
-    Swal.fire({
-      title: 'جاري التحديث...',
-      text: 'يرجى الانتظار قليلاً.',
-      icon: 'info',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
+    this.showLoading('جاري التحديث...', 'يرجى الانتظار قليلاً.');
 
     this.activityService.updateDraftActivity(this.draftId, payload).subscribe({
       next: (response) => {
@@ -380,23 +325,13 @@ export class AddAchievementComponent implements OnInit {
           saveStatus === 'مسودة'
             ? 'تم تحديث المسودة بنجاح'
             : 'تم إرسال النشاط بنجاح للمراجعة';
-        Swal.fire({
-          title: 'تم',
-          text: message,
-          icon: 'success',
-          confirmButtonText: 'حسناً',
-        }).then(() => {
+        this.showSuccess(message).then(() => {
           this.cleanupForm();
         });
       },
       error: (err) => {
         console.error('خطأ أثناء التحديث:', err);
-        Swal.fire({
-          title: 'خطأ',
-          text: err?.error?.message || 'حدث خطأ أثناء التحديث.',
-          icon: 'error',
-          confirmButtonText: 'حسناً',
-        });
+        this.showError(err?.error?.message || 'حدث خطأ أثناء التحديث.');
       },
     });
   }
@@ -427,11 +362,6 @@ export class AddAchievementComponent implements OnInit {
       payload.append('deletedAttachments', deletedAttachment);
     });
 
-    console.log('إرسال البيانات:');
-    console.log('مرفقات جديدة:', this.attachments.length);
-    console.log('مرفقات قديمة متبقية:', this.existingAttachments.length);
-    console.log('مرفقات محذوفة:', this.deletedAttachments.length);
-
     return payload;
   }
 
@@ -453,24 +383,19 @@ export class AddAchievementComponent implements OnInit {
     if (this.form.get('SubCriteria')?.invalid)
       errors.push('• المعيار الفرعي مطلوب');
 
-    Swal.fire({
-      title: 'بيانات ناقصة',
-      html: `يرجى ملء جميع الحقول المطلوبة:<br>${errors.join('<br>')}`,
-      icon: 'warning',
-      confirmButtonText: 'حسناً',
-    });
+    this.showWarning(
+      'بيانات ناقصة',
+      `يرجى ملء جميع الحقول المطلوبة:<br>${errors.join('<br>')}`
+    );
   }
 
   cancel() {
-    Swal.fire({
-      title: 'تأكيد الإلغاء',
-      text: 'هل تريد إلغاء العملية؟',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'نعم',
-      cancelButtonText: 'لا',
-    }).then((r) => {
-      if (r.isConfirmed) {
+    this.showConfirm(
+      'تأكيد الإلغاء',
+      'هل تريد إلغاء العملية؟',
+      'question'
+    ).then((result) => {
+      if (result.isConfirmed) {
         this.cleanupForm();
       }
     });
@@ -488,7 +413,7 @@ export class AddAchievementComponent implements OnInit {
     }
     this.attachments = [];
     this.existingAttachments = [];
-    this.deletedAttachments = []; 
+    this.deletedAttachments = [];
     this.subCriteria = [];
     this.selectedMain = '';
     this.isEditing = false;
@@ -553,18 +478,54 @@ export class AddAchievementComponent implements OnInit {
     window.open(fullUrl, '_blank');
   }
 
-  debugDraftData(): void {
-    console.log('=== DEBUG DRAFT DATA ===');
-    console.log('isEditing:', this.isEditing);
-    console.log('draftId:', this.draftId);
-    console.log('originalDraftData:', this.originalDraftData);
-    console.log('existingAttachments:', this.existingAttachments);
-    console.log('attachments:', this.attachments);
-    console.log('deletedAttachments:', this.deletedAttachments);
-    console.log('form values:', this.form.value);
-    console.log('mainCriteria:', this.mainCriteria);
-    console.log('subCriteria:', this.subCriteria);
-    console.log('selectedMain:', this.selectedMain);
-    console.log('========================');
+  private showLoading(title: string, text: string): void {
+    Swal.fire({
+      title,
+      text,
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
   }
+
+  private showSuccess(message: string): Promise<any> {
+    return Swal.fire({
+      title: 'تم',
+      text: message,
+      icon: 'success',
+      confirmButtonText: 'حسناً',
+    });
+  }
+
+  private showError(message: string): void {
+    Swal.fire({
+      title: 'خطأ',
+      text: message,
+      icon: 'error',
+      confirmButtonText: 'حسناً',
+    });
+  }
+
+  private showWarning(title: string, text?: string): void {
+    Swal.fire({
+      title,
+      text,
+      icon: 'warning',
+      confirmButtonText: 'حسناً',
+    });
+  }
+
+  private showConfirm(title: string, text: string, icon: any): Promise<any> {
+    return Swal.fire({
+      title,
+      text,
+      icon,
+      showCancelButton: true,
+      confirmButtonText: 'نعم',
+      cancelButtonText: 'إلغاء',
+    });
+  }
+
+  
 }

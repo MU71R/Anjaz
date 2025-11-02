@@ -1,4 +1,3 @@
-// src/app/components/reports/reports.component.ts
 import { Component, OnInit } from '@angular/core';
 import {
   ActivityService,
@@ -11,6 +10,7 @@ import {
   SubCriteria,
 } from '../../service/criteria.service';
 import { AdministrationService } from '../../service/user.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-reports',
@@ -35,11 +35,14 @@ export class ReportsComponent implements OnInit {
 
   generatedReport: any = null;
   pdfFiles: PDFFile[] = [];
+  selectedPDF: PDFFile | null = null;
 
   mainCriteriaList: MainCriteria[] = [];
   subCriteriaList: SubCriteria[] = [];
   allSubCriteria: SubCriteria[] = [];
   usersList: any[] = [];
+  showReportResults = false;
+  showPreviousReports = true;
 
   constructor(
     private activityService: ActivityService,
@@ -59,26 +62,35 @@ export class ReportsComponent implements OnInit {
     this.showFilters = !this.showFilters;
   }
 
+  toggleReportResults(): void {
+    this.showReportResults = !this.showReportResults;
+    if (this.showReportResults) {
+      this.scrollToElement('report-results');
+    }
+  }
+
+  togglePreviousReports(): void {
+    this.showPreviousReports = !this.showPreviousReports;
+  }
+
   loadFilterData() {
-    // تحميل المعايير الرئيسية
     this.criteriaService.getAllMainCriteria().subscribe({
       next: (mainCriteria: MainCriteria[]) => {
         this.mainCriteriaList = mainCriteria || [];
       },
       error: (err: any) => {
-        console.error('❌ خطأ في تحميل المعايير الرئيسية:', err);
+        console.error('خطأ في تحميل المعايير الرئيسية:', err);
         this.showError('فشل في تحميل المعايير الرئيسية');
       },
     });
 
-    // تحميل جميع المعايير الفرعية
     this.criteriaService.getAllSubCriteria().subscribe({
       next: (subCriteria: SubCriteria[]) => {
         this.allSubCriteria = subCriteria || [];
         this.subCriteriaList = [];
       },
       error: (err: any) => {
-        console.error('❌ خطأ في تحميل المعايير الفرعية:', err);
+        console.error('خطأ في تحميل المعايير الفرعية:', err);
         this.showError('فشل في تحميل المعايير الفرعية');
       },
     });
@@ -97,7 +109,7 @@ export class ReportsComponent implements OnInit {
       },
       error: (error) => {
         this.isLoadingPDFs = false;
-        console.error('❌ خطأ في تحميل ملفات PDF:', error);
+        console.error('خطأ في تحميل ملفات PDF:', error);
         this.showError('حدث خطأ أثناء تحميل التقارير السابقة');
       },
     });
@@ -112,8 +124,6 @@ export class ReportsComponent implements OnInit {
           return sub.mainCriteria === this.filters.MainCriteria;
         }
       });
-
-      // إعادة تعيين المعيار الفرعي إذا لم يكن متوافقاً
       if (this.filters.SubCriteria) {
         const exists = this.subCriteriaList.some(
           (sub: SubCriteria) => sub._id === this.filters.SubCriteria
@@ -151,12 +161,20 @@ export class ReportsComponent implements OnInit {
     return true;
   }
 
-  generateReport() {
+  async generateReport() {
     if (this.hasEmptyFilters()) {
-      const confirmGenerate = confirm(
-        'لم تقم بتحديد أي فلاتر. هذا سيولد تقريراً بجميع الأنشطة.\nهل تريد المتابعة؟'
-      );
-      if (!confirmGenerate) {
+      const result = await Swal.fire({
+        title: 'تأكيد',
+        text: 'لم تقم بتحديد أي فلاتر. هذا سيولد تقريراً بجميع الأنشطة.\nهل تريد المتابعة؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، المتابعة',
+        cancelButtonText: 'إلغاء',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+      });
+
+      if (!result.isConfirmed) {
         return;
       }
     }
@@ -174,13 +192,15 @@ export class ReportsComponent implements OnInit {
         if (response.success && response.file) {
           this.showSuccess('تم إنشاء التقرير بنجاح!');
           this.loadAllPDFs();
+          this.showReportResults = true;
+          this.scrollToElement('report-results');
         } else {
           this.showError(response.message || 'فشل في إنشاء التقرير');
         }
       },
       error: (error: any) => {
         this.isLoading = false;
-        console.error('❌ خطأ في إنشاء التقرير:', error);
+        console.error('خطأ في إنشاء التقرير:', error);
         this.showError('حدث خطأ أثناء إنشاء التقرير');
       },
     });
@@ -325,7 +345,7 @@ export class ReportsComponent implements OnInit {
         } else if (res && Array.isArray(res.data)) {
           this.usersList = res.data;
         } else {
-          console.error('❌ هيكل الاستجابة غير متوقع:', res);
+          console.error('هيكل الاستجابة غير متوقع:', res);
           return;
         }
 
@@ -334,7 +354,7 @@ export class ReportsComponent implements OnInit {
         );
       },
       error: (err: any) => {
-        console.error('❌ خطأ في تحميل المستخدمين:', err);
+        console.error('خطأ في تحميل المستخدمين:', err);
         this.showError('فشل في تحميل قائمة المستخدمين');
       },
     });
@@ -372,13 +392,34 @@ export class ReportsComponent implements OnInit {
     return parts.join(' | ') || 'جميع الأنشطة بدون فلاتر';
   }
 
+  private scrollToElement(elementId: string) {
+    setTimeout(() => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+
   private showSuccess(message: string) {
-    console.log('✅ ' + message);
-    alert(message);
+    console.log(message);
+    Swal.fire({
+      title: 'نجح!',
+      text: message,
+      icon: 'success',
+      confirmButtonText: 'حسناً',
+      confirmButtonColor: '#3085d6',
+    });
   }
 
   private showError(message: string) {
-    console.error('❌ ' + message);
-    alert('خطأ: ' + message);
+    console.error(message);
+    Swal.fire({
+      title: 'خطأ!',
+      text: message,
+      icon: 'error',
+      confirmButtonText: 'حسناً',
+      confirmButtonColor: '#d33',
+    });
   }
 }

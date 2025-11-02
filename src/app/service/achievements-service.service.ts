@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, tap, throwError, catchError } from 'rxjs';
 import { Activity } from '../model/achievement';
-
-// تعريف واجهة PDF
 export interface PDFFile {
   _id: string;
   userId: {
@@ -29,27 +27,24 @@ export class ActivityService {
     const token =
       localStorage.getItem('token') || localStorage.getItem('authToken');
 
-    console.log('🔐 Token being used:', token ? 'Exists' : 'Missing');
+    console.log('Token being used:', token ? 'Exists' : 'Missing');
 
     let headers = new HttpHeaders();
     if (token) {
-      // بدون Bearer - إرسال التوكن كما هو
       headers = headers.set('Authorization', token);
     }
     return headers;
   }
 
-  // دالة جلب جميع ملفات PDF - محدثة
   getAllPDFs(): Observable<{ success: boolean; pdfFiles: PDFFile[] }> {
     const headers = this.getAuthHeaders();
 
-    // التحقق من وجود التوكن
     if (!headers.has('Authorization')) {
-      console.error('❌ No token found for getAllPDFs');
+      console.error('No token found for getAllPDFs');
       return throwError(() => new Error('لم يتم العثور على توكن المصادقة'));
     }
 
-    console.log('🔐 Headers for getAllPDFs:', headers);
+    console.log('Headers for getAllPDFs:', headers);
 
     return this.http
       .get<{ success: boolean; pdfFiles: PDFFile[] }>(
@@ -59,9 +54,9 @@ export class ActivityService {
         }
       )
       .pipe(
-        tap((response) => console.log('📄 PDFs Response:', response)),
+        tap((response) => console.log('PDFs Response:', response)),
         catchError((error) => {
-          console.error('❌ PDFs Error:', error);
+          console.error('PDFs Error:', error);
           if (error.status === 401) {
             this.handleUnauthorized();
           }
@@ -71,18 +66,16 @@ export class ActivityService {
   }
 
   private handleUnauthorized(): void {
-    console.warn('⚠️ Unauthorized access - clearing storage');
+    console.warn('Unauthorized access - clearing storage');
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
 
-    // إعادة توجيه إلى صفحة login
     setTimeout(() => {
       window.location.href = '/login';
     }, 1000);
   }
 
-  // باقي الدوال مع إضافة معالجة الأخطاء
   addActivity(data: FormData): Observable<any> {
     return this.http
       .post<any>(`${this.API_BASE_URL}/add`, data, {
@@ -90,7 +83,7 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ Add Activity Error:', error);
+          console.error('Add Activity Error:', error);
           return throwError(() => error);
         })
       );
@@ -104,7 +97,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Get All Activities Error:', error);
+          console.error('Get All Activities Error:', error);
           return throwError(() => error);
         })
       );
@@ -118,7 +111,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Get Activity By ID Error:', error);
+          console.error('Get Activity By ID Error:', error);
           return throwError(() => error);
         })
       );
@@ -138,7 +131,7 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ Update Activity Error:', error);
+          console.error('Update Activity Error:', error);
           return throwError(() => error);
         })
       );
@@ -158,7 +151,7 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ Update Draft Activity Error:', error);
+          console.error('Update Draft Activity Error:', error);
           return throwError(() => error);
         })
       );
@@ -172,7 +165,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Delete Activity Error:', error);
+          console.error('Delete Activity Error:', error);
           return throwError(() => error);
         })
       );
@@ -186,7 +179,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Delete Draft Error:', error);
+          console.error('Delete Draft Error:', error);
           return throwError(() => error);
         })
       );
@@ -201,7 +194,7 @@ export class ActivityService {
       .pipe(
         tap((res) => console.log('[Service] Drafts:', res)),
         catchError((error) => {
-          console.error('❌ Get Drafts Error:', error);
+          console.error('Get Drafts Error:', error);
           return throwError(() => error);
         })
       );
@@ -217,7 +210,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Get Draft By ID Error:', error);
+          console.error('Get Draft By ID Error:', error);
           return throwError(() => error);
         })
       );
@@ -231,7 +224,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Get Archived Error:', error);
+          console.error('Get Archived Error:', error);
           return throwError(() => error);
         })
       );
@@ -246,7 +239,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Search Error:', error);
+          console.error('Search Error:', error);
           return throwError(() => error);
         })
       );
@@ -263,7 +256,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Filter By Status Error:', error);
+          console.error('Filter By Status Error:', error);
           return throwError(() => error);
         })
       );
@@ -282,7 +275,7 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ Get Recent Achievements Error:', error);
+          console.error('Get Recent Achievements Error:', error);
           return throwError(() => error);
         })
       );
@@ -309,7 +302,7 @@ export class ActivityService {
       )
       .pipe(
         catchError((error) => {
-          console.error('❌ Update Status Error:', error);
+          console.error('Update Status Error:', error);
           return throwError(() => error);
         })
       );
@@ -340,13 +333,12 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ Get User Stats Error:', error);
+          console.error('Get User Stats Error:', error);
           return throwError(() => error);
         })
       );
   }
 
-  // دالة viewPDF المعدلة
   viewPDF(filename: string): Observable<Blob> {
     const url = `${this.API_BASE_URL}/view-pdf/${filename}`;
     const headers = this.getAuthHeaders();
@@ -357,37 +349,30 @@ export class ActivityService {
       })
       .pipe(
         catchError((error) => {
-          console.error('❌ View PDF Error:', error);
+          console.error('View PDF Error:', error);
           return throwError(() => error);
         })
       );
   }
 
-  // دالة لفتح PDF في نافذة جديدة
   openPDF(filename: string): void {
     const token =
       localStorage.getItem('token') || localStorage.getItem('authToken');
     const url = `${this.API_BASE_URL}/view-pdf/${filename}`;
 
     if (token) {
-      // إنشاء iframe لتحميل PDF مع الهيدر
       const iframe = document.createElement('iframe');
       iframe.src = url;
       iframe.style.display = 'none';
 
       document.body.appendChild(iframe);
-
-      // فتح في نافذة جديدة
       window.open(url, '_blank');
-
-      // تنظيف iframe بعد ثانية
       setTimeout(() => {
         document.body.removeChild(iframe);
       }, 1000);
     }
   }
 
-  // دالة لتحميل PDF
   downloadPDF(filename: string, customName?: string): void {
     this.viewPDF(filename).subscribe(
       (blob: Blob) => {
@@ -405,22 +390,16 @@ export class ActivityService {
     );
   }
 
-  // تنظيف الوصف للعرض
   cleanDescriptionForDisplay(description: string): string {
     if (!description) return '';
-
-    // إذا كان النص يحتوي على HTML، نظفه
     if (description.includes('<') && description.includes('>')) {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = description;
       return tempDiv.textContent || tempDiv.innerText || description;
     }
-
-    // إذا كان نصاً عادياً، أرجع كما هو
     return description;
   }
 
-  // دالة إنشاء تقرير PDF
   generateAllActivitiesPDF(filters?: any): Observable<{
     success: boolean;
     message: string;
@@ -447,27 +426,22 @@ export class ActivityService {
       )
       .pipe(
         tap((response) => {
-          // معالجة الرابط لتصحيح مشكلة الترميز
           if (response.success && response.file) {
             response.file = this.fixArabicUrl(response.file);
           }
         }),
         catchError((error) => {
-          console.error('❌ Generate PDF Error:', error);
+          console.error('Generate PDF Error:', error);
           return throwError(() => error);
         })
       );
   }
 
-  // دالة لتصحيح الروابط العربية
   private fixArabicUrl(url: string): string {
     try {
-      // إذا كان الرابط يحتوي على ترميز مزدوج، نصلحه
       if (url.includes('%25')) {
         return decodeURIComponent(url);
       }
-
-      // إذا كان الرابط يحتوي على أحرف عربية، نستخدم decodeURI مرة واحدة
       if (url.includes('%')) {
         return decodeURI(url);
       }
@@ -479,7 +453,6 @@ export class ActivityService {
     }
   }
 
-  // دالة مساعدة لاستخراج اسم الملف من URL
   extractFilenameFromUrl(url: string): string {
     if (!url) return 'report.pdf';
 
@@ -492,16 +465,12 @@ export class ActivityService {
     }
   }
 
-  // دالة لمعالجة وعرض PDF بعد التوليد
   handleGeneratedPDF(pdfResponse: any): void {
     if (pdfResponse.success && pdfResponse.file) {
       const filename = this.extractFilenameFromUrl(pdfResponse.file);
-
-      // عرض خيارات للمستخدم
       if (confirm('تم إنشاء التقرير بنجاح. هل تريد فتحه الآن؟')) {
         this.openPDF(filename);
       } else {
-        // تحميل مباشر
         this.downloadPDF(
           filename,
           `تقرير_الانجازات_${new Date().toISOString().split('T')[0]}.pdf`

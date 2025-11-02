@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import * as ioClient from 'socket.io-client'; // ✅ استيراد بالطريقة القديمة
+import * as ioClient from 'socket.io-client'; 
 
-// في socket.service.ts أو notification.service.ts
 export interface Notification {
   id: string;
   title: string;
   message: string;
   type: 'success' | 'warning' | 'error' | 'info';
   timestamp: Date;
-  read?: boolean; // إضافة الحقل read كاختياري
+  read?: boolean; 
   userId?: string;
   actionUrl?: string;
 }
@@ -18,7 +17,7 @@ export interface Notification {
 })
 export class SocketService {
   private socket: any;
-  private readonly apiUrl = 'http://localhost:3000'; // استخدم بورت السيرفر الحقيقي
+  private readonly apiUrl = 'http://localhost:3000'; 
 
   constructor() {
     this.socket = ioClient.connect(this.apiUrl, {

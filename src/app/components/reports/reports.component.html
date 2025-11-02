@@ -1,9 +1,7 @@
-<!-- src/app/components/reports/reports.component.html -->
 <div class="reports-layout" dir="rtl">
     <app-sidebar class="sidebar"></app-sidebar>
 
     <div class="reports-content">
-        <!-- الهيدر -->
         <header class="reports-header">
             <div class="header-content">
                 <div class="header-text">
@@ -19,7 +17,6 @@
             </div>
         </header>
 
-        <!-- بطاقة الفلاتر -->
         <div class="card filter-card" [class.expanded]="showFilters">
             <div class="card-header">
                 <h5><i class="fas fa-sliders-h"></i> فلاتر التقرير</h5>
@@ -32,7 +29,6 @@
 
             <div class="card-body" *ngIf="showFilters">
                 <div class="row">
-                    <!-- تاريخ البداية -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">من تاريخ</label>
@@ -44,7 +40,6 @@
                         </div>
                     </div>
 
-                    <!-- تاريخ النهاية -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">إلى تاريخ</label>
@@ -56,7 +51,6 @@
                         </div>
                     </div>
 
-                    <!-- المعيار الرئيسي -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">المعيار الرئيسي</label>
@@ -73,7 +67,6 @@
                         </div>
                     </div>
 
-                    <!-- المعيار الفرعي -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">المعيار الفرعي</label>
@@ -90,7 +83,6 @@
                         </div>
                     </div>
 
-                    <!-- المستخدم -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">المستخدم</label>
@@ -106,7 +98,6 @@
                         </div>
                     </div>
 
-                    <!-- الحالة -->
                     <div class="col-lg-3 col-md-6">
                         <div class="form-group">
                             <label class="form-label">حالة النشاط</label>
@@ -123,14 +114,11 @@
                     </div>
                 </div>
 
-                <!-- رسالة التحقق -->
                 <div *ngIf="showDateError" class="alert alert-danger mt-3">
                     <i class="fas fa-exclamation-triangle"></i>
                     تاريخ البداية يجب أن يكون قبل تاريخ النهاية
                 </div>
 
-                <!-- زر إنشاء التقرير -->
-                <!-- تحديث قسم زر إنشاء التقرير فقط -->
                 <div class="generate-report-section">
                     <button class="btn btn-primary btn-generate" (click)="generateReportWithValidation()"
                         [disabled]="isLoading || showDateError">
@@ -149,15 +137,18 @@
             </div>
         </div>
 
-        <!-- نتائج التقرير -->
-        <div *ngIf="generatedReport" class="card result-card">
+        <div id="report-results" class="card result-card" *ngIf="generatedReport">
             <div class="card-header">
                 <h5><i class="fas fa-clipboard-check"></i> نتائج التقرير</h5>
-                <button class="btn btn-sm btn-close" (click)="generatedReport = null">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="toggleReportResults()">
+                        <i class="fas" [class.fa-chevron-up]="showReportResults" [class.fa-chevron-down]="!showReportResults"></i>
+                        {{ showReportResults ? 'إخفاء' : 'عرض' }}
+                    </button>
+                </div>
             </div>
-            <div class="card-body">
+            
+            <div class="card-body" *ngIf="showReportResults">
                 <div *ngIf="generatedReport.success" class="report-success">
                     <div class="success-icon">
                         <i class="fas fa-check-circle"></i>
@@ -175,7 +166,6 @@
                             </div>
                         </div>
 
-                        <!-- خيارات التحميل -->
                         <div class="download-section">
                             <h6>خيارات التحميل:</h6>
                             <div class="download-options">
@@ -191,7 +181,6 @@
                             </div>
                         </div>
 
-                        <!-- رابط التقرير -->
                         <div class="report-link-container">
                             <label>رابط التقرير:</label>
                             <div class="link-box">
@@ -219,16 +208,19 @@
             </div>
         </div>
 
-        <!-- قسم ملفات PDF السابقة -->
         <div class="card previous-reports-card">
             <div class="card-header">
                 <h5><i class="fas fa-history"></i> التقارير السابقة</h5>
-                <button class="btn btn-sm btn-outline-primary" (click)="loadAllPDFs()" [disabled]="isLoadingPDFs">
-                    <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingPDFs"></i>
-                    تحديث
-                </button>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="togglePreviousReports()">
+                        <i class="fas" [class.fa-chevron-up]="showPreviousReports" [class.fa-chevron-down]="!showPreviousReports"></i>
+                        {{ showPreviousReports ? 'إخفاء' : 'عرض' }}
+                    </button>
+                    
+                </div>
             </div>
-            <div class="card-body">
+            
+            <div class="card-body" *ngIf="showPreviousReports">
                 <div *ngIf="isLoadingPDFs" class="loading-pdfs">
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">جاري التحميل...</span>
@@ -247,7 +239,6 @@
                             <thead>
                                 <tr>
                                     <th>المستخدم</th>
-                                    <th>رابط التقرير</th>
                                     <th>تاريخ الإنشاء</th>
                                     <th>الإجراءات</th>
                                 </tr>
@@ -260,11 +251,6 @@
                                             <div class="user-details">
                                                 <strong>{{ pdf.userId?.fullname || 'مستخدم غير معروف' }}</strong>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="pdf-link">
-                                            <code class="url-text">{{ getShortUrl(pdf.pdfurl) }}</code>
                                         </div>
                                     </td>
                                     <td>
@@ -282,10 +268,6 @@
                                             <button class="btn btn-sm btn-outline-primary"
                                                 (click)="downloadPDF(pdf.pdfurl)" title="تحميل التقرير">
                                                 <i class="fas fa-download"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary"
-                                                (click)="copyPDFLink(pdf.pdfurl)" title="نسخ الرابط">
-                                                <i class="fas fa-copy"></i>
                                             </button>
                                         </div>
                                     </td>

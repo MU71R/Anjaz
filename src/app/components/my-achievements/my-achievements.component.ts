@@ -20,8 +20,6 @@ export class MyAchievementsComponent implements OnInit {
   showRejectModal = false;
   showImageModal = false;
   selectedImage = '';
-
-  // متغير للتحقق من صلاحية المسؤول
   isAdmin = false;
   currentUser: any = null;
 
@@ -32,15 +30,12 @@ export class MyAchievementsComponent implements OnInit {
     this.checkAdminRole();
   }
 
-  // دالة محسنة للتحقق من صلاحية المسؤول
   checkAdminRole(): void {
     try {
-      // الطريقة 1: من token الموجود في localStorage
       const token =
         localStorage.getItem('token') || localStorage.getItem('authToken');
 
       if (token) {
-        // فك تشفير الـ token (إذا كان JWT)
         const tokenPayload = this.decodeToken(token);
         if (tokenPayload) {
           this.currentUser = tokenPayload;
@@ -50,7 +45,6 @@ export class MyAchievementsComponent implements OnInit {
         }
       }
 
-      // الطريقة 2: من user data في localStorage
       const userData = localStorage.getItem('user');
       if (userData) {
         const user = JSON.parse(userData);
@@ -59,7 +53,6 @@ export class MyAchievementsComponent implements OnInit {
         return;
       }
 
-      // إذا لم يتم العثور على بيانات المستخدم
       this.isAdmin = false;
       console.warn('لم يتم العثور على بيانات المستخدم أو token');
     } catch (error) {
@@ -68,10 +61,8 @@ export class MyAchievementsComponent implements OnInit {
     }
   }
 
-  // دالة لفك تشفير JWT token
   private decodeToken(token: string): any {
     try {
-      // إذا كان token يحتوي على ثلاثة أجزاء (JWT)
       if (token.split('.').length === 3) {
         const payload = token.split('.')[1];
         const decodedPayload = atob(
@@ -103,12 +94,10 @@ export class MyAchievementsComponent implements OnInit {
     });
   }
 
-  // دالة لتنظيف وصف الإنجاز من HTML
   getCleanDescription(description: string): string {
     return this.activityService.cleanDescriptionForDisplay(description);
   }
 
-  // دالة للحصول على وصف مختصر مع التنظيف
   getShortDescription(description: string, length: number = 50): string {
     const cleanDescription = this.getCleanDescription(
       description || 'لا يوجد وصف'
@@ -175,7 +164,6 @@ export class MyAchievementsComponent implements OnInit {
     id: string,
     status: 'معتمد' | 'قيد المراجعة' | 'مرفوض'
   ): void {
-    // تحقق إضافي من الصلاحية قبل التنفيذ
     if (!this.isAdmin) {
       Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
       return;
@@ -196,7 +184,6 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   openRejectModal(activity: Activity): void {
-    // تحقق من الصلاحية قبل فتح نافذة الرفض
     if (!this.isAdmin) {
       Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
       return;
@@ -213,7 +200,6 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   submitRejection(): void {
-    // تحقق إضافي من الصلاحية قبل التنفيذ
     if (!this.isAdmin) {
       Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
       return;
@@ -238,7 +224,6 @@ export class MyAchievementsComponent implements OnInit {
   }
 
   deleteActivity(id: string): void {
-    // تحقق من الصلاحية قبل الحذف
     if (!this.isAdmin) {
       Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
       return;

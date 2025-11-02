@@ -1,6 +1,5 @@
-/* ===== التصميم العام ===== */
 .dashboard-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #f8fbff 0%, #e6f0ff 100%);
   min-height: 100vh;
 }
 
@@ -11,17 +10,16 @@
 
 .sidebar-section {
   width: 280px;
-  background: #fff;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 20px rgba(30, 58, 138, 0.15);
 }
 
 .main-content {
   flex: 1;
   padding: 24px;
   overflow-x: hidden;
+  background: #f8fbff;
 }
 
-/* تنسيقات header actions */
 .header-actions {
   display: flex;
   align-items: center;
@@ -36,14 +34,17 @@
   border-radius: 8px;
   font-weight: 600;
   transition: all 0.3s ease;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
 }
 
 .add-achievement-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
 }
 
-/* تنسيقات responsive */
 @media (max-width: 768px) {
   .header-actions {
     flex-direction: column;
@@ -57,13 +58,12 @@
   }
 }
 
-/* ===== الهيدر ===== */
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 8px 32px rgba(30, 64, 175, 0.2);
   color: white;
   position: relative;
   overflow: hidden;
@@ -93,18 +93,23 @@
   font-weight: 800;
   margin-bottom: 8px;
   font-size: 2rem;
+  color: white;
 }
 
 .welcome-message {
   opacity: 0.9;
   margin-bottom: 12px;
   font-size: 1.1rem;
+  color: #e0f2fe;
 }
 
 .user-role-badge .badge {
   font-size: 0.8rem;
   padding: 8px 16px;
   border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .add-achievement-btn {
@@ -124,47 +129,56 @@
   box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
 }
 
-/* ===== الإحصائيات ===== */
 .stats-section {
   margin-bottom: 30px;
 }
 
 .stat-card {
-  background: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
   border-radius: 16px;
   padding: 24px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(30, 64, 175, 0.08);
   transition: all 0.3s ease;
   height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  border: 1px solid #e0f2fe;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 4px;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 30px rgba(30, 64, 175, 0.15);
 }
 
-.stat-card.total {
-  border-right: 4px solid #007bff;
+.stat-card.total::before {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
 }
 
-.stat-card.pending {
-  border-right: 4px solid #ffc107;
+.stat-card.pending::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
 
-.stat-card.approved {
-  border-right: 4px solid #28a745;
+.stat-card.approved::before {
+  background: linear-gradient(90deg, #10b981, #34d399);
 }
 
-.stat-card.rejected {
-  border-right: 4px solid #dc3545;
+.stat-card.rejected::before {
+  background: linear-gradient(90deg, #ef4444, #f87171);
 }
 
-.stat-card.draft {
-  border-right: 4px solid #6c757d;
+.stat-card.draft::before {
+  background: linear-gradient(90deg, #6b7280, #9ca3af);
 }
 
 .card-icon {
@@ -179,67 +193,65 @@
 }
 
 .stat-card.total .card-icon {
-  background: rgba(0, 123, 255, 0.1);
-  color: #007bff;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: #2563eb;
 }
 
 .stat-card.pending .card-icon {
-  background: rgba(255, 193, 7, 0.1);
-  color: #ffc107;
+  background: linear-gradient(135deg, #fef3c7, #fffbeb);
+  color: #f59e0b;
 }
 
 .stat-card.approved .card-icon {
-  background: rgba(40, 167, 69, 0.1);
-  color: #28a745;
+  background: linear-gradient(135deg, #d1fae5, #ecfdf5);
+  color: #10b981;
 }
 
 .stat-card.rejected .card-icon {
-  background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  background: linear-gradient(135deg, #fee2e2, #fef2f2);
+  color: #ef4444;
 }
 
 .stat-card.draft .card-icon {
-  background: rgba(108, 117, 125, 0.1);
-  color: #6c757d;
+  background: linear-gradient(135deg, #f3f4f6, #f9fafb);
+  color: #6b7280;
 }
 
 .stat-label {
-  color: #6c757d;
+  color: #64748b;
   font-size: 0.9rem;
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .stat-value {
-  color: #2c3e50;
+  color: #1e293b;
   font-weight: 800;
   margin-bottom: 4px;
   font-size: 2.2rem;
 }
 
 .stat-subtext {
-  color: #adb5bd;
+  color: #94a3b8;
   font-size: 0.8rem;
 }
 
-/* ===== بطاقة السجل الزمني ===== */
 .section-card {
-  background: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
   border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 40px rgba(30, 64, 175, 0.1);
   margin-bottom: 30px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  border: 1px solid #e0f2fe;
 }
 
 .card-header {
   padding: 24px 30px;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, #f8fbff 0%, #f1f5f9 100%);
 }
 
 .header-title-section {
@@ -249,7 +261,7 @@
 }
 
 .card-title {
-  color: #2c3e50;
+  color: #1e293b;
   font-weight: 800;
   margin: 0;
   display: flex;
@@ -258,7 +270,7 @@
 }
 
 .achievements-count {
-  background: #007bff;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -270,13 +282,22 @@
   border-radius: 10px;
   padding: 8px 16px;
   font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  transition: all 0.3s ease;
+}
+
+.header-actions .btn:hover {
+  background: #f8fbff;
+  border-color: #3b82f6;
+  color: #2563eb;
 }
 
 .card-body {
   padding: 0;
 }
 
-/* ===== حالات التحميل والفراغ ===== */
 .loading-state {
   padding: 60px 30px;
   text-align: center;
@@ -290,7 +311,7 @@
 }
 
 .loading-text {
-  color: #6c757d;
+  color: #64748b;
   font-weight: 600;
 }
 
@@ -301,17 +322,17 @@
 
 .empty-icon {
   margin-bottom: 20px;
-  color: #dee2e6;
+  color: #cbd5e1;
 }
 
 .empty-title {
-  color: #6c757d;
+  color: #64748b;
   font-weight: 700;
   margin-bottom: 10px;
 }
 
 .empty-description {
-  color: #adb5bd;
+  color: #94a3b8;
   margin-bottom: 25px;
 }
 
@@ -319,9 +340,17 @@
   border-radius: 12px;
   padding: 12px 24px;
   font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
 }
 
-/* ===== الخط الزمني ===== */
+.empty-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
 .achievements-timeline {
   padding: 30px;
 }
@@ -354,33 +383,33 @@
   font-size: 1.2rem;
   color: white;
   z-index: 2;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
 }
 
 .status-approved .marker-icon {
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #10b981, #34d399);
 }
 
 .status-rejected .marker-icon {
-  background: linear-gradient(135deg, #dc3545, #e83e8c);
+  background: linear-gradient(135deg, #ef4444, #f87171);
 }
 
 .status-pending .marker-icon {
-  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
 }
 
 .status-new .marker-icon {
-  background: linear-gradient(135deg, #007bff, #6f42c1);
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
 }
 
 .status-default .marker-icon {
-  background: linear-gradient(135deg, #6c757d, #adb5bd);
+  background: linear-gradient(135deg, #6b7280, #9ca3af);
 }
 
 .timeline-line {
   width: 3px;
   flex: 1;
-  background: linear-gradient(to bottom, #e9ecef, transparent);
+  background: linear-gradient(to bottom, #e2e8f0, transparent);
   margin: 10px 0;
   border-radius: 2px;
 }
@@ -389,28 +418,44 @@
   flex: 1;
 }
 
-/* ===== بطاقة الإنجاز ===== */
 .achievement-card {
-  background: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
   border-radius: 16px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f1f3f4;
+  box-shadow: 0 4px 25px rgba(30, 64, 175, 0.08);
+  border: 1px solid #f1f5f9;
   overflow: hidden;
   transition: all 0.3s ease;
+  position: relative;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(180deg, #3b82f6, #60a5fa);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .achievement-card:hover {
   transform: translateX(-5px);
-  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 35px rgba(30, 64, 175, 0.15);
+}
+
+.achievement-card:hover::before {
+  opacity: 1;
 }
 
 .achievement-header {
   padding: 20px 25px;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid #f8fafc;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fafbff 0%, #f8fafc 100%);
   flex-wrap: wrap;
   gap: 15px;
 }
@@ -425,30 +470,34 @@
 }
 
 .type-new {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: #1e40af;
+  border: 1px solid #dbeafe;
 }
 
 .type-update {
-  background: #fff3e0;
-  color: #f57c00;
+  background: linear-gradient(135deg, #fef3c7, #fffbeb);
+  color: #b45309;
+  border: 1px solid #fef3c7;
 }
 
 .type-delete {
-  background: #ffebee;
-  color: #d32f2f;
+  background: linear-gradient(135deg, #fee2e2, #fef2f2);
+  color: #b91c1c;
+  border: 1px solid #fee2e2;
 }
 
 .type-default {
-  background: #f5f5f5;
-  color: #616161;
+  background: linear-gradient(135deg, #f3f4f6, #f9fafb);
+  color: #4b5563;
+  border: 1px solid #f3f4f6;
 }
 
 .achievement-meta-info {
   display: flex;
   gap: 20px;
   font-size: 0.85rem;
-  color: #6c757d;
+  color: #64748b;
 }
 
 .achievement-meta-info span {
@@ -456,7 +505,6 @@
   align-items: center;
 }
 
-/* ===== جسم البطاقة ===== */
 .achievement-body {
   padding: 25px;
 }
@@ -467,20 +515,22 @@
   gap: 15px;
   margin-bottom: 20px;
   padding: 15px;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 12px;
+  border: 1px solid #f1f5f9;
 }
 
 .user-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
 }
 
 .user-details {
@@ -490,16 +540,15 @@
 
 .user-name {
   font-weight: 700;
-  color: #2c3e50;
+  color: #1e293b;
   margin-bottom: 4px;
 }
 
 .user-action {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: #64748b;
 }
 
-/* ===== تفاصيل الإنجاز ===== */
 .achievement-details {
   display: flex;
   flex-direction: column;
@@ -513,50 +562,57 @@
   align-items: flex-start;
   gap: 12px;
   padding: 12px;
-  background: #fafbfc;
+  background: linear-gradient(135deg, #fafbff 0%, #f8fafc 100%);
   border-radius: 10px;
-  border-right: 3px solid #e9ecef;
+  border-right: 3px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.activity-title-section:hover,
+.activity-standard-section:hover,
+.activity-indicator-section:hover {
+  border-right-color: #3b82f6;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .detail-label {
   display: flex;
   align-items: center;
   font-weight: 700;
-  color: #495057;
+  color: #475569;
   min-width: 80px;
   font-size: 0.9rem;
 }
 
 .detail-value {
   flex: 1;
-  color: #2c3e50;
+  color: #1e293b;
   line-height: 1.5;
 }
 
 .title-value {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: #1e293b;
 }
 
 .standard-value {
   font-weight: 600;
-  color: #495057;
+  color: #475569;
 }
 
 .indicator-value {
-  color: #6c757d;
+  color: #64748b;
   font-style: italic;
 }
 
-/* ===== تذييلة البطاقة ===== */
 .achievement-footer {
   padding: 20px 25px;
-  border-top: 1px solid #f8f9fa;
+  border-top: 1px solid #f8fafc;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fafbfc;
+  background: linear-gradient(135deg, #fafbff 0%, #f8fafc 100%);
   flex-wrap: wrap;
   gap: 15px;
 }
@@ -566,51 +622,56 @@
   border-radius: 20px;
   font-weight: 700;
   font-size: 0.8rem;
+  border: 1px solid;
 }
 
 .badge-success {
-  background: #d4edda;
-  color: #155724;
+  background: linear-gradient(135deg, #d1fae5, #ecfdf5);
+  color: #065f46;
+  border-color: #a7f3d0;
 }
 
 .badge-danger {
-  background: #f8d7da;
-  color: #721c24;
+  background: linear-gradient(135deg, #fee2e2, #fef2f2);
+  color: #991b1b;
+  border-color: #fca5a5;
 }
 
 .badge-warning {
-  background: #fff3cd;
-  color: #856404;
+  background: linear-gradient(135deg, #fef3c7, #fffbeb);
+  color: #92400e;
+  border-color: #fcd34d;
 }
 
 .badge-primary {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: #1e40af;
+  border-color: #93c5fd;
 }
 
 .badge-secondary {
-  background: #e2e3e5;
-  color: #383d41;
+  background: linear-gradient(135deg, #f3f4f6, #f9fafb);
+  color: #374151;
+  border-color: #d1d5db;
 }
 
 .achievement-id {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: #64748b;
   font-family: 'Courier New', monospace;
-  background: #fff;
+  background: #ffffff;
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e2e8f0;
 }
 
-/* ===== الفوتر ===== */
 .dashboard-footer {
   text-align: center;
   padding: 25px;
   margin-top: 50px;
-  color: #6c757d;
-  border-top: 1px solid #e9ecef;
-  background: #f8f9fa;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 16px;
 }
 
@@ -622,7 +683,6 @@
   font-weight: 600;
 }
 
-/* ===== التجاوب ===== */
 @media (max-width: 768px) {
   .dashboard-layout {
     flex-direction: column;
@@ -687,7 +747,6 @@
   }
 }
 
-/* ===== شريط التمرير ===== */
 .achievements-timeline {
   max-height: 600px;
   overflow-y: auto;
@@ -698,15 +757,15 @@
 }
 
 .achievements-timeline::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f5f9;
   border-radius: 4px;
 }
 
 .achievements-timeline::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
   border-radius: 4px;
 }
 
 .achievements-timeline::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: linear-gradient(135deg, #94a3b8, #64748b);
 }

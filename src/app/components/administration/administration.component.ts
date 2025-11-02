@@ -17,14 +17,10 @@ export class AdministrationComponent implements OnInit {
 
   searchTerm = '';
   selectedSector = '';
-
-  // ====== MODALS CONTROL ======
   showAddDepartmentModal = false;
   showEditUserModal = false;
   showSectorForm = false;
   showPassword = false;
-
-  // ====== DATA MODELS ======
   newDepartment: Partial<User> & { _id?: string } = {
     fullname: '',
     username: '',
@@ -43,7 +39,6 @@ export class AdministrationComponent implements OnInit {
     this.loadUsers();
   }
 
-  // =================== USERS ===================
   loadUsers(): void {
     this.adminService.getAllUsers().subscribe({
       next: (data) => {
@@ -211,7 +206,6 @@ export class AdministrationComponent implements OnInit {
     this.applyFilters();
   }
 
-  // =================== SECTORS ===================
   loadSectors(): void {
     this.adminService.getAllSectors().subscribe({
       next: (res) => {
@@ -306,7 +300,6 @@ export class AdministrationComponent implements OnInit {
     });
   }
 
-  // =================== DEPARTMENTS/USERS ===================
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }

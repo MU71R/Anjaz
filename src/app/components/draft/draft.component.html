@@ -5,7 +5,6 @@
         </div>
 
         <div class="col-md-9 col-lg-10">
-            <!-- تحسين الهيدر -->
             <div
                 class="header-box mb-4 p-4 rounded-3 shadow-sm bg-gradient-primary text-white position-relative overflow-hidden">
                 <div class="position-absolute top-0 end-0 w-100 h-100 opacity-10">
@@ -30,13 +29,11 @@
                 </div>
             </div>
 
-            <!-- حالة التحميل -->
             <div *ngIf="loading" class="text-center my-5 py-5">
                 <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
                 <p class="text-muted fs-6">جاري تحميل المسودات...</p>
             </div>
 
-            <!-- حالة عدم وجود مسودات -->
             <div *ngIf="!loading && draftActivities.length === 0"
                 class="alert alert-light text-center border-0 shadow-sm rounded-3 py-5 my-4">
                 <div class="empty-state-icon mb-3">
@@ -49,7 +46,6 @@
                 </button>
             </div>
 
-            <!-- قائمة المسودات -->
             <div class="row g-4" *ngIf="!loading && draftActivities.length > 0">
                 <div class="col-12" *ngFor="let activity of draftActivities; let i = index">
                     <div class="card shadow-sm border-0 rounded-3 activity-card h-100">
@@ -106,7 +102,6 @@
                                 </div>
                             </div>
 
-                            <!-- قسم المرفقات -->
                             <div class="attachments-section"
                                 *ngIf="activity.Attachments && activity.Attachments.length > 0">
                                 <div class="section-header mb-3">
@@ -159,7 +154,6 @@
                                 </div>
                             </div>
 
-                            <!-- حالة عدم وجود مرفقات -->
                             <div *ngIf="!activity.Attachments || activity.Attachments.length === 0"
                                 class="text-center py-4 border rounded-2 bg-light">
                                 <i class="fa-solid fa-file-circle-exclamation text-muted fa-2x mb-2"></i>
@@ -167,7 +161,6 @@
                             </div>
                         </div>
 
-                        <!-- تذييل البطاقة -->
                         <div class="card-footer bg-transparent border-0 pt-0">
                             <div class="row align-items-center">
                                 <div class="col-md-6">
@@ -202,7 +195,6 @@
     </div>
 </div>
 
-<!-- مودال عرض الصورة -->
 <div *ngIf="showImageModal" class="modal-backdrop fade show" (click)="closeImageModal()"></div>
 <div *ngIf="showImageModal" class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered">

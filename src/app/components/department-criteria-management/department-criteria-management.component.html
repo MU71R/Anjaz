@@ -4,21 +4,22 @@
   </div>
 
   <div class="main-content">
-    <div
-      class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-      <div>
-        <h4 class="mb-1">إدارة الأقسام والمعايير</h4>
-        <p class="mb-0 text-muted">إدارة المعايير الرئيسية والفرعية بشكل هرمي ومنظم</p>
-      </div>
-
-      <div>
-        <button class="btn btn-primary shadow" (click)="openMainModal()" [disabled]="isSubmitting">
-          <i class="bi bi-plus-lg me-2"></i> إضافة معيار رئيسي
-        </button>
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h4 class="mb-1">إدارة الأقسام والمعايير</h4>
+          <p class="mb-0 text-muted">إدارة المعايير الرئيسية والفرعية بشكل هرمي ومنظم</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary shadow" (click)="openMainModal()" [disabled]="isSubmitting">
+            <i class="bi bi-plus-lg me-2"></i>
+            <span class="btn-text">إضافة معيار رئيسي</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div *ngIf="isLoading" class="text-center py-5">
+    <div *ngIf="isLoading" class="loading-state">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">جاري التحميل...</span>
       </div>
@@ -26,58 +27,64 @@
     </div>
 
     <div *ngIf="!isLoading && mainCriteria.length === 0; else listBlock">
-      <div class="card border-dashed text-center p-5">
-        <div class="mb-2 text-muted empty-state-icon">
+      <div class="empty-state-card">
+        <div class="empty-state-icon">
           <i class="bi bi-plus-circle"></i>
         </div>
         <h5 class="mb-1">لا توجد معايير رئيسية</h5>
-        <p class="text-muted mb-0">ابدأ بإضافة معيار رئيسي جديد</p>
+        <p class="text-muted mb-3">ابدأ بإضافة معيار رئيسي جديد</p>
+        <button class="btn btn-primary" (click)="openMainModal()">
+          <i class="bi bi-plus-lg me-2"></i> إضافة معيار رئيسي
+        </button>
       </div>
     </div>
 
     <ng-template #listBlock>
-      <div class="accordion" id="mainAccordion">
-        <div *ngFor="let main of mainCriteria" class="card mb-3 shadow-sm border-0 rounded-3 overflow-hidden">
-          <div class="card-header d-flex align-items-center justify-content-between bg-white">
-            <div class="d-flex align-items-center gap-3">
-              <button class="btn btn-sm btn-light" (click)="toggleExpanded(main._id)"
+      <div class="criteria-accordion">
+        <div *ngFor="let main of mainCriteria" class="criteria-card">
+          <div class="criteria-header">
+            <div class="criteria-info">
+              <button class="btn btn-sm toggle-btn" (click)="toggleExpanded(main._id)"
                 [attr.aria-expanded]="expandedCriteria.has(main._id)"
                 [attr.aria-label]="expandedCriteria.has(main._id) ? 'طي القسم' : 'توسيع القسم'">
                 <i class="bi" [ngClass]="expandedCriteria.has(main._id) ? 'bi-chevron-down' : 'bi-chevron-left'"></i>
               </button>
 
-              <div>
-                <div class="d-flex align-items-center gap-2">
+              <div class="criteria-details">
+                <div class="criteria-title">
                   <h6 class="mb-0">{{ main.name }}</h6>
-                  <small class="badge bg-info text-dark">{{ levelLabel(main.level) }}</small>
-                  <small *ngIf="main.sector" class="badge bg-purple text-white">{{ main.sector.name }}</small>
-                  <small *ngIf="main.departmentUser" class="badge bg-secondary text-white">{{
-                    main.departmentUser.fullname
-                    }}</small>
+                  <div class="badges-container">
+                    <span class="badge level-badge">{{ levelLabel(main.level) }}</span>
+                    <span *ngIf="main.sector" class="badge sector-badge">{{ main.sector.name }}</span>
+                    <span *ngIf="main.departmentUser" class="badge dept-badge">{{ main.departmentUser.fullname }}</span>
+                  </div>
                 </div>
-                <small class="text-muted">{{ getSubForMain(main._id).length }} معيار فرعي</small>
+                <small class="sub-count">{{ getSubForMain(main._id).length }} معيار فرعي</small>
               </div>
             </div>
 
-            <div class="d-flex align-items-center gap-1">
+            <div class="criteria-actions">
               <button class="btn btn-sm btn-outline-primary" (click)="openSubModal(main._id)" title="إضافة معيار فرعي"
                 aria-label="إضافة معيار فرعي">
                 <i class="bi bi-plus"></i>
+                <span class="action-text">إضافة فرعي</span>
               </button>
               <button class="btn btn-sm btn-outline-secondary" (click)="openMainModal(main)"
                 title="تعديل المعيار الرئيسي" aria-label="تعديل المعيار الرئيسي">
                 <i class="bi bi-pencil"></i>
+                <span class="action-text">تعديل</span>
               </button>
               <button class="btn btn-sm btn-outline-danger" (click)="requestDeleteMain(main._id)"
                 title="حذف المعيار الرئيسي" aria-label="حذف المعيار الرئيسي">
                 <i class="bi bi-trash"></i>
+                <span class="action-text">حذف</span>
               </button>
             </div>
           </div>
 
-          <div class="p-3" *ngIf="expandedCriteria.has(main._id)">
+          <div class="sub-criteria-section" *ngIf="expandedCriteria.has(main._id)">
             <div *ngIf="getSubForMain(main._id).length === 0; else subsList">
-              <div class="border border-dashed p-3 rounded bg-white text-center">
+              <div class="empty-subs-state">
                 <p class="mb-2 text-muted">لا توجد معايير فرعية</p>
                 <button class="btn btn-outline-primary btn-sm" (click)="openSubModal(main._id)">
                   <i class="bi bi-plus me-1"></i> إضافة معيار فرعي
@@ -86,29 +93,30 @@
             </div>
 
             <ng-template #subsList>
-              <div class="list-group">
-                <div *ngFor="let sub of getSubForMain(main._id); let i = index"
-                  class="list-group-item d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-circle">
+              <div class="sub-criteria-list">
+                <div *ngFor="let sub of getSubForMain(main._id); let i = index" class="sub-criteria-item">
+                  <div class="sub-info">
+                    <div class="sub-avatar">
                       {{ i + 1 }}
                     </div>
-                    <div>{{ sub.name }}</div>
+                    <span class="sub-name">{{ sub.name }}</span>
                   </div>
 
-                  <div class="d-flex gap-1">
+                  <div class="sub-actions">
                     <button class="btn btn-sm btn-outline-secondary" (click)="openSubModal(main._id, sub)"
                       title="تعديل المعيار الفرعي" aria-label="تعديل المعيار الفرعي">
                       <i class="bi bi-pencil"></i>
+                      <span class="action-text">تعديل</span>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" (click)="requestDeleteSub(sub._id)"
                       title="حذف المعيار الفرعي" aria-label="حذف المعيار الفرعي">
                       <i class="bi bi-trash"></i>
+                      <span class="action-text">حذف</span>
                     </button>
                   </div>
                 </div>
 
-                <div class="mt-2">
+                <div class="add-sub-btn-container">
                   <button class="btn btn-outline-primary w-100" (click)="openSubModal(main._id)">
                     <i class="bi bi-plus me-1"></i> إضافة معيار فرعي
                   </button>
@@ -123,46 +131,47 @@
 </div>
 
 <div class="modal-backdrop" *ngIf="isMainModalOpen"></div>
-<div class="modal d-block" tabindex="-1" *ngIf="isMainModalOpen">
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content" dir="rtl">
+<div class="modal d-block" tabindex="-1" *ngIf="isMainModalOpen" dir="rtl">
+  <div class="modal-dialog modal-dialog-responsive modal-dialog-centered">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ editingMain ? 'تعديل المعيار الرئيسي' : 'إضافة معيار رئيسي جديد' }}</h5>
-        <button type="button" class="btn-close btn-close-ltr" aria-label="إغلاق" (click)="closeMainModal()"
+        <button type="button" class="btn-close btn-close-rtl" aria-label="إغلاق" (click)="closeMainModal()"
           [disabled]="isSubmitting"></button>
       </div>
       <div class="modal-body">
-        <div class="mb-3">
+        <div class="form-group">
           <label for="mainName" class="form-label">اسم المعيار الرئيسي *</label>
           <input id="mainName" class="form-control text-end" [(ngModel)]="mainName" name="mainName"
-            [disabled]="isSubmitting" placeholder="أدخل اسم المعيار الرئيسي" />
+            [disabled]="isSubmitting" placeholder="أدخل اسم المعيار الرئيسي" dir="rtl" />
         </div>
 
-        <div class="mb-3">
+        <div class="form-group">
           <label for="mainLevel" class="form-label">مستوى المعيار *</label>
-          <select id="mainLevel" class="form-select" [(ngModel)]="mainLevel" name="mainLevel" [disabled]="isSubmitting"
-            title="مستوى المعيار">
+          <select id="mainLevel" class="form-select text-end" [(ngModel)]="mainLevel" name="mainLevel"
+            [disabled]="isSubmitting" title="مستوى المعيار" dir="rtl">
             <option value="SECTOR">مستوى القطاع</option>
             <option value="DEPARTMENT">مستوى القسم (تحت قطاع)</option>
             <option value="ALL">جميع القطاعات</option>
           </select>
         </div>
 
-        <div class="mb-3" *ngIf="mainLevel === 'SECTOR'">
+        <div class="form-group" *ngIf="mainLevel === 'SECTOR'">
           <label for="mainSectorId" class="form-label">القطاع *</label>
 
-          <div *ngIf="isLoadingSectorsDepts" class="alert alert-info">
+          <div *ngIf="isLoadingSectorsDepts" class="loading-alert text-end">
             <i class="bi bi-arrow-repeat spinner me-2"></i>
             جاري تحميل القطاعات...
           </div>
 
-          <div *ngIf="!isLoadingSectorsDepts && (!sectors || sectors.length === 0)" class="alert alert-warning">
+          <div *ngIf="!isLoadingSectorsDepts && (!sectors || sectors.length === 0)" class="warning-alert text-end">
             <i class="bi bi-exclamation-triangle me-2"></i>
             لا توجد قطاعات متاحة. يرجى إضافة قطاعات أولاً.
           </div>
 
-          <select *ngIf="!isLoadingSectorsDepts && sectors && sectors.length > 0" id="mainSectorId" class="form-select"
-            [(ngModel)]="mainSectorId" name="mainSectorId" [disabled]="isSubmitting" title="القطاع">
+          <select *ngIf="!isLoadingSectorsDepts && sectors && sectors.length > 0" id="mainSectorId"
+            class="form-select text-end" [(ngModel)]="mainSectorId" name="mainSectorId" [disabled]="isSubmitting"
+            title="القطاع" dir="rtl">
             <option value="">اختر القطاع</option>
             <option *ngFor="let s of sectors" [value]="getSectorId(s)">
               {{ getSectorDisplayName(s) }}
@@ -170,21 +179,23 @@
           </select>
         </div>
 
-        <div class="mb-3" *ngIf="mainLevel === 'DEPARTMENT'">
+        <div class="form-group" *ngIf="mainLevel === 'DEPARTMENT'">
           <label for="mainDeptId" class="form-label">القسم *</label>
 
-          <div *ngIf="isLoadingSectorsDepts" class="alert alert-info">
+          <div *ngIf="isLoadingSectorsDepts" class="loading-alert text-end">
             <i class="bi bi-arrow-repeat spinner me-2"></i>
             جاري تحميل الأقسام...
           </div>
 
-          <div *ngIf="!isLoadingSectorsDepts && (!departments || departments.length === 0)" class="alert alert-warning">
+          <div *ngIf="!isLoadingSectorsDepts && (!departments || departments.length === 0)"
+            class="warning-alert text-end">
             <i class="bi bi-exclamation-triangle me-2"></i>
             لا توجد أقسام متاحة. يرجى إضافة أقسام أولاً.
           </div>
 
           <select *ngIf="!isLoadingSectorsDepts && departments && departments.length > 0" id="mainDeptId"
-            class="form-select" [(ngModel)]="mainDeptId" name="mainDeptId" [disabled]="isSubmitting" title="القسم">
+            class="form-select text-end" [(ngModel)]="mainDeptId" name="mainDeptId" [disabled]="isSubmitting"
+            title="القسم" dir="rtl">
             <option value="">اختر القسم</option>
             <option *ngFor="let d of departments" [value]="d._id">
               {{ d.fullname || 'اسم غير محدد' }}
@@ -205,27 +216,27 @@
 </div>
 
 <div class="modal-backdrop" *ngIf="isSubModalOpen"></div>
-<div class="modal d-block" tabindex="-1" *ngIf="isSubModalOpen">
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content" dir="rtl">
+<div class="modal d-block" tabindex="-1" *ngIf="isSubModalOpen" dir="rtl">
+  <div class="modal-dialog modal-dialog-responsive modal-dialog-centered">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ editingSub ? 'تعديل المعيار الفرعي' : 'إضافة معيار فرعي جديد' }}</h5>
-        <button type="button" class="btn-close btn-close-ltr" aria-label="إغلاق" (click)="closeSubModal()"
+        <button type="button" class="btn-close btn-close-rtl" aria-label="إغلاق" (click)="closeSubModal()"
           [disabled]="isSubmitting"></button>
       </div>
       <div class="modal-body">
-        <div class="mb-3">
+        <div class="form-group">
           <label for="subName" class="form-label">اسم المعيار الفرعي *</label>
           <input id="subName" class="form-control text-end" [(ngModel)]="subName" name="subName"
-            [disabled]="isSubmitting" placeholder="أدخل اسم المعيار الفرعي" />
+            [disabled]="isSubmitting" placeholder="أدخل اسم المعيار الفرعي" dir="rtl" />
         </div>
 
-        <div class="mb-3">
+        <div class="form-group">
           <label class="form-label">المعيار الرئيسي</label>
-          <div class="form-control bg-light border-0">
+          <div class="form-control-static text-end" dir="rtl">
             {{ getCurrentMainCriteriaName() }}
           </div>
-          <small class="text-muted">المعيار الفرعي سيتم إضافته تحت هذا المعيار الرئيسي</small>
+          <small class="form-hint text-end">المعيار الفرعي سيتم إضافته تحت هذا المعيار الرئيسي</small>
         </div>
       </div>
 
@@ -241,15 +252,15 @@
 </div>
 
 <div class="modal-backdrop" *ngIf="isConfirmOpen"></div>
-<div class="modal d-block" tabindex="-1" *ngIf="isConfirmOpen">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content" dir="rtl">
+<div class="modal d-block" tabindex="-1" *ngIf="isConfirmOpen" dir="rtl">
+  <div class="modal-dialog modal-dialog-responsive modal-dialog-centered">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">تأكيد الحذف</h5>
-        <button type="button" class="btn-close btn-close-ltr" aria-label="إغلاق" (click)="confirmClose(false)"></button>
+        <button type="button" class="btn-close btn-close-rtl" aria-label="إغلاق" (click)="confirmClose(false)"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-0">{{ confirmMessage }}</p>
+        <p class="mb-0 text-end">{{ confirmMessage }}</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" (click)="confirmClose(false)">إلغاء</button>
