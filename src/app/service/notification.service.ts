@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Notification } from '../model/notification';
+import { environment } from '../environments/environments.pord';
 
 @Injectable({
   providedIn: 'root',
@@ -12,12 +13,12 @@ export class NotificationService {
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
 
-  private API_URL = 'http://localhost:3000/notifications';
+  private API_URL = `${environment.apiUrl}/notifications`;
 
   constructor(private http: HttpClient) {
     this.requestNotificationPermission();
     this.fetchNotificationsFromServer();
-    this.socket = io('http://localhost:3000', {
+    this.socket = io(`${environment.apiUrl}`, {
       transports: ['websocket', 'polling'],
     });
 

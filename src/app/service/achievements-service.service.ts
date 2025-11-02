@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, tap, throwError, catchError } from 'rxjs';
 import { Activity } from '../model/achievement';
+import { environment } from '../environments/environments.pord';
 export interface PDFFile {
   _id: string;
   userId: {
@@ -19,7 +20,7 @@ export interface PDFFile {
   providedIn: 'root',
 })
 export class ActivityService {
-  private readonly API_BASE_URL = 'http://localhost:3000/activity';
+  private readonly API_BASE_URL = `${environment.apiUrl}/activity`;
 
   constructor(private http: HttpClient) {}
 
