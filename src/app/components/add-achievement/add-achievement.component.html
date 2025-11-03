@@ -87,7 +87,7 @@
                 (input)="syncDescriptionToForm()"></div>
               <small class="form-text text-muted mt-1 d-block">يمكنك استخدام شريط الأدوات أعلاه لتنسيق النص</small>
               <div class="text-end text-muted small">
-                {{ form.get('activityDescription')?.value?.length || 0 }}/300
+                {{ form.get('activityDescription')?.value?.length || 0 }}/1000
               </div>
               <div class="text-danger mt-1" *ngIf="form.get('activityDescription')?.errors?.['required']">
                 الوصف مطلوب.
@@ -96,13 +96,13 @@
                 يجب أن يكون الوصف على الأقل 10 أحرف.
               </div>
               <div class="text-danger mt-1" *ngIf="form.get('activityDescription')?.errors?.['maxlength']">
-                الحد الأقصى للوصف 300 حرف.
+                الحد الأقصى للوصف 1000 حرف.
               </div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-semibold" for="name">الاسم (اختياري)</label>
-              <input id="name" type="text" class="form-control" placeholder="أدخل اسم المنجز" formControlName="name" />
+              <label class="form-label fw-semibold" for="name">المسئول عن اضافه الانجاز (اختياري)</label>
+              <input id="name" type="text" class="form-control" placeholder="أدخل اسم المسئول" formControlName="name" />
             </div>
 
             <div class="mb-3">
@@ -215,7 +215,7 @@
               </button>
 
               <button class="btn submit-btn flex-fill" type="submit">
-                <i class="bi bi-send"></i> {{ isEditing ? 'تحديث وإرسال' : 'إرسال للمراجعة' }}
+                <i class="bi bi-send"></i> {{ isEditing ? 'تحديث وإرسال' : 'إرسال' }}
               </button>
             </div>
           </div>

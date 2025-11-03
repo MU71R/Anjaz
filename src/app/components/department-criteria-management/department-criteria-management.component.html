@@ -53,11 +53,6 @@
               <div class="criteria-details">
                 <div class="criteria-title">
                   <h6 class="mb-0">{{ main.name }}</h6>
-                  <div class="badges-container">
-                    <span class="badge level-badge">{{ levelLabel(main.level) }}</span>
-                    <span *ngIf="main.sector" class="badge sector-badge">{{ main.sector.name }}</span>
-                    <span *ngIf="main.departmentUser" class="badge dept-badge">{{ main.departmentUser.fullname }}</span>
-                  </div>
                 </div>
                 <small class="sub-count">{{ getSubForMain(main._id).length }} معيار فرعي</small>
               </div>
@@ -147,17 +142,7 @@
         </div>
 
         <div class="form-group">
-          <label for="mainLevel" class="form-label">مستوى المعيار *</label>
-          <select id="mainLevel" class="form-select text-end" [(ngModel)]="mainLevel" name="mainLevel"
-            [disabled]="isSubmitting" title="مستوى المعيار" dir="rtl">
-            <option value="SECTOR">مستوى القطاع</option>
-            <option value="DEPARTMENT">مستوى القسم (تحت قطاع)</option>
-            <option value="ALL">جميع القطاعات</option>
-          </select>
-        </div>
-
-        <div class="form-group" *ngIf="mainLevel === 'SECTOR'">
-          <label for="mainSectorId" class="form-label">القطاع *</label>
+          <label for="mainSectorId" class="form-label">القطاع</label>
 
           <div *ngIf="isLoadingSectorsDepts" class="loading-alert text-end">
             <i class="bi bi-arrow-repeat spinner me-2"></i>
@@ -171,36 +156,37 @@
 
           <select *ngIf="!isLoadingSectorsDepts && sectors && sectors.length > 0" id="mainSectorId"
             class="form-select text-end" [(ngModel)]="mainSectorId" name="mainSectorId" [disabled]="isSubmitting"
-            title="القطاع" dir="rtl">
-            <option value="">اختر القطاع</option>
+            title="القطاع" dir="rtl" (change)="onSectorChange()">
+            <option value="ALL">جميع القطاعات</option>
             <option *ngFor="let s of sectors" [value]="getSectorId(s)">
               {{ getSectorDisplayName(s) }}
             </option>
           </select>
         </div>
 
-        <div class="form-group" *ngIf="mainLevel === 'DEPARTMENT'">
-          <label for="mainDeptId" class="form-label">القسم *</label>
+        <div class="form-group" *ngIf="mainSectorId !== 'ALL'">
+          <label for="mainDeptId" class="form-label">القسم</label>
 
           <div *ngIf="isLoadingSectorsDepts" class="loading-alert text-end">
             <i class="bi bi-arrow-repeat spinner me-2"></i>
             جاري تحميل الأقسام...
           </div>
 
-          <div *ngIf="!isLoadingSectorsDepts && (!departments || departments.length === 0)"
-            class="warning-alert text-end">
+          <div *ngIf="!isLoadingSectorsDepts && filteredDepartments.length === 0" class="warning-alert text-end">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            لا توجد أقسام متاحة. يرجى إضافة أقسام أولاً.
+            لا توجد أقسام متاحة لهذا القطاع.
           </div>
 
-          <select *ngIf="!isLoadingSectorsDepts && departments && departments.length > 0" id="mainDeptId"
+          <select *ngIf="!isLoadingSectorsDepts && filteredDepartments.length > 0" id="mainDeptId"
             class="form-select text-end" [(ngModel)]="mainDeptId" name="mainDeptId" [disabled]="isSubmitting"
             title="القسم" dir="rtl">
-            <option value="">اختر القسم</option>
-            <option *ngFor="let d of departments" [value]="d._id">
+            <option value="">جميع الأقسام</option>
+            <option *ngFor="let d of filteredDepartments" [value]="d._id">
               {{ d.fullname || 'اسم غير محدد' }}
             </option>
           </select>
+          <small class="form-hint text-end">اختياري - إذا لم تختر قسم سيتم تطبيق المعيار على جميع أقسام القطاع
+            المختار</small>
         </div>
       </div>
 

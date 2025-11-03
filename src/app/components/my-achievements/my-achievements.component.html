@@ -98,7 +98,7 @@
                           <th scope="col" width="25%">عنوان الإنجاز</th>
                           <th scope="col" width="15%">المعيار الرئيسي</th>
                           <th scope="col" width="15%">المعيار الفرعي</th>
-                          <th scope="col" width="12%">مقدم الطلب</th>
+                          <th scope="col" width="15%">المسئول عن اضافه الانجاز </th>
                           <th scope="col" width="10%">الحالة</th>
                           <th scope="col" width="10%">التاريخ</th>
                           <th scope="col" width="8%" class="text-center">الإجراءات</th>
@@ -258,12 +258,12 @@
                     'لا يوجد وصف' }}</p>
                 </div>
                 <div class="info-item">
-                  <strong>اسم القائم بالنشاط:</strong>
+                  <strong>المسئول عن اضافه الانجاز  :</strong>
                   <span>{{ selectedAchievement.name || 'غير محدد' }}</span>
                 </div>
                 <div class="info-item">
-                  <strong>مقدم الطلب:</strong>
-                  <span>{{ getUserName(selectedAchievement.user) }}</span>
+                  <strong>تاريخ الإنشاء:</strong>
+                  <span>{{ formatDate(selectedAchievement.createdAt) }}</span>
                 </div>
               </div>
             </div>
@@ -289,10 +289,6 @@
                   <span class="badge status-badge" [ngClass]="getStatusClass(selectedAchievement.status)">
                     {{ selectedAchievement.status }}
                   </span>
-                </div>
-                <div class="info-item">
-                  <strong>تاريخ الإنشاء:</strong>
-                  <span>{{ formatDate(selectedAchievement.createdAt) }}</span>
                 </div>
                 <div class="info-item">
                   <strong>آخر تحديث:</strong>
@@ -363,10 +359,6 @@
         <div class="w-100">
           <div class="row align-items-center">
             <div class="col-12 col-md-6 mb-2 mb-md-0">
-              <small class="text-muted">
-                <i class="fa-solid fa-id-badge me-1"></i>
-                معرف الإنجاز: {{ selectedAchievement._id }}
-              </small>
             </div>
             <div class="col-12 col-md-6 text-md-start">
               <div class="action-buttons d-flex flex-column flex-md-row gap-2">

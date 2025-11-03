@@ -18,10 +18,11 @@ import Swal from 'sweetalert2';
   styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent implements OnInit {
-  showFilters: boolean = true;
+  showFilters: boolean = false;
   isLoading = false;
   isLoadingPDFs = false;
   showDateError = false;
+  dateRequiredError = false;
   maxDate: string;
 
   filters: ReportFilter = {
@@ -146,39 +147,30 @@ export class ReportsComponent implements OnInit {
   }
 
   validateFilters(): boolean {
+    if (!this.filters.startDate || !this.filters.endDate) {
+      this.dateRequiredError = true;
+      this.showError('تاريخ البداية وتاريخ النهاية مطلوبان');
+      return false;
+    }
+
     if (this.filters.startDate && this.filters.endDate) {
       const startDate = new Date(this.filters.startDate);
       const endDate = new Date(this.filters.endDate);
 
       if (startDate > endDate) {
         this.showDateError = true;
+        this.dateRequiredError = false;
         this.showError('تاريخ البداية يجب أن يكون قبل تاريخ النهاية');
         return false;
       }
     }
 
     this.showDateError = false;
+    this.dateRequiredError = false;
     return true;
   }
 
   async generateReport() {
-    if (this.hasEmptyFilters()) {
-      const result = await Swal.fire({
-        title: 'تأكيد',
-        text: 'لم تقم بتحديد أي فلاتر. هذا سيولد تقريراً بجميع الأنشطة.\nهل تريد المتابعة؟',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'نعم، المتابعة',
-        cancelButtonText: 'إلغاء',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-      });
-
-      if (!result.isConfirmed) {
-        return;
-      }
-    }
-
     this.isLoading = true;
     this.generatedReport = null;
 
@@ -195,13 +187,20 @@ export class ReportsComponent implements OnInit {
           this.showReportResults = true;
           this.scrollToElement('report-results');
         } else {
-          this.showError(response.message || 'فشل في إنشاء التقرير');
+          const errorMessage = response.message || 'فشل في إنشاء التقرير';
+          this.showError(errorMessage);
         }
       },
       error: (error: any) => {
         this.isLoading = false;
         console.error('خطأ في إنشاء التقرير:', error);
-        this.showError('حدث خطأ أثناء إنشاء التقرير');
+        if (error.error && error.error.message) {
+          this.showError(error.error.message);
+        } else if (error.message) {
+          this.showError(error.message);
+        } else {
+          this.showError('حدث خطأ أثناء إنشاء التقرير');
+        }
       },
     });
   }
@@ -259,28 +258,6 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  copyPDFLink(pdfUrl: string): void {
-    navigator.clipboard
-      .writeText(pdfUrl)
-      .then(() => {
-        this.showSuccess('تم نسخ رابط التقرير إلى الحافظة');
-      })
-      .catch((err) => {
-        this.showError('فشل نسخ الرابط، يرجى المحاولة يدوياً');
-      });
-  }
-
-  copyReportLink(fileUrl: string) {
-    navigator.clipboard
-      .writeText(fileUrl)
-      .then(() => {
-        this.showSuccess('تم نسخ رابط التقرير إلى الحافظة');
-      })
-      .catch((err) => {
-        this.showError('فشل نسخ الرابط، يرجى المحاولة يدوياً');
-      });
-  }
-
   extractFilenameFromUrl(url: string): string {
     try {
       if (!url) return '';
@@ -289,16 +266,6 @@ export class ReportsComponent implements OnInit {
       return filename.split('?')[0];
     } catch (error) {
       return '';
-    }
-  }
-
-  getShortUrl(url: string): string {
-    if (!url) return '';
-    try {
-      const urlObj = new URL(url);
-      return urlObj.pathname.split('/').pop() || url;
-    } catch {
-      return url.length > 50 ? url.substring(0, 50) + '...' : url;
     }
   }
 
@@ -316,14 +283,10 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  hasEmptyFilters(): boolean {
-    return Object.values(this.filters).every((value) => !value || value === '');
-  }
-
   clearFilters() {
     this.filters = {
-      startDate: '',
-      endDate: '',
+      startDate: this.filters.startDate, 
+      endDate: this.filters.endDate, 
       MainCriteria: '',
       SubCriteria: '',
       user: '',
@@ -332,7 +295,19 @@ export class ReportsComponent implements OnInit {
     this.subCriteriaList = [];
     this.generatedReport = null;
     this.showDateError = false;
-    this.showSuccess('تم مسح جميع الفلاتر');
+    this.dateRequiredError = false;
+    this.showSuccess('تم مسح الفلاتر الاختيارية');
+  }
+
+  clearDates() {
+    this.filters.startDate = '';
+    this.filters.endDate = '';
+    this.dateRequiredError = false;
+    this.showDateError = false;
+  }
+
+  isDateComplete(): boolean {
+    return !!(this.filters.startDate && this.filters.endDate);
   }
 
   loadUsers() {
@@ -389,7 +364,7 @@ export class ReportsComponent implements OnInit {
       parts.push(`مستخدم: ${user?.fullname || 'غير معروف'}`);
     }
 
-    return parts.join(' | ') || 'جميع الأنشطة بدون فلاتر';
+    return parts.join(' | ') || 'جميع الأنشطة في النطاق الزمني المحدد';
   }
 
   private scrollToElement(elementId: string) {

@@ -81,12 +81,14 @@ export class AdministrationComponent implements OnInit {
     const newStatus = user.status === 'active' ? 'inactive' : 'active';
     this.adminService.updateUserStatus(user._id, newStatus).subscribe({
       next: () => (user.status = newStatus),
-      error: (err: HttpErrorResponse) =>
+      error: (err: HttpErrorResponse) => {
+        const errorMessage = err.error?.message || err.message;
         Swal.fire({
           icon: 'error',
           title: 'خطأ في تحديث الحالة',
-          text: err.message,
-        }),
+          text: errorMessage,
+        });
+      },
     });
   }
 
@@ -133,27 +135,36 @@ export class AdministrationComponent implements OnInit {
       sector: typeof sector === 'string' ? sector : (sector as Sector)?._id,
     };
     this.adminService.updateUser(this.selectedUser._id, payload).subscribe({
-      next: () => {
-        const index = this.users.findIndex(
-          (u) => u._id === this.selectedUser._id
-        );
-        if (index !== -1)
-          this.users[index] = { ...this.users[index], ...payload };
-        this.applyFilters();
-        Swal.fire({
-          icon: 'success',
-          title: 'تم تعديل المستخدم بنجاح',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        this.closeEditUser();
+      next: (response: any) => {
+        if (response.success) {
+          const index = this.users.findIndex(
+            (u) => u._id === this.selectedUser._id
+          );
+          if (index !== -1)
+            this.users[index] = { ...this.users[index], ...payload };
+          this.applyFilters();
+          Swal.fire({
+            icon: 'success',
+            title: response.message || 'تم تعديل المستخدم بنجاح',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          this.closeEditUser();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: response.message || 'خطأ أثناء تعديل المستخدم',
+          });
+        }
       },
-      error: (err: HttpErrorResponse) =>
+      error: (err: HttpErrorResponse) => {
+        const errorMessage = err.error?.message || err.message;
         Swal.fire({
           icon: 'error',
           title: 'خطأ أثناء تعديل المستخدم',
-          text: err.message,
-        }),
+          text: errorMessage,
+        });
+      },
     });
   }
 
@@ -168,22 +179,31 @@ export class AdministrationComponent implements OnInit {
     }).then((res) => {
       if (!res.isConfirmed) return;
       this.adminService.deleteUser(user._id!).subscribe({
-        next: () => {
-          this.users = this.users.filter((u) => u._id !== user._id);
-          this.applyFilters();
-          Swal.fire({
-            icon: 'success',
-            title: 'تم حذف المستخدم',
-            timer: 2000,
-            showConfirmButton: false,
-          });
+        next: (response: any) => {
+          if (response.success) {
+            this.users = this.users.filter((u) => u._id !== user._id);
+            this.applyFilters();
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'تم حذف المستخدم',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.message || 'خطأ أثناء الحذف',
+            });
+          }
         },
-        error: (err: HttpErrorResponse) =>
+        error: (err: HttpErrorResponse) => {
+          const errorMessage = err.error?.message || err.message;
           Swal.fire({
             icon: 'error',
             title: 'خطأ أثناء الحذف',
-            text: err.message,
-          }),
+            text: errorMessage,
+          });
+        },
       });
     });
   }
@@ -214,12 +234,14 @@ export class AdministrationComponent implements OnInit {
           .filter((s: Sector) => s.sector)
           .map((s: Sector) => ({ _id: s._id, sector: s.sector }));
       },
-      error: (err: HttpErrorResponse) =>
+      error: (err: HttpErrorResponse) => {
+        const errorMessage = err.error?.message || err.message;
         Swal.fire({
           icon: 'error',
           title: 'خطأ في جلب القطاعات',
-          text: err.message,
-        }),
+          text: errorMessage,
+        });
+      },
     });
   }
 
@@ -246,30 +268,60 @@ export class AdministrationComponent implements OnInit {
     const payload = { sector: this.newSector.sector.trim() };
     if (this.newSector._id) {
       this.adminService.updateSector(this.newSector._id, payload).subscribe({
-        next: () => {
-          this.closeSectorForm();
-          this.loadSectors();
-          this.loadUsers();
+        next: (response: any) => {
+          if (response.success) {
+            this.closeSectorForm();
+            this.loadSectors();
+            this.loadUsers();
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'تم تعديل القطاع بنجاح',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.message || 'خطأ في تعديل القطاع',
+            });
+          }
         },
-        error: (err: HttpErrorResponse) =>
+        error: (err: HttpErrorResponse) => {
+          const errorMessage = err.error?.message || err.message;
           Swal.fire({
             icon: 'error',
             title: 'خطأ في تعديل القطاع',
-            text: err.message,
-          }),
+            text: errorMessage,
+          });
+        },
       });
     } else {
       this.adminService.addSector(payload as Sector).subscribe({
-        next: () => {
-          this.closeSectorForm();
-          this.loadSectors();
+        next: (response: any) => {
+          if (response.success) {
+            this.closeSectorForm();
+            this.loadSectors();
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'تم إضافة القطاع بنجاح',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.message || 'خطأ أثناء إضافة القطاع',
+            });
+          }
         },
-        error: (err: HttpErrorResponse) =>
+        error: (err: HttpErrorResponse) => {
+          const errorMessage = err.error?.message || err.message;
           Swal.fire({
             icon: 'error',
             title: 'خطأ أثناء إضافة القطاع',
-            text: err.message,
-          }),
+            text: errorMessage,
+          });
+        },
       });
     }
   }
@@ -286,26 +338,37 @@ export class AdministrationComponent implements OnInit {
     }).then((res) => {
       if (!res.isConfirmed) return;
       this.adminService.deleteSector(id).subscribe({
-        next: () => {
-          this.loadSectors();
-          this.loadUsers();
+        next: (response: any) => {
+          if (response.success) {
+            this.loadSectors();
+            this.loadUsers();
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'تم حذف القطاع بنجاح',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.message || 'خطأ في الحذف',
+            });
+          }
         },
-        error: (err: HttpErrorResponse) =>
+        error: (err: HttpErrorResponse) => {
+          const errorMessage = err.error?.message || err.message;
           Swal.fire({
             icon: 'error',
             title: 'خطأ في الحذف',
-            text: err.message,
-          }),
+            text: errorMessage,
+          });
+        },
       });
     });
   }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
-  }
-
-  validatePassword(password: string): boolean {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
   }
 
   saveDepartment(): void {
@@ -322,14 +385,6 @@ export class AdministrationComponent implements OnInit {
       Swal.fire({ icon: 'warning', title: 'كلمة المرور مطلوبة' });
       return;
     }
-    if (!this.validatePassword(password)) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'كلمة المرور ضعيفة',
-        html: `<ul style="text-align:right;"><li>8 أحرف على الأقل</li><li>حرف كبير واحد على الأقل</li><li>حرف صغير واحد على الأقل</li><li>رقم واحد على الأقل</li><li>رمز خاص واحد على الأقل</li></ul>`,
-      });
-      return;
-    }
     if (!role) {
       Swal.fire({ icon: 'warning', title: 'اختر الدور' });
       return;
@@ -342,22 +397,31 @@ export class AdministrationComponent implements OnInit {
     this.adminService
       .addUser({ ...this.newDepartment, sector } as User)
       .subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'تمت الإضافة بنجاح',
-            timer: 2000,
-            showConfirmButton: false,
-          });
-          this.closeAddDepartment();
-          this.loadUsers();
+        next: (response: any) => {
+          if (response.success) {
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'تمت الإضافة بنجاح',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+            this.closeAddDepartment();
+            this.loadUsers();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.message || 'خطأ أثناء الإضافة',
+            });
+          }
         },
-        error: (err: HttpErrorResponse) =>
+        error: (err: HttpErrorResponse) => {
+          const errorMessage = err.error?.message || err.message;
           Swal.fire({
             icon: 'error',
             title: 'خطأ أثناء الإضافة',
-            text: err.message,
-          }),
+            text: errorMessage,
+          });
+        },
       });
   }
 }

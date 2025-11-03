@@ -133,7 +133,7 @@ export class AddAchievementComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(10),
-            Validators.maxLength(300),
+            Validators.maxLength(1000),
           ],
         ],
         MainCriteria: ['', Validators.required],

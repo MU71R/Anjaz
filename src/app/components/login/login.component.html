@@ -41,8 +41,6 @@
         </div>
         <div class="invalid-feedback text-end mt-1" *ngIf="f['password'].touched && f['password'].errors">
           <span *ngIf="f['password'].errors['required']">كلمة المرور مطلوبة</span>
-          <span *ngIf="f['password'].errors['minlength']">كلمة المرور يجب أن تكون 4 أحرف على الأقل</span>
-          <span *ngIf="f['password'].errors['maxlength']">كلمة المرور يجب ألا تتجاوز 20 حرفًا</span>
         </div>
       </div>
 

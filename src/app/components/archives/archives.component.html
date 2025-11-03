@@ -52,10 +52,6 @@
                                             <i class="fa-solid fa-check-circle me-1"></i>
                                             معتمد
                                         </span>
-                                        <span class="badge bg-light text-success fs-7">
-                                            <i class="fa-solid fa-calendar me-1"></i>
-                                            {{ formatDate(activity.createdAt) }}
-                                        </span>
                                     </div>
                                 </div>                               
                             </div>
@@ -73,29 +69,29 @@
                                     </div>
                                     <div class="info-item mt-3">
                                         <i class="fa-solid fa-user text-success me-2"></i>
-                                        <strong class="text-dark">اسم القائم بالنشاط:</strong>
+                                        <strong class="text-dark">المسئول عن اضافه الانجاز  : </strong>
                                         <span class="text-muted">{{ activity.name || 'غير محدد' }}</span>
                                     </div>
                                     <div class="info-item mt-3">
                                         <i class="fa-solid fa-calendar-day text-success me-2"></i>
-                                        <strong class="text-dark">تاريخ النشاط:</strong>
+                                        <strong class="text-dark">تاريخ النشاط : </strong>
                                         <span class="text-muted">{{ formatDate(activity.date) }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="info-item">
                                         <i class="fa-solid fa-layer-group text-success me-2"></i>
-                                        <strong class="text-dark">المعيار الرئيسي:</strong>
+                                        <strong class="text-dark">المعيار الرئيسي : </strong>
                                         <span class="text-muted">{{ getCriteriaName(activity.MainCriteria) }}</span>
                                     </div>
                                     <div class="info-item mt-3">
                                         <i class="fa-solid fa-sitemap text-success me-2"></i>
-                                        <strong class="text-dark">المعيار الفرعي:</strong>
+                                        <strong class="text-dark">المعيار الفرعي: </strong>
                                         <span class="text-muted">{{ getCriteriaName(activity.SubCriteria) }}</span>
                                     </div>
                                     <div class="info-item mt-3">
                                         <i class="fa-solid fa-user-shield text-success me-2"></i>
-                                        <strong class="text-dark">مقدم النشاط:</strong>
+                                        <strong class="text-dark">الجهه : </strong>
                                         <span class="text-muted">
                                             {{ getUserName(activity.user) }}
                                         </span>

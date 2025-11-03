@@ -485,6 +485,134 @@
     box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
 }
 
+.required-section {
+    border-right: 3px solid #007bff;
+    padding-right: 15px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.optional-section {
+    border-right: 3px solid #6c757d;
+    padding-right: 15px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #495057;
+    font-weight: 600;
+}
+
+.required-badge {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.optional-badge {
+    background: #6c757d;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.required-star {
+    color: #dc3545;
+    margin-right: 4px;
+}
+
+.form-label.required {
+    font-weight: 600;
+    color: #495057;
+}
+
+.date-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 28px;
+}
+
+.date-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #28a745;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.generate-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .generate-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-actions {
+        margin-top: 15px;
+        justify-content: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+.filter-card {
+    transition: all 0.3s ease;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+
 .error-content h4 {
     color: #dc2626;
     margin-bottom: 0.75rem;

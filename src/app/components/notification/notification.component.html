@@ -22,28 +22,12 @@
                             <i class="fas fa-check-double"></i>
                             تعليم الكل كمقروء
                         </button>
-                        <button class="action-btn test-notification" (click)="sendTestNotification()">
-                            <i class="fas fa-plus"></i>
-                            إشعار تجريبي
-                        </button>
-                        <button class="action-btn clear-all" (click)="clearAllNotifications()"
-                            *ngIf="notifications.length > 0">
-                            <i class="fas fa-trash"></i>
-                            مسح الكل
-                        </button>
                     </div>
                 </div>
 
                 <div class="filter-tabs">
                     <button class="filter-tab" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
                         الكل ({{ notifications.length }})
-                    </button>
-                    <button class="filter-tab" [class.active]="activeFilter === 'unread'" (click)="setFilter('unread')">
-                        غير المقروء ({{ unreadCount }})
-                    </button>
-                    <button class="filter-tab" *ngFor="let type of notificationTypes"
-                        [class.active]="activeFilter === type" (click)="setFilter(type)">
-                        {{ getTypeLabel(type) }} ({{ getTypeCount(type) }})
                     </button>
                 </div>
             </div>
@@ -65,10 +49,7 @@
                     <p *ngIf="activeFilter !== 'all' && activeFilter !== 'unread'">
                         لا توجد إشعارات من نوع {{ getTypeLabel(activeFilter) }}
                     </p>
-                    <button class="btn-primary" (click)="sendTestNotification()">
-                        <i class="fas fa-plus"></i>
-                        إنشاء إشعار تجريبي
-                    </button>
+                    
                 </div>
 
                 <div *ngIf="!isLoading && filteredNotifications.length > 0" class="notifications-list">
@@ -90,14 +71,6 @@
 
                                 <p class="notification-message">{{ notification.message }}</p>
 
-                                <div class="notification-meta">
-                                    <span class="notification-type" [class]="'type-' + notification.type">
-                                        {{ getTypeLabel(notification.type) }}
-                                    </span>
-                                    <span class="notification-id" *ngIf="notification._id">
-                                        #{{ notification._id.slice(-6) }}
-                                    </span>
-                                </div>
                             </div>
                         </div>
 
@@ -107,22 +80,12 @@
                                 [disabled]="!notification._id">
                                 <i class="fas fa-check"></i>
                             </button>
-                            <button class="action-btn delete-btn"
-                                (click)="notification._id && removeNotification(notification._id)" title="حذف الإشعار"
-                                [disabled]="!notification._id">
-                                <i class="fas fa-times"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <div class="footer-info">
-                    <span class="notifications-count">
-                        عرض {{ filteredNotifications.length }} من أصل {{ notifications.length }} إشعار
-                    </span>
-                </div>
                 <div class="footer-actions">
                     <button class="btn-secondary" (click)="closeNotificationsModal()">
                         إغلاق

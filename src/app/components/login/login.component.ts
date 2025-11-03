@@ -32,14 +32,7 @@ export class LoginComponent implements OnInit {
           Validators.maxLength(20),
         ],
       ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(4),
-          Validators.maxLength(20),
-        ],
-      ],
+      password: ['', [Validators.required]], // إزالة minLength و maxLength
     });
   }
 

@@ -23,7 +23,7 @@
           <p class="text-muted">إضافة وتعديل الأقسام المرتبطة بالمستخدمين</p>
         </div>
         <button class="btn btn-secondary" (click)="openAddDepartment()" title="إضافة قسم جديد">
-          <i class="bi bi-plus-lg ms-1"></i> إضافة قسم
+          <i class="bi bi-plus-lg ms-1"></i> إضافة جهه
         </button>
       </div>
 
@@ -37,9 +37,9 @@
           </select>
         </div>
         <div class="col-md-4">
-          <label for="searchDept" class="visually-hidden">بحث باسم القسم</label>
+          <label for="searchDept" class="visually-hidden">بحث باسم الجهه</label>
           <input id="searchDept" type="text" class="form-control" [(ngModel)]="searchTerm" (input)="applyFilters()"
-            placeholder="ابحث باسم القسم ..." title="بحث باسم القسم" />
+            placeholder="ابحث باسم الجهه ..." title="بحث باسم الجهه" />
         </div>
         <div class="col-md-4 d-grid">
           <button class="btn btn-outline-secondary" (click)="resetFilters()" title="إعادة تعيين الفلاتر">
@@ -54,7 +54,7 @@
             <tr>
               <th class="text-end">القطاع</th>
               <th class="text-end">اسم المستخدم</th>
-              <th class="text-end">القسم</th>
+              <th class="text-end">الجهه</th>
               <th>الحالة</th>
               <th>الإجراءات</th>
             </tr>
@@ -127,7 +127,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ newDepartment._id ? 'تعديل القسم' : 'إضافة قسم جديد' }}</h5>
+        <h5 class="modal-title">{{ newDepartment._id ? 'تعديل القسم' : 'إضافة جهه جديده' }}</h5>
         <button type="button" class="btn-close" (click)="closeAddDepartment()" title="إغلاق"></button>
       </div>
       <div class="modal-body">

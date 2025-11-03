@@ -18,6 +18,7 @@ export interface MainCriteria {
   };
   subCriteria?: SubCriteria[];
   createdAt?: string;
+  
 }
 
 export interface SubCriteria {
@@ -44,6 +45,13 @@ export interface Department {
   _id: string;
   fullname: string;
   username: string;
+  sector?: string; // نضيف هذا الحقل إذا كان موجود في البيانات
+  sectorId?: string; // أو هذا
+  sectorInfo?: {
+    // أو إذا كان object
+    _id: string;
+    name: string;
+  };
 }
 
 export interface Sector {
@@ -158,6 +166,16 @@ export class CriteriaService {
   getAllSectors(): Observable<{ success: boolean; data: Sector[] }> {
     return this.http.get<{ success: boolean; data: Sector[] }>(
       `${this.usersUrl}/all-sectors`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
+  }
+
+  // في ال criteria.service.ts نضيف هذه الدالة
+  getDepartmentsBySector(sectorId: string): Observable<Department[]> {
+    return this.http.get<Department[]>(
+      `${this.usersUrl}/departments-by-sector/${sectorId}`,
       {
         headers: this.getAuthHeaders(),
       }
