@@ -7,7 +7,7 @@
     <div class="page-header">
       <div class="header-content">
         <div class="header-text">
-          <h4 class="mb-1">إدارة الأقسام والمعايير</h4>
+          <h4 class="mb-1">إدارة المعايير</h4>
           <p class="mb-0 text-muted">إدارة المعايير الرئيسية والفرعية بشكل هرمي ومنظم</p>
         </div>
         <div class="header-actions">
@@ -155,7 +155,7 @@
           </div>
 
           <select *ngIf="!isLoadingSectorsDepts && sectors && sectors.length > 0" id="mainSectorId"
-            class="form-select text-end" [(ngModel)]="mainSectorId" name="mainSectorId" [disabled]="isSubmitting"
+            class="form-select dropdown-rtl" [(ngModel)]="mainSectorId" name="mainSectorId" [disabled]="isSubmitting"
             title="القطاع" dir="rtl" (change)="onSectorChange()">
             <option value="ALL">جميع القطاعات</option>
             <option *ngFor="let s of sectors" [value]="getSectorId(s)">
@@ -178,7 +178,7 @@
           </div>
 
           <select *ngIf="!isLoadingSectorsDepts && filteredDepartments.length > 0" id="mainDeptId"
-            class="form-select text-end" [(ngModel)]="mainDeptId" name="mainDeptId" [disabled]="isSubmitting"
+            class="form-select dropdown-rtl" [(ngModel)]="mainDeptId" name="mainDeptId" [disabled]="isSubmitting"
             title="القسم" dir="rtl">
             <option value="">جميع الأقسام</option>
             <option *ngFor="let d of filteredDepartments" [value]="d._id">
@@ -255,3 +255,4 @@
     </div>
   </div>
 </div>
+

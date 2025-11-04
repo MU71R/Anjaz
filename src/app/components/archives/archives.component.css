@@ -371,3 +371,42 @@
 .spinner-border.text-success {
     color: #3b82f6 !important;
 }
+
+
+.description-content {
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.description-text {
+    font-size: 0.95rem;
+}
+
+.description-text strong {
+    font-weight: bold;
+    color: #2c5c2c;
+}
+
+.description-text em {
+    font-style: italic;
+    color: #666;
+}
+
+.description-text u {
+    text-decoration: underline;
+}
+
+.description-text p {
+    margin-bottom: 0.5rem;
+}
+
+.description-text p:last-child {
+    margin-bottom: 0;
+}
+
+.description-text br {
+    content: "";
+    display: block;
+    margin-bottom: 0.3rem;
+}

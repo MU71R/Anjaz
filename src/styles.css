@@ -26,16 +26,3 @@
     background-color: #0dcaf0 !important;
 }
 
-/* منع التمرير عند فتح الشريط الجانبي على الأجهزة المحمولة */
-body.sidebar-open {
-    overflow: hidden;
-}
-
-/* دعم المتصفحات القديمة */
-@supports not (width: min(250px, 100%)) {
-    @media (max-width: 576px) {
-        .sidebar {
-            width: 85%;
-        }
-    }
-}

@@ -1,51 +1,66 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NotificationService } from 'src/app/service/notification.service';
 import { Notification } from 'src/app/model/notification';
-import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
-  styleUrls: ['./notification.component.css']
+  styleUrls: ['./notification.component.css'],
 })
-export class NotificationComponent implements OnInit {
-
+export class NotificationComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   filteredNotifications: Notification[] = [];
-  notificationTypes: string[] = ['info', 'success', 'warning', 'error'];
   isLoading = false;
   showNotificationsModal = false;
   activeFilter: string = 'all';
   unreadCount = 0;
-  hasMoreNotifications = false;
 
-  constructor(private notificationService: NotificationService) {}
+  private notificationsSubscription!: Subscription;
+
+  constructor(
+    private notificationService: NotificationService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadNotifications();
+    this.notificationService.fetchNotificationsFromServer();
+  }
+
+  ngOnDestroy(): void {
+    if (this.notificationsSubscription) {
+      this.notificationsSubscription.unsubscribe();
+    }
   }
 
   loadNotifications(): void {
     this.isLoading = true;
-    this.notificationService.notifications$.subscribe({
+    
+    this.notificationsSubscription = this.notificationService.notifications$.subscribe({
       next: (data) => {
         this.notifications = data;
         this.updateFilteredNotifications();
         this.updateUnreadCount();
         this.isLoading = false;
+        console.log('Notifications loaded:', this.notifications);
       },
       error: (err) => {
         console.error('خطأ أثناء تحميل الإشعارات:', err);
+        this.toastr.error('حدث خطأ أثناء تحميل الإشعارات', 'خطأ');
         this.isLoading = false;
-      }
+      },
     });
   }
 
   updateUnreadCount(): void {
-    this.unreadCount = this.notifications.filter(n => !n.read).length;
+    this.unreadCount = this.notifications.filter((n) => !n.read).length;
   }
 
   openNotificationsModal(): void {
     this.showNotificationsModal = true;
+    this.notificationService.fetchNotificationsFromServer();
   }
 
   closeNotificationsModal(): void {
@@ -61,77 +76,74 @@ export class NotificationComponent implements OnInit {
     if (this.activeFilter === 'all') {
       this.filteredNotifications = this.notifications;
     } else if (this.activeFilter === 'unread') {
-      this.filteredNotifications = this.notifications.filter(n => !n.read);
+      this.filteredNotifications = this.notifications.filter((n) => !n.read);
     } else {
-      this.filteredNotifications = this.notifications.filter(n => n.type === this.activeFilter);
+      this.filteredNotifications = this.notifications.filter(
+        (n) => n.type === this.activeFilter
+      );
     }
   }
 
-  markAsRead(_id: string): void {
-  this.notificationService.markAsRead(_id).subscribe({
-    next: (updatedNotif: Notification) => {
-      const index = this.notifications.findIndex(n => n._id === _id);
-      if (index !== -1) {
-        this.notifications[index] = updatedNotif; 
-      }
-      this.updateUnreadCount();
-      this.updateFilteredNotifications();
-      Swal.fire('تم تعليم الإشعار كمقروء بنجاح', '', 'success');
-    },
-    error: err => console.error('خطأ أثناء التعليم كمقروء:', err)
-  });
-}
+  markAsReadAndDelete(_id: string): void {
+    this.notificationService.markAsRead(_id).subscribe({
+      next: (updatedNotif: Notification) => {
+        const index = this.notifications.findIndex((n) => n._id === _id);
+        if (index !== -1) {
+          this.notifications[index] = updatedNotif;
+        }
+        this.notificationService.deleteNotification(_id).subscribe({
+          next: () => {
+            this.notifications = this.notifications.filter(
+              (n) => n._id !== _id
+            );
+            this.updateUnreadCount();
+            this.updateFilteredNotifications();
+            this.toastr.success(
+              'تم تعليم الإشعار كمقروء وحذفه بنجاح',
+              'تم بنجاح'
+            );
+          },
+          error: (err) => {
+            console.error('خطأ أثناء حذف الإشعار:', err);
+            this.toastr.error('حدث خطأ أثناء حذف الإشعار', 'خطأ');
+          },
+        });
+      },
+      error: (err) => {
+        console.error('خطأ أثناء التعليم كمقروء:', err);
+        this.toastr.error('حدث خطأ أثناء تعليم الإشعار كمقروء', 'خطأ');
+      },
+    });
+  }
 
-  markAllAsRead(): void {
+  markAllAsReadAndDelete(): void {
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
-        this.notifications.forEach(n => n.read = true);
-        this.updateUnreadCount();
-        this.updateFilteredNotifications();
-        Swal.fire('تم تعليم الكل كمقروء بنجاح', '', 'success');
+        this.notificationService.clearAllNotifications().subscribe({
+          next: () => {
+            this.notifications = [];
+            this.updateUnreadCount();
+            this.updateFilteredNotifications();
+            this.toastr.success(
+              'تم تعليم جميع الإشعارات كمقروءة وحذفها جميعاً',
+              'تم بنجاح'
+            );
+          },
+          error: (err) => {
+            console.error('خطأ أثناء حذف جميع الإشعارات:', err);
+            this.toastr.error('حدث خطأ أثناء حذف جميع الإشعارات', 'خطأ');
+          },
+        });
       },
-      error: err => console.error('خطأ أثناء تعليم الكل كمقروء:', err)
-    });
-  }
-
-  sendTestNotification(): void {
-    this.notificationService.sendTestNotification().subscribe({
-      next: (newNotif) => {
-        this.notifications.unshift(newNotif);
-        this.updateUnreadCount();
-        this.updateFilteredNotifications();
+      error: (err) => {
+        console.error('خطأ أثناء تعليم الكل كمقروء:', err);
+        this.toastr.error('حدث خطأ أثناء تعليم جميع الإشعارات كمقروءة', 'خطأ');
       },
-      error: err => console.error('خطأ أثناء إنشاء إشعار تجريبي:', err)
-    });
-  }
-
-  removeNotification(_id: string): void {
-    this.notificationService.deleteNotification(_id).subscribe({
-      next: () => {
-        this.notifications = this.notifications.filter(n => n._id !== _id);
-        this.updateUnreadCount();
-        this.updateFilteredNotifications();
-        Swal.fire('تم حذف الإشعار بنجاح', '', 'success');
-      },
-      error: err => console.error('خطأ أثناء حذف الإشعار:', err)
-    });
-  }
-
-  clearAllNotifications(): void {
-    if (!confirm('هل أنت متأكد من مسح جميع الإشعارات؟')) return;
-    this.notificationService.clearAllNotifications().subscribe({
-      next: () => {
-        this.notifications = [];
-        this.updateFilteredNotifications();
-        this.updateUnreadCount();
-        Swal.fire('تم مسح جميع الإشعارات بنجاح', '', 'success');
-      },
-      error: err => console.error('خطأ أثناء مسح الإشعارات:', err)
     });
   }
 
   hasUnreadNotifications(): boolean {
-    return this.notifications.some(n => !n.read);
+    return this.notifications.some((n) => !n.read);
   }
 
   isRead(notification: Notification): boolean {
@@ -143,17 +155,13 @@ export class NotificationComponent implements OnInit {
       info: 'معلومة',
       warning: 'تحذير',
       success: 'نجاح',
-      error: 'خطأ'
+      error: 'خطأ',
     };
     return map[type] || 'أخرى';
   }
 
   getNotificationIcon(type: string): string {
     const icons: any = {
-      info: 'ℹ️',
-      warning: '⚠️',
-      success: '✅',
-      error: '❌'
     };
     return icons[type] || '🔔';
   }
@@ -170,11 +178,8 @@ export class NotificationComponent implements OnInit {
     return `${Math.floor(diff / 86400)} يوم`;
   }
 
-  getTypeCount(type: string): number {
-    return this.notifications.filter(n => n.type === type).length;
-  }
-
-  loadMoreNotifications(): void {
-    this.hasMoreNotifications = false;
+  refreshNotifications(): void {
+    this.isLoading = true;
+    this.notificationService.fetchNotificationsFromServer();
   }
 }

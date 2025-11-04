@@ -53,4 +53,5 @@ import { ReportsComponent } from './components/reports/reports.component';
   providers: [SocketService, NotificationService],
   bootstrap: [AppComponent],
 })
+
 export class AppModule {}

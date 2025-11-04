@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivityService } from '../../service/achievements-service.service';
 import { Activity } from 'src/app/model/achievement';
 import Swal from 'sweetalert2';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-archived-activities',
@@ -17,7 +18,10 @@ export class ArchivedActivitiesComponent implements OnInit {
   loadingPdf: string | null = null;
   loadingDocx: string | null = null;
 
-  constructor(private activityService: ActivityService) {}
+  constructor(
+    private activityService: ActivityService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     this.loadArchivedActivities();
@@ -37,6 +41,48 @@ export class ArchivedActivitiesComponent implements OnInit {
         Swal.fire('خطأ', this.errorMessage, 'error');
       },
     });
+  }
+
+  getCleanDescription(description: string): SafeHtml {
+    if (!description) return 'لا يوجد وصف';
+    let cleanHtml = description;
+    if (description.includes('<') && description.includes('>')) {
+      cleanHtml = this.cleanHTMLForDisplay(description);
+    } else {
+      cleanHtml = this.formatPlainText(description);
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+  }
+
+  private cleanHTMLForDisplay(html: string): string {
+    if (!html) return '';
+
+    return (
+      html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') 
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') 
+        .replace(/<link[^>]*>/gi, '') 
+        .replace(/<meta[^>]*>/gi, '') 
+        .replace(/<div[^>]*>/g, '<div>') 
+        .replace(/<p[^>]*>/g, '<p>')
+        .replace(/<br\s*\/?>/gi, '<br>') 
+        .replace(/&nbsp;/g, ' ') 
+        .replace(/\n/g, '<br>') 
+        .trim()
+    );
+  }
+
+  private formatPlainText(text: string): string {
+    if (!text) return '';
+
+    return text
+      .split('\n')
+      .map((paragraph) => {
+        const trimmed = paragraph.trim();
+        return trimmed ? `<p class="mb-2">${trimmed}</p>` : '';
+      })
+      .join('');
   }
 
   getCriteriaName(criteria: any): string {
@@ -95,40 +141,41 @@ export class ArchivedActivitiesComponent implements OnInit {
     }
   }
 
-viewGeneratedPDF(activity: Activity): void {
-  const pdfUrl =
-    activity.generatedFiles?.pdf ||
-    activity.Attachments?.find((att: string) => att.toLowerCase().endsWith('.pdf'));
+  viewGeneratedPDF(activity: Activity): void {
+    const pdfUrl =
+      activity.generatedFiles?.pdf ||
+      activity.Attachments?.find((att: string) =>
+        att.toLowerCase().endsWith('.pdf')
+      );
 
-  if (!pdfUrl) {
-    Swal.fire('info', 'لا يوجد ملف PDF متاح للعرض', 'info');
-    return;
-  }
+    if (!pdfUrl) {
+      Swal.fire('info', 'لا يوجد ملف PDF متاح للعرض', 'info');
+      return;
+    }
 
-  this.loadingPdf = activity._id || null;
-  const filename = this.extractFilenameFromUrl(pdfUrl);
+    this.loadingPdf = activity._id || null;
+    const filename = this.extractFilenameFromUrl(pdfUrl);
 
-  if (!filename) {
-    Swal.fire('خطأ', 'تعذر تحديد اسم الملف', 'error');
-    this.loadingPdf = null;
-    return;
-  }
-
-  this.activityService.viewPDF(filename).subscribe({
-    next: (blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    if (!filename) {
+      Swal.fire('خطأ', 'تعذر تحديد اسم الملف', 'error');
       this.loadingPdf = null;
-    },
-    error: (err) => {
-      console.error(' خطأ في عرض PDF:', err);
-      Swal.fire('خطأ', 'تعذر فتح ملف PDF', 'error');
-      this.loadingPdf = null;
-    },
-  });
-}
+      return;
+    }
 
+    this.activityService.viewPDF(filename).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        this.loadingPdf = null;
+      },
+      error: (err) => {
+        console.error(' خطأ في عرض PDF:', err);
+        Swal.fire('خطأ', 'تعذر فتح ملف PDF', 'error');
+        this.loadingPdf = null;
+      },
+    });
+  }
 
   downloadGeneratedWord(activity: Activity): void {
     const docxUrl = activity.generatedFiles?.docx;

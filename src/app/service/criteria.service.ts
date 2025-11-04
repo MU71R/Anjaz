@@ -45,10 +45,9 @@ export interface Department {
   _id: string;
   fullname: string;
   username: string;
-  sector?: string; // نضيف هذا الحقل إذا كان موجود في البيانات
-  sectorId?: string; // أو هذا
+  sector?: string; 
+  sectorId?: string; 
   sectorInfo?: {
-    // أو إذا كان object
     _id: string;
     name: string;
   };
@@ -172,7 +171,6 @@ export class CriteriaService {
     );
   }
 
-  // في ال criteria.service.ts نضيف هذه الدالة
   getDepartmentsBySector(sectorId: string): Observable<Department[]> {
     return this.http.get<Department[]>(
       `${this.usersUrl}/departments-by-sector/${sectorId}`,

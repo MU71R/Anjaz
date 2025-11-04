@@ -53,7 +53,7 @@
                                             معتمد
                                         </span>
                                     </div>
-                                </div>                               
+                                </div>
                             </div>
                         </div>
 
@@ -63,19 +63,16 @@
                                     <div class="info-item">
                                         <i class="fa-solid fa-align-left text-success me-2"></i>
                                         <strong class="text-dark">الوصف:</strong>
-                                        <p class="text-muted mb-0 mt-1 lh-base">
-                                            {{ activity.activityDescription || 'لا يوجد وصف' }}
-                                        </p>
+                                        <div class="description-content mt-2 p-3 bg-light rounded-2 border">
+                                            <div [innerHTML]="getCleanDescription(activity.activityDescription)"
+                                                class="text-muted lh-base description-text">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="info-item mt-3">
                                         <i class="fa-solid fa-user text-success me-2"></i>
-                                        <strong class="text-dark">المسئول عن اضافه الانجاز  : </strong>
+                                        <strong class="text-dark">المسئول عن اضافه الانجاز : </strong>
                                         <span class="text-muted">{{ activity.name || 'غير محدد' }}</span>
-                                    </div>
-                                    <div class="info-item mt-3">
-                                        <i class="fa-solid fa-calendar-day text-success me-2"></i>
-                                        <strong class="text-dark">تاريخ النشاط : </strong>
-                                        <span class="text-muted">{{ formatDate(activity.date) }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

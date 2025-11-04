@@ -30,8 +30,8 @@
       <div class="row mb-4 g-2">
         <div class="col-md-4">
           <label for="filterSector" class="visually-hidden">اختر القطاع</label>
-          <select id="filterSector" class="form-select" [(ngModel)]="selectedSector" (change)="applyFilters()"
-            title="اختر القطاع">
+          <select id="filterSector" class="form-select dropdown-rtl" [(ngModel)]="selectedSector"
+            (change)="applyFilters()" title="اختر القطاع">
             <option value="">كل القطاعات</option>
             <option *ngFor="let s of sectors" [value]="s._id">{{ s.sector }}</option>
           </select>
@@ -133,7 +133,8 @@
       <div class="modal-body">
         <div class="mb-3">
           <label for="deptSector" class="form-label">القطاع:</label>
-          <select id="deptSector" class="form-select" [(ngModel)]="newDepartment.sector" title="اختر القطاع">
+          <select id="deptSector" class="form-select dropdown-rtl" [(ngModel)]="newDepartment.sector"
+            title="اختر القطاع">
             <option value="" disabled selected>اختر اسم القطاع</option>
             <option *ngFor="let s of sectors" [value]="s._id">{{ s.sector }}</option>
           </select>
@@ -148,16 +149,16 @@
           <input id="deptFullname" type="text" class="form-control" [(ngModel)]="newDepartment.fullname"
             placeholder="اسم القسم" title="الاسم الكامل" />
         </div>
-        <div class="mb-3 position-relative">
+        <div class="mb-3 position-relative password-input-container">
           <label for="deptPassword" class="form-label">كلمة المرور:</label>
-          <input id="deptPassword" [type]="showPassword ? 'text' : 'password'" class="form-control"
+          <input id="deptPassword" [type]="showPassword ? 'text' : 'password'" class="form-control password-input"
             [(ngModel)]="newDepartment.password" placeholder="كلمة المرور" title="كلمة المرور" />
-          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'" (click)="togglePassword()"
-            class="password-toggle" title="إظهار/إخفاء كلمة المرور"></i>
+          <i class="bi password-toggle-icon" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+            (click)="togglePassword()" title="إظهار/إخفاء كلمة المرور"></i>
         </div>
         <div class="mb-3">
           <label for="deptRole" class="form-label">الدور:</label>
-          <select id="deptRole" class="form-select" [(ngModel)]="newDepartment.role" title="اختر الدور">
+          <select id="deptRole" class="form-select dropdown-rtl" [(ngModel)]="newDepartment.role" title="اختر الدور">
             <option value="user">مستخدم</option>
             <option value="admin">مشرف</option>
           </select>
@@ -201,7 +202,8 @@
       <div class="modal-body">
         <div class="mb-3">
           <label for="editUserSector" class="form-label">القطاع:</label>
-          <select id="editUserSector" class="form-select" [(ngModel)]="selectedUser.sector" title="اختر القطاع">
+          <select id="editUserSector" class="form-select dropdown-rtl" [(ngModel)]="selectedUser.sector"
+            title="اختر القطاع">
             <option *ngFor="let s of sectors" [value]="s._id">{{ s.sector }}</option>
           </select>
         </div>
@@ -210,6 +212,14 @@
           <input id="editUsername" type="text" class="form-control" [(ngModel)]="selectedUser.username"
             placeholder="اسم المستخدم" title="اسم المستخدم" />
         </div>
+        <div class="mb-3 password-input-container">
+          <label for="editPassword" class="form-label">كلمة المرور الجديدة (اختياري):</label>
+          <input id="editPassword" [type]="showEditPassword ? 'text' : 'password'" class="form-control password-input"
+            [(ngModel)]="selectedUser.newPassword" placeholder="اتركه فارغاً للحفاظ على كلمة المرور الحالية"
+            title="كلمة المرور الجديدة" />
+          <i class="bi password-toggle-icon" [ngClass]="showEditPassword ? 'bi-eye-slash' : 'bi-eye'"
+            (click)="toggleEditPassword()" title="إظهار/إخفاء كلمة المرور"></i>
+        </div>
         <div class="mb-3">
           <label for="editFullname" class="form-label">الاسم الكامل (القسم):</label>
           <input id="editFullname" type="text" class="form-control" [(ngModel)]="selectedUser.fullname"
@@ -217,14 +227,15 @@
         </div>
         <div class="mb-3">
           <label for="editRole" class="form-label">الدور:</label>
-          <select id="editRole" class="form-select" [(ngModel)]="selectedUser.role" title="اختر الدور">
+          <select id="editRole" class="form-select dropdown-rtl" [(ngModel)]="selectedUser.role" title="اختر الدور">
             <option value="user">مستخدم</option>
             <option value="admin">مشرف</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="editStatus" class="form-label">الحالة:</label>
-          <select id="editStatus" class="form-select" [(ngModel)]="selectedUser.status" title="اختر الحالة">
+          <select id="editStatus" class="form-select dropdown-rtl" [(ngModel)]="selectedUser.status"
+            title="اختر الحالة">
             <option value="active">نشط</option>
             <option value="inactive">معطل</option>
           </select>

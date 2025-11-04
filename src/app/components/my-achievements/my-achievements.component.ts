@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivityService } from '../../service/achievements-service.service';
 import { Activity } from 'src/app/model/achievement';
 import Swal from 'sweetalert2';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-my-achievements',
@@ -23,7 +24,10 @@ export class MyAchievementsComponent implements OnInit {
   isAdmin = false;
   currentUser: any = null;
 
-  constructor(private activityService: ActivityService) {}
+  constructor(
+    private activityService: ActivityService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     this.loadActivities();
@@ -94,17 +98,62 @@ export class MyAchievementsComponent implements OnInit {
     });
   }
 
-  getCleanDescription(description: string): string {
-    return this.activityService.cleanDescriptionForDisplay(description);
+  getCleanDescription(description: string): SafeHtml {
+    if (!description) return 'لا يوجد وصف';
+
+    let cleanHtml = description;
+    if (description.includes('<') && description.includes('>')) {
+      cleanHtml = this.cleanHTMLForDisplay(description);
+    } else {
+      cleanHtml = this.formatPlainText(description);
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+  }
+
+  private cleanHTMLForDisplay(html: string): string {
+    if (!html) return '';
+
+    return (
+      html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') 
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') 
+        .replace(/<link[^>]*>/gi, '') 
+        .replace(/<meta[^>]*>/gi, '')
+        .replace(/<div[^>]*>/g, '<div>') 
+        .replace(/<p[^>]*>/g, '<p>') 
+        .replace(/<br\s*\/?>/gi, '<br>') 
+        .replace(/&nbsp;/g, ' ') 
+        .replace(/\n/g, '<br>') 
+        .trim()
+    );
+  }
+
+  private formatPlainText(text: string): string {
+    if (!text) return '';
+
+    return text
+      .split('\n')
+      .map((paragraph) => {
+        const trimmed = paragraph.trim();
+        return trimmed ? `<p class="mb-2">${trimmed}</p>` : '';
+      })
+      .join('');
   }
 
   getShortDescription(description: string, length: number = 50): string {
-    const cleanDescription = this.getCleanDescription(
-      description || 'لا يوجد وصف'
-    );
-    return cleanDescription.length > length
-      ? cleanDescription.substring(0, length) + '...'
-      : cleanDescription;
+    if (!description) return 'لا يوجد وصف';
+
+    const plainText = description
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return plainText.length > length
+      ? plainText.substring(0, length) + '...'
+      : plainText;
   }
 
   filteredAchievements(): Activity[] {
@@ -115,10 +164,11 @@ export class MyAchievementsComponent implements OnInit {
       list = list.filter(
         (a) =>
           a.activityTitle?.toLowerCase().includes(term) ||
-          this.getCleanDescription(a.activityDescription || '')
+          this.getCleanDescriptionText(a.activityDescription || '')
             .toLowerCase()
             .includes(term) ||
           a.name?.toLowerCase().includes(term) ||
+          this.getFullName(a.user)?.toLowerCase().includes(term) || 
           this.getUserName(a.user)?.toLowerCase().includes(term)
       );
     }
@@ -128,6 +178,16 @@ export class MyAchievementsComponent implements OnInit {
     }
 
     return list;
+  }
+
+  private getCleanDescriptionText(description: string): string {
+    if (!description) return '';
+    return description
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   resetFilters(): void {
@@ -160,20 +220,48 @@ export class MyAchievementsComponent implements OnInit {
     }
   }
 
+  getFullName(user: any): string {
+    if (!user) return 'غير محدد';
+
+    if (typeof user === 'string') return user;
+
+    return user.fullname || user.name || 'غير محدد';
+  }
+
   updateActivityStatus(
     id: string,
-    status: 'معتمد' | 'قيد المراجعة' | 'مرفوض'
+    status: 'معتمد' | 'قيد المراجعة' | 'مرفوض',
+    reason?: string
   ): void {
     if (!this.isAdmin) {
       Swal.fire('خطأ', 'ليس لديك صلاحية لهذا الإجراء', 'error');
       return;
     }
 
-    this.activityService.updateStatus(id, status).subscribe({
+    const updateData: any = { status };
+
+    if (status === 'مرفوض') {
+      updateData.reasonForRejection = reason || 'لم يتم تحديد سبب الرفض';
+    }
+
+    this.activityService.updateStatus(id, updateData).subscribe({
       next: (res) => {
         if (res.success) {
-          this.updateLocalStatus(id, status);
-          Swal.fire('تم', `تم تحديث الحالة إلى ${status}`, 'success');
+          this.updateLocalStatus(id, status, reason);
+
+          let message = `تم تحديث الحالة إلى ${status}`;
+          if (status === 'مرفوض' && reason) {
+            message += ` مع سبب الرفض`;
+          } else if (status === 'مرفوض') {
+            message += ` بدون تحديد سبب`;
+          }
+
+          Swal.fire('تم', message, 'success');
+
+          if (status === 'مرفوض') {
+            this.closeRejectModal();
+            this.closeDetailsModal();
+          }
         }
       },
       error: (err) => {
@@ -208,19 +296,23 @@ export class MyAchievementsComponent implements OnInit {
     const achievement = this.selectedAchievement;
     if (!achievement || !achievement._id) return;
 
-    this.activityService.updateStatus(achievement._id, 'مرفوض').subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.updateLocalStatus(achievement._id!, 'مرفوض');
-          this.showRejectModal = false;
-          Swal.fire('تم الرفض', 'تم رفض الإنجاز بنجاح', 'success');
-        }
-      },
-      error: (err) => {
-        console.error('Error rejecting activity:', err);
-        Swal.fire('خطأ', 'تعذر رفض الإنجاز', 'error');
-      },
-    });
+    if (
+      this.rejectionReason &&
+      this.rejectionReason.trim().length > 0 &&
+      this.rejectionReason.trim().length < 5
+    ) {
+      Swal.fire(
+        'تحذير',
+        'إذا قمت بكتابة سبب الرفض، فيجب أن يكون على الأقل 5 أحرف',
+        'warning'
+      );
+      return;
+    }
+
+    const reason = this.rejectionReason
+      ? this.rejectionReason.trim()
+      : undefined;
+    this.updateActivityStatus(achievement._id, 'مرفوض', reason);
   }
 
   deleteActivity(id: string): void {
@@ -255,10 +347,26 @@ export class MyAchievementsComponent implements OnInit {
     });
   }
 
-  private updateLocalStatus(id: string, status: string): void {
+  private updateLocalStatus(id: string, status: string, reason?: string): void {
     this.achievements = this.achievements.map((a) =>
-      a._id === id ? { ...a, status } : a
+      a._id === id
+        ? {
+            ...a,
+            status,
+            ...(status === 'مرفوض' && {
+              reasonForRejection: reason || 'لم يتم تحديد سبب الرفض',
+            }),
+          }
+        : a
     );
+
+    if (this.selectedAchievement && this.selectedAchievement._id === id) {
+      this.selectedAchievement.status = status;
+      if (status === 'مرفوض') {
+        this.selectedAchievement.reasonForRejection =
+          reason || 'لم يتم تحديد سبب الرفض';
+      }
+    }
   }
 
   getNameField(field: any): string {

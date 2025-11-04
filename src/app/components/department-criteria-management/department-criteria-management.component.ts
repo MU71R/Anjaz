@@ -18,7 +18,7 @@ import Swal from 'sweetalert2';
 })
 export class DepartmentCriteriaManagementComponent implements OnInit {
   departments: Department[] = [];
-  filteredDepartments: Department[] = []; // الأقسام المصفاة حسب القطاع
+  filteredDepartments: Department[] = []; 
   sectors: Sector[] = [];
   mainCriteria: MainCriteria[] = [];
   subCriteria: SubCriteria[] = [];
@@ -26,8 +26,8 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
   isMainModalOpen = false;
   editingMain: MainCriteria | null = null;
   mainName = '';
-  mainSectorId = 'ALL'; // Default to ALL sectors
-  mainDeptId = ''; // Empty means all departments
+  mainSectorId = 'ALL';
+  mainDeptId = ''; 
   isSubModalOpen = false;
   editingSub: SubCriteria | null = null;
   subName = '';
@@ -123,7 +123,7 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       next: (departments) => {
         console.log('Departments loaded:', departments);
         this.departments = departments;
-        this.filteredDepartments = []; // نبدأ بقائمة فارغة
+        this.filteredDepartments = []; 
         this.isLoadingSectorsDepts = false;
       },
       error: (error) => {
@@ -139,27 +139,20 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     });
   }
 
-  // دالة لتصفية الأقسام بناءً على القطاع المختار
   filterDepartmentsBySector(sectorId: string): void {
     if (sectorId === 'ALL') {
       this.filteredDepartments = [];
-      this.mainDeptId = ''; // Reset department selection
+      this.mainDeptId = ''; 
     } else {
-      // هنا بيكون فيه منطق لربط الأقسام بالقطاع
-      // إذا كان في حقل sector في Department object
       this.filteredDepartments = this.departments.filter(
         (dept) =>
           dept.sector === sectorId ||
           (dept as any).sectorId === sectorId ||
           (dept as any).sector?._id === sectorId
       );
-
-      // إذا مفيش بيانات عن القطاع في الأقسام، نعرض كل الأقسام
       if (this.filteredDepartments.length === 0) {
         this.filteredDepartments = this.departments;
       }
-
-      // نعيد تعيين القسم المختار إذا كان مش موجود في القائمة الجديدة
       if (
         this.mainDeptId &&
         !this.filteredDepartments.find((d) => d._id === this.mainDeptId)
@@ -256,8 +249,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       this.mainName = edit.name;
 
       console.log('Editing main criteria:', edit);
-
-      // Set sector - if it's ALL or specific sector
       if (edit.level === 'ALL') {
         this.mainSectorId = 'ALL';
       } else if (edit.sector) {
@@ -270,7 +261,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         this.mainSectorId = 'ALL';
       }
 
-      // Set department - if empty it means all departments
       if (edit.departmentUser) {
         if (typeof edit.departmentUser === 'string') {
           this.mainDeptId = edit.departmentUser;
@@ -281,7 +271,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
         this.mainDeptId = '';
       }
 
-      // نطبق التصفية عند فتح المودال للتعديل
       this.filterDepartmentsBySector(this.mainSectorId);
 
       console.log(
@@ -293,9 +282,9 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     } else {
       this.editingMain = null;
       this.mainName = '';
-      this.mainSectorId = 'ALL'; // Default to ALL sectors
-      this.mainDeptId = ''; // Default to all departments
-      this.filteredDepartments = []; // نبدأ بقائمة فارغة
+      this.mainSectorId = 'ALL'; 
+      this.mainDeptId = ''; 
+      this.filteredDepartments = []; 
     }
     this.isMainModalOpen = true;
   }
@@ -323,7 +312,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    // Determine level based on selections
     let level: 'ALL' | 'SECTOR' | 'DEPARTMENT' = 'ALL';
     let sectorId: string | null = null;
     let departmentId: string | null = null;
@@ -336,7 +324,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
       level = 'SECTOR';
       sectorId = this.mainSectorId;
 
-      // If department is selected, set level to DEPARTMENT
       if (this.mainDeptId) {
         level = 'DEPARTMENT';
         departmentId = this.mainDeptId;
@@ -430,7 +417,6 @@ export class DepartmentCriteriaManagementComponent implements OnInit {
     }
   }
 
-  // باقي الدوال تبقى كما هي...
   requestDeleteMain(id: string) {
     const used = this.subCriteria.some((s) =>
       typeof s.mainCriteria === 'string'

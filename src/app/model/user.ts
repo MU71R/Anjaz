@@ -2,7 +2,6 @@ export interface LoginCredentials {
   username: string;
   password: string;
 }
-
 export interface User {
   _id?: string;
   username: string;
@@ -10,7 +9,8 @@ export interface User {
   role: 'admin' | 'user' | string;
   sector: string;
   status?: 'active' | 'inactive';
-  sectorName?: string; 
+  newPassword?: string;
+  sectorName?: string;
   department?: string;
   password?: string;
 }

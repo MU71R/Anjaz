@@ -98,7 +98,7 @@
                           <th scope="col" width="25%">عنوان الإنجاز</th>
                           <th scope="col" width="15%">المعيار الرئيسي</th>
                           <th scope="col" width="15%">المعيار الفرعي</th>
-                          <th scope="col" width="15%">المسئول عن اضافه الانجاز </th>
+                          <th scope="col" width="15%">الجهه</th>
                           <th scope="col" width="10%">الحالة</th>
                           <th scope="col" width="10%">التاريخ</th>
                           <th scope="col" width="8%" class="text-center">الإجراءات</th>
@@ -131,8 +131,9 @@
                             </span>
                           </td>
                           <td>
-                            <span class="applicant-text text-dark" title="{{ achievement.name || 'غير محدد' }}">
-                              {{ (achievement.name || 'غير محدد').substring(0, 20) }}{{ (achievement.name || '').length
+                            <span class="applicant-text text-dark" title="{{ getFullName(achievement.user) }}">
+                              {{ getFullName(achievement.user).substring(0, 20) }}{{
+                              getFullName(achievement.user).length
                               >
                               20
                               ? '...' : '' }}
@@ -194,8 +195,8 @@
                             <div class="meta-item">
                               <small class="text-muted">
                                 <i class="fa-solid fa-user me-1"></i>
-                                {{ (achievement.name || 'غير محدد').substring(0, 15) }}{{ (achievement.name ||
-                                '').length > 15 ? '...' : '' }}
+                                {{ getFullName(achievement.user).substring(0, 15) }}{{
+                                getFullName(achievement.user).length > 15 ? '...' : '' }}
                               </small>
                             </div>
                             <div class="meta-item">
@@ -236,8 +237,6 @@
           <i class="fa-solid fa-file-lines me-2"></i>
           تفاصيل الإنجاز
         </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeDetailsModal()"
-          aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3 g-md-4">
@@ -254,12 +253,15 @@
                 </div>
                 <div class="info-item">
                   <strong>الوصف:</strong>
-                  <p class="mb-0 description-text">{{ getCleanDescription(selectedAchievement.activityDescription) ||
-                    'لا يوجد وصف' }}</p>
+                  <div class="description-content mt-2 p-3 bg-light rounded-2 border">
+                    <div [innerHTML]="getCleanDescription(selectedAchievement.activityDescription)"
+                      class="text-muted lh-base description-text modal-description">
+                    </div>
+                  </div>
                 </div>
                 <div class="info-item">
-                  <strong>المسئول عن اضافه الانجاز  :</strong>
-                  <span>{{ selectedAchievement.name || 'غير محدد' }}</span>
+                  <strong>الجهه :</strong>
+                  <span>{{ getFullName(selectedAchievement.user) }}</span>
                 </div>
                 <div class="info-item">
                   <strong>تاريخ الإنشاء:</strong>
@@ -289,6 +291,14 @@
                   <span class="badge status-badge" [ngClass]="getStatusClass(selectedAchievement.status)">
                     {{ selectedAchievement.status }}
                   </span>
+                </div>
+                <div class="info-item"
+                  *ngIf="selectedAchievement.status === 'مرفوض' && selectedAchievement.reasonForRejection">
+                  <strong>سبب الرفض:</strong>
+                  <div class="rejection-reason mt-2 p-3 bg-light rounded-2 border text-danger">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i>
+                    {{ selectedAchievement.reasonForRejection }}
+                  </div>
                 </div>
                 <div class="info-item">
                   <strong>آخر تحديث:</strong>
@@ -403,9 +413,17 @@
         </div>
 
         <div class="mb-3">
-          <label for="rejectionReason" class="form-label">سبب الرفض (اختياري)</label>
-          <textarea class="form-control" id="rejectionReason" rows="3" [(ngModel)]="rejectionReason"
-            placeholder="أدخل سبب الرفض إذا رغبت..."></textarea>
+          <label for="rejectionReason" class="form-label">
+            <strong>سبب الرفض</strong>
+            <span class="text-muted">(اختياري)</span>
+          </label>
+          <textarea class="form-control" id="rejectionReason" rows="4" [(ngModel)]="rejectionReason"
+            placeholder="يمكنك كتابة سبب الرفض لتوضيح السبب للمستخدم...">
+          </textarea>
+          <div class="form-text text-muted">
+            <i class="fa-solid fa-info-circle me-1"></i>
+            سبب الرفض اختياري - سيتم إرساله للمستخدم المسؤول عن الإنجاز إذا تم كتابته
+          </div>
         </div>
       </div>
       <div class="modal-footer border-0">

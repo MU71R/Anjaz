@@ -117,9 +117,12 @@ export class AddAchievementComponent implements OnInit {
         this.getSubCriteria(mainCriteriaId);
       }
 
-      if (this.descriptionEditor) {
+      if (
+        this.descriptionEditor &&
+        this.originalDraftData.activityDescription
+      ) {
         this.descriptionEditor.nativeElement.innerHTML =
-          this.originalDraftData.activityDescription || '';
+          this.originalDraftData.activityDescription;
       }
     }
   }
@@ -195,15 +198,37 @@ export class AddAchievementComponent implements OnInit {
 
   syncDescriptionToForm() {
     let html = this.descriptionEditor.nativeElement.innerHTML.trim();
-
+    html = this.cleanHTML(html);
     const text = html
-      .replace(/<br\s*\/?>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n')
       .replace(/&nbsp;/g, ' ')
       .replace(/<[^>]*>/g, '')
       .trim();
 
-    this.form.get('activityDescription')?.setValue(text);
+    if (text.length < 10) {
+      this.form.get('activityDescription')?.setErrors({ minlength: true });
+    } else if (text.length > 1000) {
+      this.form.get('activityDescription')?.setErrors({ maxlength: true });
+    } else {
+      this.form.get('activityDescription')?.setErrors(null);
+    }
+    this.form.get('activityDescription')?.setValue(html);
     this.form.get('activityDescription')?.markAsTouched();
+  }
+
+  private cleanHTML(html: string): string {
+    return html
+      .replace(/ style="[^"]*"/g, '') 
+      .replace(/ class="[^"]*"/g, '') 
+      .replace(/<span[^>]*>/g, '') 
+      .replace(/<\/span>/g, '') 
+      .replace(/<div[^>]*>/g, '<div>') 
+      .replace(/<p[^>]*>/g, '<p>') 
+      .replace(/<b>/g, '<strong>')
+      .replace(/<\/b>/g, '</strong>')
+      .replace(/<i>/g, '<em>')
+      .replace(/<\/i>/g, '</em>')
+      .trim();
   }
 
   onFilesSelected(ev: Event) {
@@ -225,7 +250,6 @@ export class AddAchievementComponent implements OnInit {
       const allowedImage = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'];
 
       if (ext === 'pdf') {
-        // يمكن إضافة تأكيد لرفع ملفات PDF إذا لزم الأمر
       }
 
       if (!(ext === 'pdf' || allowedImage.includes(ext))) {
@@ -526,6 +550,4 @@ export class AddAchievementComponent implements OnInit {
       cancelButtonText: 'إلغاء',
     });
   }
-
-  
 }

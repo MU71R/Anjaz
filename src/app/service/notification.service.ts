@@ -15,8 +15,16 @@ export class NotificationService {
   private API_URL = 'http://localhost:3000/notifications';
 
   constructor(private http: HttpClient) {
+    this.initializeNotifications();
+  }
+
+  private initializeNotifications(): void {
     this.requestNotificationPermission();
     this.fetchNotificationsFromServer();
+    this.initializeSocketConnection();
+  }
+
+  private initializeSocketConnection(): void {
     this.socket = io('http://localhost:3000', {
       transports: ['websocket', 'polling'],
     });
@@ -25,10 +33,11 @@ export class NotificationService {
     if (userData) {
       const user = JSON.parse(userData);
       if (user._id) {
-        this.socket.emit('registerUser', user._id); 
+        this.socket.emit('registerUser', user._id);
         console.log('Registered user room:', user._id);
       }
     }
+
     this.socket.on('notification', (notification: Notification) => {
       this.addNotification(notification);
       this.showBrowserNotification(notification.title, notification.message);
@@ -36,6 +45,11 @@ export class NotificationService {
 
     this.socket.on('connect', () => {
       console.log('Connected to Socket.IO server');
+      this.fetchNotificationsFromServer();
+    });
+
+    this.socket.on('disconnect', () => {
+      console.log('Disconnected from Socket.IO server');
     });
   }
 
@@ -48,12 +62,17 @@ export class NotificationService {
   }
 
   fetchNotificationsFromServer(): void {
-    this.http.get<Notification[]>(this.API_URL, {
-      headers: this.getAuthHeaders(),
-    }).subscribe({
-      next: (data) => this.notificationsSubject.next(data),
-      error: (err) => console.error('Error fetching notifications:', err),
-    });
+    this.http
+      .get<Notification[]>(this.API_URL, {
+        headers: this.getAuthHeaders(),
+      })
+      .subscribe({
+        next: (data) => {
+          console.log('Fetched notifications:', data);
+          this.notificationsSubject.next(data);
+        },
+        error: (err) => console.error('Error fetching notifications:', err),
+      });
   }
 
   requestNotificationPermission(): void {
@@ -63,29 +82,36 @@ export class NotificationService {
   }
 
   private showBrowserNotification(title: string, message: string): void {
-    if ('Notification' in window && window.Notification.permission === 'granted') {
+    if (
+      'Notification' in window &&
+      window.Notification.permission === 'granted'
+    ) {
       new window.Notification(title, { body: message });
     }
   }
 
   addNotification(notification: Notification): void {
-    const updated = [notification, ...this.notificationsSubject.value];
+    const currentNotifications = this.notificationsSubject.value;
+    const updated = [notification, ...currentNotifications];
     this.notificationsSubject.next(updated);
   }
 
   markAsRead(notificationId: string) {
-  return this.http.post<Notification>(  
-    `${this.API_URL}/${notificationId}`,
-    { seen: true },
-    { headers: this.getAuthHeaders() }
-  );
-}
-
+    return this.http.post<Notification>(
+      `${this.API_URL}/${notificationId}`,
+      { seen: true },
+      { headers: this.getAuthHeaders() }
+    );
+  }
 
   markAllAsRead() {
-    return this.http.put(`${this.API_URL}/markAllRead`, {}, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.put(
+      `${this.API_URL}/markAllRead`,
+      {},
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
   }
 
   deleteNotification(notificationId: string) {
@@ -101,8 +127,18 @@ export class NotificationService {
   }
 
   sendTestNotification() {
-    return this.http.post<Notification>(`${this.API_URL}/test`, {}, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.post<Notification>(
+      `${this.API_URL}/test`,
+      {},
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
+  }
+
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 }

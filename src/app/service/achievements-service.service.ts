@@ -283,7 +283,7 @@ export class ActivityService {
 
   updateStatus(
     id: string,
-    status: Activity['status']
+    data: { status: Activity['status']; reasonForRejection?: string }
   ): Observable<{ success: boolean; message: string; activity: Activity }> {
     return this.http
       .put<{
@@ -292,7 +292,7 @@ export class ActivityService {
         activity: Activity;
       }>(
         `${this.API_BASE_URL}/update-status/${id}`,
-        { status },
+        data, 
         {
           headers: this.getAuthHeaders().set(
             'Content-Type',

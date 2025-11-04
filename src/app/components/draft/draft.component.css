@@ -434,3 +434,65 @@
     background: linear-gradient(90deg, #1e3a8a, #3b82f6);
     border-radius: 0.75rem 0.75rem 0 0;
 }
+
+
+.description-content {
+    max-height: 150px;
+    overflow-y: auto;
+    line-height: 1.6;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.description-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.description-text strong {
+    font-weight: bold;
+    color: #2c5c2c;
+}
+
+.description-text em {
+    font-style: italic;
+    color: #666;
+}
+
+.description-text u {
+    text-decoration: underline;
+}
+
+.description-text p {
+    margin-bottom: 0.5rem;
+}
+
+.description-text p:last-child {
+    margin-bottom: 0;
+}
+
+.description-text br {
+    content: "";
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.description-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.description-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

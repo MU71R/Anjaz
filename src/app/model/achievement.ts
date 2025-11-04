@@ -21,13 +21,14 @@ export interface Achievement {
 
 export interface Activity {
   _id?: string;
-  user: { _id?: string; name?: string } | string;
+  user: { _id?: string; name?: string; fullname?: string } | string; 
   activityTitle: string;
   activityDescription: string;
   MainCriteria: { _id?: string; name?: string } | string;
   SubCriteria: { _id?: string; name?: string } | string;
   department?: { _id?: string; name?: string } | string;
   status: 'مرفوض' | 'قيد المراجعة' | 'معتمد' | string;
+  reasonForRejection?: string; 
   SaveStatus: 'مسودة' | 'مكتمل';
   Attachments: string[];
   name?: string;

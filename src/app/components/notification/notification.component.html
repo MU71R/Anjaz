@@ -16,13 +16,6 @@
                         <i class="fas fa-bell"></i>
                         الإشعارات
                     </h2>
-                    <div class="header-actions">
-                        <button class="action-btn mark-all-read" (click)="markAllAsRead()"
-                            *ngIf="hasUnreadNotifications()">
-                            <i class="fas fa-check-double"></i>
-                            تعليم الكل كمقروء
-                        </button>
-                    </div>
                 </div>
 
                 <div class="filter-tabs">
@@ -30,10 +23,12 @@
                         الكل ({{ notifications.length }})
                     </button>
                 </div>
+                <button class="close-btn" (click)="closeNotificationsModal()" title="إغلاق">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <div class="modal-body">
-
                 <div *ngIf="isLoading" class="loading-state">
                     <div class="spinner"></div>
                     <p>جاري تحميل الإشعارات...</p>
@@ -49,12 +44,11 @@
                     <p *ngIf="activeFilter !== 'all' && activeFilter !== 'unread'">
                         لا توجد إشعارات من نوع {{ getTypeLabel(activeFilter) }}
                     </p>
-                    
                 </div>
 
                 <div *ngIf="!isLoading && filteredNotifications.length > 0" class="notifications-list">
                     <div *ngFor="let notification of filteredNotifications" class="notification-item"
-                        [class.unread]="!isRead(notification)" [class]="'notification-' + notification.type">
+                        [class.unread]="!notification.read" [class]="'type-' + notification.type">
 
                         <div class="notification-main">
                             <div class="notification-icon" [class]="'icon-' + notification.type">
@@ -68,16 +62,13 @@
                                         {{ formatTimeAgo(notification.timestamp) }}
                                     </span>
                                 </div>
-
                                 <p class="notification-message">{{ notification.message }}</p>
-
                             </div>
                         </div>
 
                         <div class="notification-actions">
-                            <button class="action-btn read-btn" *ngIf="!isRead(notification)"
-                                (click)="notification._id && markAsRead(notification._id)" title="تعليم كمقروء"
-                                [disabled]="!notification._id">
+                            <button class="action-btn read-delete-btn" (click)="markAsReadAndDelete(notification._id)"
+                                title="تعليم كمقروء وحذف" [disabled]="!notification._id">
                                 <i class="fas fa-check"></i>
                             </button>
                         </div>
@@ -86,12 +77,16 @@
             </div>
 
             <div class="modal-footer">
+                <div class="header-actions">
+                    <button class="action-btn mark-all-read" (click)="markAllAsReadAndDelete()"
+                        *ngIf="notifications.length > 0">
+                        <i class="fas fa-check-double"></i>
+                        تعليم الكل كمقروء وحذف الكل
+                    </button>
+                </div>
                 <div class="footer-actions">
                     <button class="btn-secondary" (click)="closeNotificationsModal()">
                         إغلاق
-                    </button>
-                    <button class="btn-primary" (click)="loadMoreNotifications()" *ngIf="hasMoreNotifications">
-                        تحميل المزيد
                     </button>
                 </div>
             </div>

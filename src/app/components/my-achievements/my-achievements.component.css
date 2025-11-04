@@ -1,3 +1,19 @@
+.modal-description {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.6 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.achievement-desc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
 .bg-gradient-primary {
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
 }
@@ -574,4 +590,73 @@
 
 .mobile-achievements-list::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.description-content {
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.6;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.description-text {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.description-text strong {
+  font-weight: bold;
+  color: #2c5c2c;
+}
+
+.description-text em {
+  font-style: italic;
+  color: #666;
+}
+
+.description-text u {
+  text-decoration: underline;
+}
+
+.description-text p {
+  margin-bottom: 0.5rem;
+}
+
+.description-text p:last-child {
+  margin-bottom: 0;
+}
+
+.description-text br {
+  content: "";
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.description-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.description-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.achievement-desc {
+  line-height: 1.4;
+}
+
+.achievement-content {
+  max-width: 300px;
 }

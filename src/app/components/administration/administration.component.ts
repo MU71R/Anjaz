@@ -16,6 +16,7 @@ export class AdministrationComponent implements OnInit {
   activeTab: 'users' | 'sectors' = 'users';
 
   searchTerm = '';
+  showEditPassword = false;
   selectedSector = '';
   showAddDepartmentModal = false;
   showEditUserModal = false;
@@ -29,7 +30,7 @@ export class AdministrationComponent implements OnInit {
     sector: '',
   };
 
-  selectedUser: Partial<User> & { _id?: string } = {};
+  selectedUser: Partial<User> & { _id?: string; newPassword?: string } = {};
   newSector: Sector = { _id: '', sector: '' };
 
   constructor(private adminService: AdministrationService) {}
@@ -109,17 +110,22 @@ export class AdministrationComponent implements OnInit {
 
   openEditUser(user: User): void {
     this.selectedUser = { ...user };
+    this.selectedUser.newPassword = ''; 
     this.showEditUserModal = true;
+    this.showEditPassword = false;
   }
 
   closeEditUser(): void {
     this.selectedUser = {};
     this.showEditUserModal = false;
+    this.showEditPassword = false;
   }
 
   confirmEditUser(): void {
     if (!this.selectedUser._id) return;
-    const { fullname, username, role, sector } = this.selectedUser;
+
+    const { fullname, username, role, sector, newPassword } = this.selectedUser;
+
     if (!fullname?.trim() || !username?.trim() || !role || !sector) {
       Swal.fire({
         icon: 'warning',
@@ -127,6 +133,7 @@ export class AdministrationComponent implements OnInit {
       });
       return;
     }
+
     const payload: Partial<User> = {
       fullname: fullname.trim(),
       username: username.trim(),
@@ -134,14 +141,22 @@ export class AdministrationComponent implements OnInit {
       status: this.selectedUser.status,
       sector: typeof sector === 'string' ? sector : (sector as Sector)?._id,
     };
+    if (newPassword && newPassword.trim()) {
+      payload.password = newPassword.trim();
+    }
+
     this.adminService.updateUser(this.selectedUser._id, payload).subscribe({
       next: (response: any) => {
         if (response.success) {
           const index = this.users.findIndex(
             (u) => u._id === this.selectedUser._id
           );
-          if (index !== -1)
-            this.users[index] = { ...this.users[index], ...payload };
+          if (index !== -1) {
+            this.users[index] = {
+              ...this.users[index],
+              ...payload,
+            };
+          }
           this.applyFilters();
           Swal.fire({
             icon: 'success',
@@ -369,6 +384,10 @@ export class AdministrationComponent implements OnInit {
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  toggleEditPassword(): void {
+    this.showEditPassword = !this.showEditPassword;
   }
 
   saveDepartment(): void {
