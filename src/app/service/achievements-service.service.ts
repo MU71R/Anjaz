@@ -2,17 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, tap, throwError, catchError } from 'rxjs';
 import { Activity } from '../model/achievement';
+// في service/achievements-service.service.ts
 export interface PDFFile {
-  _id: string;
+  _id?: string;
+  pdfurl: string;
   userId: {
     _id: string;
     fullname: string;
-    name: string;
-    role: string;
   };
-  pdfurl: string;
   createdAt: string;
-  updatedAt: string;
+  // إضافة الخصائص الجديدة
+  generatedBy?: string;
+  generatedAt?: string;
+  filename?: string;
 }
 
 @Injectable({

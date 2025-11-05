@@ -24,6 +24,7 @@ export class ReportsComponent implements OnInit {
   showDateError = false;
   dateRequiredError = false;
   maxDate: string;
+  currentDate: string;
 
   filters: ReportFilter = {
     startDate: '',
@@ -51,12 +52,47 @@ export class ReportsComponent implements OnInit {
     private administrationService: AdministrationService
   ) {
     this.maxDate = new Date().toISOString().split('T')[0];
+    this.currentDate = new Date().toISOString();
   }
 
   ngOnInit() {
     this.loadFilterData();
     this.loadAllPDFs();
     this.loadUsers();
+  }
+
+  preventDateInput(event: any): void {
+    if (event.type === 'keydown') {
+      event.preventDefault();
+      return;
+    }
+
+    if (event.type === 'paste') {
+      event.preventDefault();
+      return;
+    }
+  }
+
+  onDateInput(event: any, fieldName: string): void {
+    const input = event.target;
+    const value = input.value;
+
+    if (value && !this.isValidDate(value)) {
+      if (fieldName === 'startDate') {
+        input.value = this.filters.startDate;
+      } else {
+        input.value = this.filters.endDate;
+      }
+      this.showError('يرجى استخدام التقويم لاختيار التاريخ');
+    }
+  }
+
+  isValidDate(dateString: string): boolean {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateString)) return false;
+
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date.getTime());
   }
 
   toggleFilters(): void {
@@ -163,6 +199,14 @@ export class ReportsComponent implements OnInit {
         this.showError('تاريخ البداية يجب أن يكون قبل تاريخ النهاية');
         return false;
       }
+
+      const today = new Date();
+      if (startDate > today || endDate > today) {
+        this.showDateError = true;
+        this.dateRequiredError = false;
+        this.showError('لا يمكن اختيار تاريخ في المستقبل');
+        return false;
+      }
     }
 
     this.showDateError = false;
@@ -182,6 +226,8 @@ export class ReportsComponent implements OnInit {
         this.generatedReport = response;
 
         if (response.success && response.file) {
+          this.currentDate = new Date().toISOString();
+
           this.showSuccess('تم إنشاء التقرير بنجاح!');
           this.loadAllPDFs();
           this.showReportResults = true;
@@ -277,16 +323,25 @@ export class ReportsComponent implements OnInit {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       });
     } catch {
       return dateString;
     }
   }
 
+  getUserDisplayName(pdf: PDFFile): string {
+    if (pdf.userId && pdf.userId.fullname) {
+      return pdf.userId.fullname;
+    }
+    return 'مستخدم غير معروف';
+  }
+
   clearFilters() {
     this.filters = {
-      startDate: this.filters.startDate, 
-      endDate: this.filters.endDate, 
+      startDate: '',
+      endDate: '',
       MainCriteria: '',
       SubCriteria: '',
       user: '',
@@ -296,7 +351,7 @@ export class ReportsComponent implements OnInit {
     this.generatedReport = null;
     this.showDateError = false;
     this.dateRequiredError = false;
-    this.showSuccess('تم مسح الفلاتر الاختيارية');
+    this.showSuccess('تم مسح جميع الفلاتر');
   }
 
   clearDates() {
@@ -335,11 +390,17 @@ export class ReportsComponent implements OnInit {
     });
   }
 
+  getCurrentUserName(): string {
+    return 'المستخدم الحالي';
+  }
+
   getFilterSummary(): string {
     const parts = [];
 
-    if (this.filters.startDate) parts.push(`من: ${this.filters.startDate}`);
-    if (this.filters.endDate) parts.push(`إلى: ${this.filters.endDate}`);
+    if (this.filters.startDate)
+      parts.push(`من: ${this.formatDate(this.filters.startDate)}`);
+    if (this.filters.endDate)
+      parts.push(`إلى: ${this.formatDate(this.filters.endDate)}`);
 
     if (this.filters.MainCriteria) {
       const mainCriteria = this.mainCriteriaList.find(

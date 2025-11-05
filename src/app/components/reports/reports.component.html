@@ -40,7 +40,9 @@
                                     <i class="fas fa-calendar-alt"></i>
                                     <input type="date" class="form-control" [(ngModel)]="filters.startDate"
                                         name="startDate" [max]="filters.endDate || maxDate"
-                                        [class.is-invalid]="dateRequiredError">
+                                        [class.is-invalid]="dateRequiredError || showDateError"
+                                        (keydown)="preventDateInput($event)" (paste)="preventDateInput($event)"
+                                        (input)="onDateInput($event, 'startDate')">
                                 </div>
                             </div>
                         </div>
@@ -55,14 +57,16 @@
                                     <i class="fas fa-calendar-alt"></i>
                                     <input type="date" class="form-control" [(ngModel)]="filters.endDate" name="endDate"
                                         [min]="filters.startDate" [max]="maxDate"
-                                        [class.is-invalid]="dateRequiredError">
+                                        [class.is-invalid]="dateRequiredError || showDateError"
+                                        (keydown)="preventDateInput($event)" (paste)="preventDateInput($event)"
+                                        (input)="onDateInput($event, 'endDate')">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-lg-6 col-md-12">
                             <div class="date-actions">
-                                <div class="date-info" *ngIf="isDateComplete()">
+                                <div class="date-info" *ngIf="isDateComplete() && !showDateError">
                                     <i class="fas fa-check-circle text-success"></i>
                                     <span>تم تحديد النطاق الزمني</span>
                                 </div>
@@ -80,6 +84,21 @@
                     <div class="row">
                         <div class="col-lg-3 col-md-6">
                             <div class="form-group">
+                                <label class="form-label">المستخدم</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user"></i>
+                                    <select class="form-control" [(ngModel)]="filters.user" name="user">
+                                        <option value="">جميع المستخدمين</option>
+                                        <option *ngFor="let user of usersList" [value]="user._id">
+                                            {{ user.fullname }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
                                 <label class="form-label">المعيار الرئيسي</label>
                                 <div class="input-with-icon">
                                     <i class="fas fa-list-alt"></i>
@@ -95,35 +114,22 @@
                         </div>
 
                         <div class="col-lg-3 col-md-6">
-                            <div class="form-group">
+                            <div class="form-group dropdown-container">
                                 <label class="form-label">المعيار الفرعي</label>
                                 <div class="input-with-icon">
                                     <i class="fas fa-list"></i>
                                     <select class="form-control" [(ngModel)]="filters.SubCriteria" name="SubCriteria"
-                                        [disabled]="!filters.MainCriteria || subCriteriaList.length === 0">
+                                        [disabled]="!filters.MainCriteria || subCriteriaList.length === 0"
+                                        style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;">
                                         <option value="">جميع المعايير الفرعية</option>
-                                        <option *ngFor="let sub of subCriteriaList" [value]="sub._id">
-                                            {{ sub.name }}
+                                        <option *ngFor="let sub of subCriteriaList" [value]="sub._id" [title]="sub.name">
+                                            {{ sub.name.length > 150 ? (sub.name | slice:0:150) + '...' : sub.name }}
                                         </option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-lg-3 col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">المستخدم</label>
-                                <div class="input-with-icon">
-                                    <i class="fas fa-user"></i>
-                                    <select class="form-control" [(ngModel)]="filters.user" name="user">
-                                        <option value="">جميع المستخدمين</option>
-                                        <option *ngFor="let user of usersList" [value]="user._id">
-                                            {{ user.fullname }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -134,13 +140,13 @@
 
                 <div *ngIf="showDateError" class="alert alert-danger mt-3">
                     <i class="fas fa-exclamation-triangle"></i>
-                    تاريخ البداية يجب أن يكون قبل تاريخ النهاية
+                    <strong>خطأ في التواريخ</strong> - تاريخ البداية يجب أن يكون قبل تاريخ النهاية
                 </div>
 
                 <div class="generate-report-section">
                     <div class="generate-actions">
                         <button class="btn btn-primary btn-generate" (click)="generateReportWithValidation()"
-                            [disabled]="isLoading || showDateError || dateRequiredError">
+                            [disabled]="isLoading || showDateError || dateRequiredError || !isDateComplete()">
                             <span class="btn-content">
                                 <i class="fas" [class.fa-file-pdf]="!isLoading" [class.fa-spinner]="isLoading"
                                     [class.fa-spin]="isLoading"></i>
@@ -180,8 +186,16 @@
                                 <span class="summary-label">عدد الأنشطة:</span>
                                 <span class="summary-value">{{ generatedReport.count }} نشاط</span>
                             </div>
+                            <div class="summary-item">
+                                <span class="summary-label">تم الإنشاء بواسطة:</span>
+                                <span class="summary-value">{{ getCurrentUserName() }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">تاريخ الإنشاء:</span>
+                                <span class="summary-value">{{ formatDate(currentDate) }}</span>
+                            </div>
                         </div>
-            
+
                         <div class="download-section">
                             <h6>خيارات التحميل:</h6>
                             <div class="download-options">
@@ -195,7 +209,7 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <div *ngIf="!generatedReport.success" class="report-error">
                     <div class="error-icon">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -232,6 +246,11 @@
             </div>
 
             <div class="card-body" *ngIf="showPreviousReports">
+                <div *ngIf="isLoadingPDFs" class="loading-pdfs">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                    <p>جاري تحميل التقارير السابقة...</p>
+                </div>
+
                 <div *ngIf="!isLoadingPDFs && pdfFiles.length === 0" class="no-pdfs">
                     <i class="fas fa-file-pdf fa-3x text-muted"></i>
                     <p>لا توجد تقارير سابقة</p>
@@ -253,7 +272,7 @@
                                         <div class="user-info">
                                             <i class="fas fa-user-circle"></i>
                                             <div class="user-details">
-                                                <strong>{{ pdf.userId.fullname || 'مستخدم غير معروف' }}</strong>
+                                                <strong>{{ getUserDisplayName(pdf) }}</strong>
                                             </div>
                                         </div>
                                     </td>

@@ -906,3 +906,39 @@
 .previous-reports-card {
     animation: fadeIn 0.5s ease-out;
 }
+
+
+.form-control {
+    contain: layout;
+}
+
+select.form-control {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.form-group {
+    overflow: visible;
+}
+
+.card-body {
+    overflow: visible;
+}
+
+.filter-card {
+    overflow: visible;
+}
+
+select.form-control {
+    position: static;
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        position: relative;
+    }
+
+    select.form-control:focus {
+        position: relative;
+    }
+}
