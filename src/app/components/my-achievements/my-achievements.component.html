@@ -254,8 +254,8 @@
                 <div class="info-item">
                   <strong>الوصف:</strong>
                   <div class="description-content mt-2 p-3 bg-light rounded-2 border">
-                    <div [innerHTML]="getCleanDescription(selectedAchievement.activityDescription)"
-                      class="text-muted lh-base description-text modal-description">
+                    <div class="text-muted lh-base description-text modal-description">
+                      {{ getCleanDescription(selectedAchievement.activityDescription) }}
                     </div>
                   </div>
                 </div>

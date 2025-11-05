@@ -3,7 +3,6 @@ import { ActivityService } from 'src/app/service/achievements-service.service';
 import { Activity } from 'src/app/model/achievement';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-drafts',
@@ -18,8 +17,7 @@ export class DraftsComponent implements OnInit {
 
   constructor(
     private activityService: ActivityService,
-    private router: Router,
-    private sanitizer: DomSanitizer
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -44,48 +42,20 @@ export class DraftsComponent implements OnInit {
     }
   }
 
-  getCleanDescription(description: string): SafeHtml {
+  getCleanDescription(description: string): string {
     if (!description) return 'لا يوجد وصف';
 
-    let cleanHtml = description;
-
     if (description.includes('<') && description.includes('>')) {
-      cleanHtml = this.cleanHTMLForDisplay(description);
-    } else {
-      cleanHtml = this.formatPlainText(description);
+      return this.stripHtmlTags(description);
     }
 
-    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+    return description;
   }
 
-  private cleanHTMLForDisplay(html: string): string {
-    if (!html) return '';
-
-    return (
-      html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') 
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') 
-        .replace(/<link[^>]*>/gi, '') 
-        .replace(/<meta[^>]*>/gi, '') 
-        .replace(/<div[^>]*>/g, '<div>') 
-        .replace(/<p[^>]*>/g, '<p>') 
-        .replace(/<br\s*\/?>/gi, '<br>') 
-        .replace(/&nbsp;/g, ' ') 
-        .replace(/\n/g, '<br>')
-        .trim()
-    );
-  }
-
-  private formatPlainText(text: string): string {
-    if (!text) return '';
-
-    return text
-      .split('\n')
-      .map((paragraph) => {
-        const trimmed = paragraph.trim();
-        return trimmed ? `<p class="mb-2">${trimmed}</p>` : '';
-      })
-      .join('');
+  private stripHtmlTags(html: string): string {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
   }
 
   getMainCriteriaName(activity: Activity): string {

@@ -121,8 +121,10 @@ export class AddAchievementComponent implements OnInit {
         this.descriptionEditor &&
         this.originalDraftData.activityDescription
       ) {
-        this.descriptionEditor.nativeElement.innerHTML =
-          this.originalDraftData.activityDescription;
+        const plainText = this.stripHTML(
+          this.originalDraftData.activityDescription
+        );
+        this.descriptionEditor.nativeElement.innerText = plainText;
       }
     }
   }
@@ -197,38 +199,55 @@ export class AddAchievementComponent implements OnInit {
   }
 
   syncDescriptionToForm() {
-    let html = this.descriptionEditor.nativeElement.innerHTML.trim();
-    html = this.cleanHTML(html);
-    const text = html
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/<[^>]*>/g, '')
-      .trim();
+    let plainText = this.descriptionEditor.nativeElement.innerText || '';
 
-    if (text.length < 10) {
+    plainText = this.cleanText(plainText);
+
+    if (plainText.length < 10) {
       this.form.get('activityDescription')?.setErrors({ minlength: true });
-    } else if (text.length > 1000) {
+    } else if (plainText.length > 1000) {
       this.form.get('activityDescription')?.setErrors({ maxlength: true });
     } else {
       this.form.get('activityDescription')?.setErrors(null);
     }
-    this.form.get('activityDescription')?.setValue(html);
+
+    this.form.get('activityDescription')?.setValue(plainText);
     this.form.get('activityDescription')?.markAsTouched();
   }
 
-  private cleanHTML(html: string): string {
-    return html
-      .replace(/ style="[^"]*"/g, '') 
-      .replace(/ class="[^"]*"/g, '') 
-      .replace(/<span[^>]*>/g, '') 
-      .replace(/<\/span>/g, '') 
-      .replace(/<div[^>]*>/g, '<div>') 
-      .replace(/<p[^>]*>/g, '<p>') 
-      .replace(/<b>/g, '<strong>')
-      .replace(/<\/b>/g, '</strong>')
-      .replace(/<i>/g, '<em>')
-      .replace(/<\/i>/g, '</em>')
-      .trim();
+  private cleanText(text: string): string {
+    if (!text) return '';
+
+    return (
+      text
+        .replace(
+          /[\r\n\t\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]+/g,
+          ' '
+        )
+        .replace(/\s+/g, ' ') 
+        .replace(/^\s+/, '') 
+        .replace(/\s+$/, '') 
+        .normalize('NFKC') 
+        .replace(
+          /[^\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0020-\u007E\u00A0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]/g,
+          ''
+        ) 
+        .trim()
+    );
+  }
+
+  private stripHTML(html: string): string {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const text = div.textContent || div.innerText || '';
+    return this.cleanText(text); 
+  }
+
+  getDescriptionLength(): number {
+    const description = this.form.get('activityDescription')?.value;
+    if (!description) return 0;
+    return description.length;
   }
 
   onFilesSelected(ev: Event) {
@@ -248,9 +267,6 @@ export class AddAchievementComponent implements OnInit {
       const sizeMB = f.size / (1024 * 1024);
       const ext = f.name.split('.').pop()?.toLowerCase() || '';
       const allowedImage = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'];
-
-      if (ext === 'pdf') {
-      }
 
       if (!(ext === 'pdf' || allowedImage.includes(ext))) {
         this.showError('نوع ملف غير مدعوم. يُسمح فقط بالصور أو PDF.');
@@ -362,6 +378,7 @@ export class AddAchievementComponent implements OnInit {
 
   private createFormData(status: string, saveStatus: string): FormData {
     const payload = new FormData();
+
     payload.append('activityTitle', this.form.value.activityTitle);
     payload.append('activityDescription', this.form.value.activityDescription);
     payload.append('MainCriteria', this.form.value.MainCriteria);
@@ -433,7 +450,7 @@ export class AddAchievementComponent implements OnInit {
   resetForm() {
     this.form.reset();
     if (this.descriptionEditor) {
-      this.descriptionEditor.nativeElement.innerHTML = '';
+      this.descriptionEditor.nativeElement.innerText = '';
     }
     this.attachments = [];
     this.existingAttachments = [];

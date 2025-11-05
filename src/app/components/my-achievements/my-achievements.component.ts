@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivityService } from '../../service/achievements-service.service';
 import { Activity } from 'src/app/model/achievement';
 import Swal from 'sweetalert2';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-my-achievements',
@@ -24,10 +23,7 @@ export class MyAchievementsComponent implements OnInit {
   isAdmin = false;
   currentUser: any = null;
 
-  constructor(
-    private activityService: ActivityService,
-    private sanitizer: DomSanitizer
-  ) {}
+  constructor(private activityService: ActivityService) {}
 
   ngOnInit(): void {
     this.loadActivities();
@@ -98,59 +94,28 @@ export class MyAchievementsComponent implements OnInit {
     });
   }
 
-  getCleanDescription(description: string): SafeHtml {
+  getCleanDescription(description: string): string {
     if (!description) return 'لا يوجد وصف';
 
-    let cleanHtml = description;
+    // إذا كان الوصف يحتوي على HTML tags، نحوله إلى نص عادي
     if (description.includes('<') && description.includes('>')) {
-      cleanHtml = this.cleanHTMLForDisplay(description);
-    } else {
-      cleanHtml = this.formatPlainText(description);
+      return this.stripHtmlTags(description);
     }
 
-    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+    // إذا كان نص عادي، نعيده كما هو
+    return description;
   }
 
-  private cleanHTMLForDisplay(html: string): string {
-    if (!html) return '';
-
-    return (
-      html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') 
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') 
-        .replace(/<link[^>]*>/gi, '') 
-        .replace(/<meta[^>]*>/gi, '')
-        .replace(/<div[^>]*>/g, '<div>') 
-        .replace(/<p[^>]*>/g, '<p>') 
-        .replace(/<br\s*\/?>/gi, '<br>') 
-        .replace(/&nbsp;/g, ' ') 
-        .replace(/\n/g, '<br>') 
-        .trim()
-    );
-  }
-
-  private formatPlainText(text: string): string {
-    if (!text) return '';
-
-    return text
-      .split('\n')
-      .map((paragraph) => {
-        const trimmed = paragraph.trim();
-        return trimmed ? `<p class="mb-2">${trimmed}</p>` : '';
-      })
-      .join('');
+  private stripHtmlTags(html: string): string {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
   }
 
   getShortDescription(description: string, length: number = 50): string {
     if (!description) return 'لا يوجد وصف';
 
-    const plainText = description
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-
+    const plainText = this.getCleanDescriptionText(description);
     return plainText.length > length
       ? plainText.substring(0, length) + '...'
       : plainText;
@@ -168,7 +133,7 @@ export class MyAchievementsComponent implements OnInit {
             .toLowerCase()
             .includes(term) ||
           a.name?.toLowerCase().includes(term) ||
-          this.getFullName(a.user)?.toLowerCase().includes(term) || 
+          this.getFullName(a.user)?.toLowerCase().includes(term) ||
           this.getUserName(a.user)?.toLowerCase().includes(term)
       );
     }
@@ -182,12 +147,7 @@ export class MyAchievementsComponent implements OnInit {
 
   private getCleanDescriptionText(description: string): string {
     if (!description) return '';
-    return description
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    return this.getCleanDescription(description);
   }
 
   resetFilters(): void {

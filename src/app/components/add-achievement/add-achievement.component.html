@@ -8,7 +8,8 @@
       <div class="add-achievement-content">
 
         <h2 class="mb-1">{{ isEditing ? 'تعديل المسودة' : 'إضافة إنجاز جديد' }}</h2>
-        <p class="text-muted mb-4">{{ isEditing ? 'قم بتعديل بيانات المسودة' : 'قم بتعبئة جميع الحقول المطلوبة لتسجيل الإنجاز' }}</p>
+        <p class="text-muted mb-4">{{ isEditing ? 'قم بتعديل بيانات المسودة' : 'قم بتعبئة جميع الحقول المطلوبة لتسجيل
+          الإنجاز' }}</p>
 
         <form [formGroup]="form" (ngSubmit)="submitForReview()">
           <div class="card p-3 p-md-4 mb-3 shadow-sm border-0">
@@ -57,37 +58,10 @@
             <div class="mb-3">
               <label class="form-label fw-semibold">وصف الإنجاز <span class="text-danger">*</span></label>
 
-              <div class="toolbar mb-2 d-flex flex-wrap gap-1 gap-sm-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('bold')" title="عريض">
-                  <strong>B</strong>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('italic')" title="مائل">
-                  <em>I</em>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('underline')"
-                  title="تسطير">
-                  <u>U</u>
-                </button>
-                <div class="vr d-none d-sm-block"></div>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('justifyRight')"
-                  title="يمين">
-                  <i class="bi bi-text-right"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('justifyCenter')"
-                  title="توسيط">
-                  <i class="bi bi-text-center"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="exec('justifyLeft')"
-                  title="يسار">
-                  <i class="bi bi-text-left"></i>
-                </button>
-              </div>
-
               <div #descriptionEditor class="editor border rounded p-2 p-sm-3" contenteditable="true"
                 (input)="syncDescriptionToForm()"></div>
-              <small class="form-text text-muted mt-1 d-block">يمكنك استخدام شريط الأدوات أعلاه لتنسيق النص</small>
               <div class="text-end text-muted small">
-                {{ form.get('activityDescription')?.value?.length || 0 }}/1000
+                {{ getDescriptionLength() }}/1000
               </div>
               <div class="text-danger mt-1" *ngIf="form.get('activityDescription')?.errors?.['required']">
                 الوصف مطلوب.
@@ -188,7 +162,8 @@
                     [class.disabled]="(attachments.length + existingAttachments.length) >= maxFiles">
                     <i class="bi bi-cloud-arrow-up-fill"></i>
                     <span>
-                      {{ (attachments.length + existingAttachments.length) >= maxFiles ? 'تم الوصول للحد الأقصى' : 'رفع ملف' }}
+                      {{ (attachments.length + existingAttachments.length) >= maxFiles ? 'تم الوصول للحد الأقصى' : 'رفع
+                      ملف' }}
                     </span>
                     <input type="file" (change)="onFilesSelected($event)" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp"
                       multiple hidden [disabled]="(attachments.length + existingAttachments.length) >= maxFiles">

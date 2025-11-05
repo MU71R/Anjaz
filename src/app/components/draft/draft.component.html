@@ -96,8 +96,8 @@
                                         <i class="fa-solid fa-align-left text-primary me-2"></i>
                                         <strong class="text-dark">الوصف : </strong>
                                         <div class="description-content mt-2 p-3 bg-light rounded-2 border">
-                                            <div [innerHTML]="getCleanDescription(activity.activityDescription)"
-                                                class="text-muted lh-base description-text">
+                                            <div class="text-muted lh-base description-text">
+                                                {{ getCleanDescription(activity.activityDescription) }}
                                             </div>
                                         </div>
                                     </div>
