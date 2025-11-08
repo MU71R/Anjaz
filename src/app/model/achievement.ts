@@ -47,7 +47,8 @@ export interface ReportFilter {
   SubCriteria?: string;
   user?: string;
   status?: string;
-  username?: string;       
-  performerName?: string;   
+  username?: string;
+  performerName?: string;
+  reportType?: 'pdf' | 'docx';
 }
   

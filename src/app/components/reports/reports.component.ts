@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {
   ActivityService,
   PDFFile,
+  ReportFilters,
+  ReportGenerationResponse,
 } from '../../service/achievements-service.service';
-import { ReportFilter } from '../../model/achievement';
 import {
   CriteriaService,
   MainCriteria,
@@ -12,19 +13,31 @@ import {
 import { AdministrationService } from '../../service/user.service';
 import Swal from 'sweetalert2';
 
+interface ReportFilter {
+  startDate: string;
+  endDate: string;
+  MainCriteria?: string;
+  SubCriteria?: string;
+  user?: string;
+  status?: string;
+}
+
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent implements OnInit {
-  showFilters: boolean = false;
+  showFilters: boolean = true;
   isLoading = false;
   isLoadingPDFs = false;
   showDateError = false;
   dateRequiredError = false;
   maxDate: string;
   currentDate: string;
+  reportType: 'pdf' | 'docx' = 'pdf';
+  fileTypeFilter: string = 'all';
+  filteredPDFs: PDFFile[] = [];
 
   filters: ReportFilter = {
     startDate: '',
@@ -59,40 +72,6 @@ export class ReportsComponent implements OnInit {
     this.loadFilterData();
     this.loadAllPDFs();
     this.loadUsers();
-  }
-
-  preventDateInput(event: any): void {
-    if (event.type === 'keydown') {
-      event.preventDefault();
-      return;
-    }
-
-    if (event.type === 'paste') {
-      event.preventDefault();
-      return;
-    }
-  }
-
-  onDateInput(event: any, fieldName: string): void {
-    const input = event.target;
-    const value = input.value;
-
-    if (value && !this.isValidDate(value)) {
-      if (fieldName === 'startDate') {
-        input.value = this.filters.startDate;
-      } else {
-        input.value = this.filters.endDate;
-      }
-      this.showError('يرجى استخدام التقويم لاختيار التاريخ');
-    }
-  }
-
-  isValidDate(dateString: string): boolean {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!regex.test(dateString)) return false;
-
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date.getTime());
   }
 
   toggleFilters(): void {
@@ -140,6 +119,7 @@ export class ReportsComponent implements OnInit {
         this.isLoadingPDFs = false;
         if (response.success) {
           this.pdfFiles = response.pdfFiles || [];
+          this.filterPDFs();
         } else {
           this.showError('فشل في تحميل التقارير السابقة');
         }
@@ -150,6 +130,20 @@ export class ReportsComponent implements OnInit {
         this.showError('حدث خطأ أثناء تحميل التقارير السابقة');
       },
     });
+  }
+
+  filterPDFs(): void {
+    if (this.fileTypeFilter === 'all') {
+      this.filteredPDFs = this.pdfFiles;
+    } else {
+      this.filteredPDFs = this.pdfFiles.filter(
+        (pdf) => this.getFileType(pdf) === this.fileTypeFilter
+      );
+    }
+  }
+
+  getFileType(pdf: PDFFile): 'pdf' | 'docx' {
+    return this.activityService.getFileTypeFromFilename(pdf.pdfurl);
   }
 
   onMainCriteriaChange() {
@@ -220,15 +214,32 @@ export class ReportsComponent implements OnInit {
 
     const cleanFilters = this.cleanFiltersBeforeSend();
 
-    this.activityService.generateAllActivitiesPDF(cleanFilters).subscribe({
-      next: (response: any) => {
+    let reportObservable;
+
+    if (this.reportType === 'pdf') {
+      reportObservable =
+        this.activityService.generateAllActivitiesPDF(cleanFilters);
+    } else {
+      reportObservable =
+        this.activityService.generateAllActivitiesDOCX(cleanFilters);
+    }
+
+    reportObservable.subscribe({
+      next: (response: ReportGenerationResponse) => {
         this.isLoading = false;
-        this.generatedReport = response;
+        this.generatedReport = {
+          ...response,
+          fileType: this.reportType,
+        };
 
         if (response.success && response.file) {
           this.currentDate = new Date().toISOString();
 
-          this.showSuccess('تم إنشاء التقرير بنجاح!');
+          this.showSuccess(
+            `تم إنشاء التقرير ${
+              this.reportType === 'pdf' ? 'PDF' : 'DOCX'
+            } بنجاح!`
+          );
           this.loadAllPDFs();
           this.showReportResults = true;
           this.scrollToElement('report-results');
@@ -240,79 +251,92 @@ export class ReportsComponent implements OnInit {
       error: (error: any) => {
         this.isLoading = false;
         console.error('خطأ في إنشاء التقرير:', error);
+
+        let errorMessage = 'حدث خطأ أثناء إنشاء التقرير';
         if (error.error && error.error.message) {
-          this.showError(error.error.message);
+          errorMessage = error.error.message;
         } else if (error.message) {
-          this.showError(error.message);
-        } else {
-          this.showError('حدث خطأ أثناء إنشاء التقرير');
+          errorMessage = error.message;
         }
+
+        this.generatedReport = {
+          success: false,
+          message: errorMessage,
+        };
+        this.showReportResults = true;
+        this.scrollToElement('report-results');
       },
     });
   }
 
   cleanFiltersBeforeSend(): any {
     const cleanedFilters: any = {};
-    Object.keys(this.filters).forEach((key) => {
-      const value = (this.filters as any)[key];
-      if (value && value !== '') {
-        cleanedFilters[key] = value;
-      }
-    });
+
+    cleanedFilters.startDate = this.filters.startDate;
+    cleanedFilters.endDate = this.filters.endDate;
+
+    if (this.filters.MainCriteria)
+      cleanedFilters.MainCriteria = this.filters.MainCriteria;
+    if (this.filters.SubCriteria)
+      cleanedFilters.SubCriteria = this.filters.SubCriteria;
+    if (this.filters.user) cleanedFilters.user = this.filters.user;
+    if (this.filters.status) cleanedFilters.status = this.filters.status;
+
     return cleanedFilters;
   }
 
-  viewPDFReport(fileUrl: string) {
+  viewReport(fileUrl: string, fileType: 'pdf' | 'docx') {
     try {
-      const filename = this.extractFilenameFromUrl(fileUrl);
-      if (filename) {
+      if (fileType === 'pdf') {
+        const filename = this.extractFilenameFromUrl(fileUrl);
         this.activityService.openPDF(filename);
       } else {
         window.open(fileUrl, '_blank');
       }
     } catch (error) {
-      window.open(fileUrl, '_blank');
+      console.error('خطأ في فتح الملف:', error);
+      this.showError('حدث خطأ أثناء فتح الملف');
     }
   }
 
-  downloadPDF(fileUrl: string) {
+  downloadReport(fileUrl: string, fileType: 'pdf' | 'docx') {
     try {
-      const filename = this.extractFilenameFromUrl(fileUrl);
-      if (filename) {
+      if (fileType === 'pdf') {
+        const filename = this.extractFilenameFromUrl(fileUrl);
         this.activityService.downloadPDF(
           filename,
           `تقرير_الأنشطة_${new Date().toISOString().split('T')[0]}.pdf`
         );
       } else {
-        window.open(fileUrl, '_blank');
+        this.activityService.downloadDOCXFromUrl(
+          fileUrl,
+          `تقرير_الأنشطة_${new Date().toISOString().split('T')[0]}.docx`
+        );
       }
     } catch (error) {
-      window.open(fileUrl, '_blank');
+      console.error('خطأ في تحميل الملف:', error);
+      this.showError('حدث خطأ أثناء تحميل الملف');
     }
   }
 
-  openPDF(pdfUrl: string): void {
+  openReport(pdfUrl: string, fileType: 'pdf' | 'docx'): void {
     try {
-      const filename = this.extractFilenameFromUrl(pdfUrl);
-      if (filename) {
+      if (fileType === 'pdf') {
+        const filename = this.extractFilenameFromUrl(pdfUrl);
         this.activityService.openPDF(filename);
       } else {
         window.open(pdfUrl, '_blank');
       }
     } catch (error) {
-      window.open(pdfUrl, '_blank');
+      console.error('خطأ في فتح الملف:', error);
+      this.showError('حدث خطأ أثناء فتح الملف');
     }
   }
 
+  
+
   extractFilenameFromUrl(url: string): string {
-    try {
-      if (!url) return '';
-      const urlParts = url.split('/');
-      const filename = urlParts[urlParts.length - 1];
-      return filename.split('?')[0];
-    } catch (error) {
-      return '';
-    }
+    return this.activityService.extractFilenameFromUrl(url);
   }
 
   formatDate(dateString: string): string {
@@ -347,18 +371,12 @@ export class ReportsComponent implements OnInit {
       user: '',
       status: '',
     };
+    this.reportType = 'pdf';
     this.subCriteriaList = [];
     this.generatedReport = null;
     this.showDateError = false;
     this.dateRequiredError = false;
     this.showSuccess('تم مسح جميع الفلاتر');
-  }
-
-  clearDates() {
-    this.filters.startDate = '';
-    this.filters.endDate = '';
-    this.dateRequiredError = false;
-    this.showDateError = false;
   }
 
   isDateComplete(): boolean {
@@ -391,11 +409,22 @@ export class ReportsComponent implements OnInit {
   }
 
   getCurrentUserName(): string {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        return user.fullname || 'المستخدم الحالي';
+      } catch {
+        return 'المستخدم الحالي';
+      }
+    }
     return 'المستخدم الحالي';
   }
 
   getFilterSummary(): string {
     const parts = [];
+
+    parts.push(`نوع: ${this.reportType === 'pdf' ? 'PDF' : 'DOCX'}`);
 
     if (this.filters.startDate)
       parts.push(`من: ${this.formatDate(this.filters.startDate)}`);
@@ -438,7 +467,6 @@ export class ReportsComponent implements OnInit {
   }
 
   private showSuccess(message: string) {
-    console.log(message);
     Swal.fire({
       title: 'نجح!',
       text: message,
@@ -449,13 +477,22 @@ export class ReportsComponent implements OnInit {
   }
 
   private showError(message: string) {
-    console.error(message);
     Swal.fire({
       title: 'خطأ!',
       text: message,
       icon: 'error',
       confirmButtonText: 'حسناً',
       confirmButtonColor: '#d33',
+    });
+  }
+
+  private showInfo(message: string) {
+    Swal.fire({
+      title: 'معلومة',
+      text: message,
+      icon: 'info',
+      confirmButtonText: 'حسناً',
+      confirmButtonColor: '#3085d6',
     });
   }
 }
