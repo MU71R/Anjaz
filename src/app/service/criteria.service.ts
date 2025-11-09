@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LoginService } from './login.service';
+import { environment } from '../environments/environments.pord';
 
 export interface MainCriteria {
   _id: string;
@@ -67,8 +68,8 @@ export interface AddSubCriteriaRequest {
   providedIn: 'root',
 })
 export class CriteriaService {
-  private apiUrl = 'http://localhost:3000/criteria';
-  private usersUrl = 'http://localhost:3000/users';
+  private apiUrl = `${environment.apiUrl}/criteria`;
+  private usersUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient, private loginService: LoginService) {}
 
